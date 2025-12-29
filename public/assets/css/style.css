@@ -1,0 +1,143 @@
+/**
+ * ZUSÄTZLICHE STYLES FÜR DIE ÖFFENTLICHE AUFGUSSPLAN-ANZEIGE
+ *
+ * Diese Datei enthält CSS-Regeln, die zusätzlich zu Tailwind geladen werden.
+ * Sie enthält spezielle Styles für:
+ * - TV-freundliche Anzeige
+ * - Responsive Design für verschiedene Bildschirmgrößen
+ * - Animierte Aufguss-Karten
+ * - Timer mit Farbcodierung
+ *
+ * Als Anfänger solltest du wissen:
+ * - Tailwind deckt 90% der Styles ab, dies sind nur Spezialfälle
+ * - @media queries machen das Design responsive (verschiedene Bildschirmgrößen)
+ * - CSS-Variablen (--variable) werden von Tailwind verwendet
+ * - Animationen machen die UI lebendig
+ * - Z-index steuert Überlagerungen (höhere Werte = oben)
+ */
+
+/* ============================================================================
+   VOLLBILD-MODUS FÜR TV-ANZEIGE
+   ============================================================================ */
+
+.fullscreen {
+    /* Vollbild-Positionierung */
+    position: fixed;        /* Fixiert auf dem Bildschirm */
+    top: 0;                 /* Oben ansetzen */
+    left: 0;                /* Links ansetzen */
+    width: 100vw;           /* Vollbild-Breite (Viewport Width) */
+    height: 100vh;          /* Vollbild-Höhe (Viewport Height) */
+
+    /* Schwarzer Hintergrund für TV-Modus */
+    background: #000;
+
+    /* Ganz oben liegen (über allen anderen Elementen) */
+    z-index: 9999;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN - VERSCHIEDENE BILDSCHIRMGRÖßEN
+   ============================================================================ */
+
+/* TABLET UND HANDY (max. 768px Breite) */
+@media (max-width: 768px) {
+    .container {
+        /* Weniger Innenabstand auf kleinen Bildschirmen */
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* TV-AUFLÖSUNG (min. 1920px Breite) */
+@media (min-width: 1920px) {
+    .container {
+        /* Größere maximale Breite für TV-Bildschirme */
+        max-width: 1800px;
+    }
+
+    .text-3xl {
+        /* Größere Schrift für TV-Fernsehen */
+        font-size: 3rem;
+    }
+}
+
+/* ============================================================================
+   AUFGUSS-KARTEN STYLING
+   ============================================================================ */
+
+/* NORMALE AUFGUSS-KARTE */
+.aufguss-card {
+    /* Schöner Farbverlauf als Hintergrund */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    /* Weißer Text für guten Kontrast */
+    color: white;
+
+    /* Abgerundete Ecken */
+    border-radius: 12px;
+
+    /* Innenabstand */
+    padding: 1.5rem;
+
+    /* Außenabstand zwischen Karten */
+    margin-bottom: 1rem;
+
+    /* Schatten für Tiefe */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* AKTUELL LAUFENDER AUFGUSS - HERVORGEHOBEN */
+.aufguss-card.current {
+    /* Anderer Farbverlauf (Rosa-Orange) für aktuellen Aufguss */
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+    /* Pulsierende Animation für Aufmerksamkeit */
+    animation: pulse 2s infinite;
+}
+
+/* PULS-ANIMATION für aktuellen Aufguss */
+@keyframes pulse {
+    0%   { transform: scale(1); }      /* Normalgröße */
+    50%  { transform: scale(1.02); }   /* Leicht vergrößert */
+    100% { transform: scale(1); }      /* Zurück zur Normalgröße */
+}
+
+/* ============================================================================
+   TIMER STYLING - COUNTDOWN FÜR LAUFENDEN AUFGUSS
+   ============================================================================ */
+
+/* GRUNDLAGEN für Timer-Anzeige */
+.timer {
+    /* Monospace-Schrift für gleiche Ziffernbreite */
+    font-family: 'Courier New', monospace;
+
+    /* Große, fette Schrift */
+    font-size: 2rem;
+    font-weight: bold;
+
+    /* Zentrierte Ausrichtung */
+    text-align: center;
+}
+
+/* WARNUNG - Unter 5 Minuten verbleibend */
+.timer.warning {
+    color: #ff6b6b;  /* Hellrot für Warnung */
+}
+
+/* GEFAHR - Unter 1 Minute verbleibend */
+.timer.danger {
+    color: #ff4757;  /* Dunkelrot für Gefahr */
+
+    /* Blinkende Animation für Dringlichkeit */
+    animation: blink 1s infinite;
+}
+
+/* BLINK-ANIMATION für kritische Zeit */
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;      /* Sichtbar */
+    }
+    51%, 100% {
+        opacity: 0.3;    /* Halbtransparent */
+    }
+}

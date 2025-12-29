@@ -1,0 +1,53 @@
+# IDE und Editor-Dateien
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-spezifische Dateien
+.DS_Store
+Thumbs.db
+*.log
+
+# Vendor-Verzeichnis (Composer)
+vendor/
+
+# Uploads (sollten nicht versioniert werden)
+public/uploads/*
+
+# Konfiguration (sensible Daten)
+src/config/local.php
+.env
+.env.local
+
+# Cache und temporäre Dateien
+cache/
+tmp/
+logs/*.log
+
+# Datenbank-Dateien
+*.sqlite
+*.db
+
+# Node.js (falls später verwendet)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# PHP Session-Dateien
+session/*
+
+# Backup-Dateien
+*.bak
+*.backup
+*.old
+
+# Test-Dateien
+tests/_output/*
+phpunit.xml
+
+# Build-Verzeichnisse
+build/
+dist/

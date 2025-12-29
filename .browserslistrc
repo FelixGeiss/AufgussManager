@@ -1,0 +1,32 @@
+# Browserslist Konfiguration
+#
+# Diese Datei definiert, welche Browser-Versionen unser CSS und JavaScript
+# unterstützen sollen. Tools wie Autoprefixer verwenden diese Informationen,
+# um zu entscheiden, welche Vendor-Prefixes und Polyfills nötig sind.
+#
+# Als Anfänger solltest du wissen:
+# - Nicht alle Browser unterstützen die gleichen CSS/JS-Features
+# - Ältere Browser brauchen manchmal "Vorläufer-Code" (Polyfills)
+# - Diese Liste balanciert Kompatibilität mit Dateigröße
+
+# Browser mit mehr als 0.5% Marktanteil weltweit unterstützen
+> 0.5%
+
+# Die letzten 2 Versionen jedes Browsers unterstützen
+last 2 versions
+
+# "Tote" Browser (nicht mehr aktualisiert) ausschließen
+not dead
+
+# Spezifische Mindestversionen für wichtige Browser:
+# Chrome ab Version 60 (veröffentlicht ~2017)
+Chrome >= 60
+
+# Firefox ab Version 60 (veröffentlicht ~2018)
+Firefox >= 60
+
+# Safari ab Version 12 (veröffentlicht ~2018)
+Safari >= 12
+
+# Microsoft Edge ab Version 79 (Chromium-basierte Version, ~2020)
+Edge >= 79

@@ -1,0 +1,114 @@
+/**
+ * ADMIN-SPEZIFISCHE CSS-STYLES
+ *
+ * Diese Datei enthält Styles, die nur im Admin-Bereich verwendet werden:
+ * - CSS-Variablen für konsistente Farben
+ * - Benutzerdefinierte Select-Boxen (Dropdown-Menüs)
+ * - Verbesserte Formular-Elemente
+ *
+ * Als Anfänger solltest du wissen:
+ * - :root definiert globale CSS-Variablen
+ * - Select-Elemente sehen in verschiedenen Browsern unterschiedlich aus
+ * - Custom-Styling macht die UI einheitlicher
+ * - SVG-Data-URLs erlauben Icons ohne externe Dateien
+ * - Vendor-Prefixes (-webkit-, -moz-) für Browser-Kompatibilität
+ */
+
+/* ============================================================================
+   CSS-VARIABLEN FÜR KONSISTENTE FARBEN
+   ============================================================================ */
+
+:root {
+    /* Primärfarbe für Buttons und Links */
+    --primary-color: #3b82f6;    /* Tailwind blue-500 */
+
+    /* Rahmenfarbe für Formularelemente */
+    --border-color: #4240a7ab;   /* Blaue Rahmen mit Transparenz */
+}
+
+/* ============================================================================
+   BENUTZERDEFINIERTE SELECT-BOXEN (DROPDOWN-MENÜS)
+   ============================================================================
+ *
+ * Standard-Select-Elemente sehen in verschiedenen Browsern unterschiedlich aus.
+ * Diese Styles machen sie einheitlich und moderner.
+ */
+
+select {
+    /* Standard-Browser-Styling entfernen */
+    appearance: none;           /* Standard-Pfeil verstecken */
+    -webkit-appearance: none;   /* Safari */
+    -moz-appearance: none;      /* Firefox */
+
+    /* CUSTOM-PFEIL als Hintergrundbild */
+    /* SVG-Pfeil (Dreieck nach unten) als Data-URL */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+
+    /* Pfeil-Positionierung */
+    background-repeat: no-repeat;         /* Nicht wiederholen */
+    background-position: right 0.75rem center;  /* Rechts, vertikal zentriert */
+    background-size: 1rem;               /* 16px groß */
+
+    /* Zusätzlicher Platz für den Pfeil */
+    padding-right: 2.5rem;               /* Rechts mehr Platz */
+}
+
+/* ============================================================================
+   OPTION-STYLING INNERHALB VON SELECTS
+   ============================================================================
+ *
+ * Wie die Optionen aussehen, wenn das Dropdown geöffnet ist.
+ * Hat begrenzte Browser-Unterstützung.
+ */
+
+select option {
+    /* Zentrierter Text in Optionen */
+    text-align: center;
+
+    /* Hintergrund und Textfarbe */
+    background-color: white;
+    color: #111827;
+
+    /* Innenabstand für bessere Lesbarkeit */
+    padding: 0.5rem 0.75rem;
+}
+
+/* HOVER-EFFEKT für Optionen (beim Überfahren mit Maus) */
+select option:hover {
+    /* Heller Hintergrund beim Hover */
+    background-color: #f3f4f6;
+}
+
+
+/* ============================================================================
+   LEICHT TRANSPARENTE TABELLENZEILEN
+   ============================================================================ */
+
+
+table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.96);
+}
+
+/* ============================================================================
+   UPLOAD-BEREICHE MIT HOVER/FOCUS-EFFEKT
+   ============================================================================ */
+
+.upload-area {
+    border-color: var(--border-color);
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background-color: #eef2ff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+}
+
+.upload-area:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+}
+
+
+
