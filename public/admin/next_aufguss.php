@@ -21,6 +21,7 @@ $sql = "SELECT
             a.staerke,
             a.aufgieser_name,
             aa_list.aufgieser_namen,
+            aa_list.aufgieser_items,
             a.zeit_anfang,
             a.zeit,
             s.name AS sauna_name,
@@ -31,7 +32,8 @@ $sql = "SELECT
         FROM aufguesse a
         LEFT JOIN (
             SELECT aa.aufguss_id,
-                   GROUP_CONCAT(COALESCE(m2.name, aa.name) ORDER BY aa.id SEPARATOR ", ") as aufgieser_namen
+                   GROUP_CONCAT(COALESCE(m2.name, aa.name) ORDER BY aa.id SEPARATOR ', ') as aufgieser_namen,
+                   GROUP_CONCAT(CONCAT(COALESCE(m2.name, aa.name), '||', IFNULL(m2.bild, '')) ORDER BY aa.id SEPARATOR ';;') as aufgieser_items
             FROM aufguss_aufgieser aa
             LEFT JOIN mitarbeiter m2 ON aa.mitarbeiter_id = m2.id
             GROUP BY aa.aufguss_id
@@ -63,6 +65,7 @@ echo json_encode([
         'name' => $row['name'],
         'staerke' => $row['staerke'],
         'aufgieser_name' => $aufgieser,
+        'aufgieser_items' => $row['aufgieser_items'],
         'sauna_name' => $row['sauna_name'],
         'sauna_bild' => $row['sauna_bild'],
         'mitarbeiter_bild' => $row['mitarbeiter_bild'],

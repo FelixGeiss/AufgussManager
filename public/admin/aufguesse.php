@@ -2217,13 +2217,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function buildNextAufgussHtml(data) {
             const aufgussName = data.name || 'Aufguss';
             const staerke = data.staerke ? `Starke: ${data.staerke}` : 'Starke: -';
-            const aufgieser = data.aufgieser_name || 'Aufgieser: -';
+            const aufgieserRaw = data.aufgieser_name || '-';
+            const aufgieserList = aufgieserRaw
+                .split(',')
+                .map(item => item.trim())
+                .filter(Boolean);
+            const aufgieser = aufgieserList.length > 1 ? aufgieserList.join('<br>') : aufgieserRaw;
             const saunaName = data.sauna_name || 'Sauna: -';
             const duftmittel = data.duftmittel_name || 'Duftmittel: -';
 
-            const mitarbeiterImg = data.mitarbeiter_bild ?
-                `<img src="../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-56 object-cover rounded-lg">` :
-                `<div class="w-full h-56 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgieser-Bild</div>`;
+            const aufgieserItems = (data.aufgieser_items || '')
+                .split(';;')
+                .map(item => item.split('||'))
+                .filter(parts => parts[0] && parts[0].trim() !== '');
+            const aufgieserImages = aufgieserItems.map(parts => {
+                const name = parts[0] ? parts[0].trim() : 'Aufgieser';
+                const bild = parts[1] ? parts[1].trim() : '';
+                const img = bild
+                    ? `<img src="../uploads/${bild}" alt="${name}" class="w-full h-28 object-cover rounded-lg">`
+                    : `<div class="w-full h-28 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">Kein Bild</div>`;
+                return `<div class="flex flex-col gap-1 text-center"><div>${img}</div><div class="text-xs text-gray-600">${name}</div></div>`;
+            });
+
+            const mitarbeiterImg = aufgieserImages.length > 0
+                ? `<div class="grid grid-cols-2 gap-3">${aufgieserImages.join('')}</div>`
+                : (data.mitarbeiter_bild
+                    ? `<img src="../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-56 object-cover rounded-lg">`
+                    : `<div class="w-full h-56 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgieser-Bild</div>`);
 
             const saunaImg = data.sauna_bild ?
                 `<img src="../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-56 object-cover rounded-lg">` :
@@ -2234,9 +2254,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="flex flex-col gap-1">
                         <div class="text-2xl font-bold text-gray-900">${aufgussName}</div>
                         <div class="text-sm text-gray-600">${staerke}</div>
-                        <div class="text-sm text-gray-600">Aufgieser: ${aufgieser}</div>
+                        <div class="text-sm text-gray-600">Aufgieser:<br>${aufgieser}</div>
                         <div class="text-sm text-gray-600">Sauna: ${saunaName}</div>
                         <div class="text-sm text-gray-600">Duftmittel: ${duftmittel}</div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>${mitarbeiterImg}</div>
                         <div>${saunaImg}</div>
