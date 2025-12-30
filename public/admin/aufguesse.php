@@ -127,17 +127,38 @@ if (isset($_SESSION['delete_message'])) {
     unset($_SESSION['delete_error']);
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once __DIR__ . '/../../src/services/aufgussService.php';
-    $service = new AufgussService();
-    $result = $service->verarbeiteFormular($_POST, $_FILES);
+    if (!empty($_POST['form_type']) && $_POST['form_type'] === 'create_plan') {
+        $planName = trim($_POST['plan_name'] ?? '');
+        $planBeschreibung = trim($_POST['plan_beschreibung'] ?? '');
 
-    if ($result['success']) {
-        $message = $result['message'];
-        // Seite neu laden, um die Änderungen anzuzeigen
-        header('Location: ' . $_SERVER['REQUEST_URI']);
-        exit;
+        if ($planName === '') {
+            $errors[] = 'Bitte einen Plannamen eingeben.';
+        } else {
+            try {
+                $aufgussModel->createPlan([
+                    'name' => $planName,
+                    'beschreibung' => $planBeschreibung !== '' ? $planBeschreibung : null
+                ]);
+                $message = 'Plan erfolgreich erstellt!';
+                header('Location: ' . $_SERVER['REQUEST_URI']);
+                exit;
+            } catch (Exception $e) {
+                $errors[] = 'Datenbankfehler: ' . $e->getMessage();
+            }
+        }
     } else {
-        $errors = $result['errors'];
+        require_once __DIR__ . '/../../src/services/aufgussService.php';
+        $service = new AufgussService();
+        $result = $service->verarbeiteFormular($_POST, $_FILES);
+
+        if ($result['success']) {
+            $message = $result['message'];
+            // Seite neu laden, um die ?"nderungen anzuzeigen
+            header('Location: ' . $_SERVER['REQUEST_URI']);
+            exit;
+        } else {
+            $errors = $result['errors'];
+        }
     }
 }
 ?>
@@ -232,6 +253,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </ul>
             </div>
         <?php endif; ?>
+
+
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Neuen Plan erstellen</h2>
+                <form method="POST" class="space-y-4">
+                    <input type="hidden" name="form_type" value="create_plan">
+                    <div>
+                        <label for="plan-name" class="block text-sm font-medium text-gray-900 mb-2 text-center">Planname</label>
+                        <input type="text" id="plan-name" name="plan_name" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Wellness-Tag, Power-Aufguesse" required>
+                    </div>
+                    <div>
+                        <label for="plan-beschreibung" class="block text-sm font-medium text-gray-900 mb-2 text-center">Beschreibung</label>
+                        <textarea id="plan-beschreibung" name="plan_beschreibung" rows="3" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="Kurze Beschreibung fuer den Plan"></textarea>
+                    </div>
+                    <div class="flex justify-center">
+                        <button type="submit" class="rounded-md bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            Plan erstellen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <?php if (empty($plaene)): ?>
             <!-- Keine Pläne vorhanden -->

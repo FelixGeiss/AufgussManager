@@ -629,7 +629,7 @@ class Aufguss {
      * @return array - Array mit allen Plänen
      */
     public function getAllPlans() {
-        $sql = "SELECT * FROM plaene ORDER BY name ASC";
+        $sql = "SELECT * FROM plaene ORDER BY erstellt_am DESC";
         return $this->db->query($sql)->fetchAll();
     }
 
