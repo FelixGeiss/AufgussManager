@@ -64,6 +64,34 @@ file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
 // Alle Aufgüsse laden (für die Aufguss-Tabelle)
 $aufgüsse = $aufgussModel->getAll();
 
+// Hochgeladene Dateien sammeln (Werbung, Bilder, Hintergruende)
+$uploadedFiles = [];
+$addUploadedFile = function ($bereich, $name, $datei, $typ, $extra = []) use (&$uploadedFiles) {
+    if (empty($datei)) {
+        return;
+    }
+    $uploadedFiles[] = array_merge([
+        'bereich' => $bereich,
+        'name' => $name,
+        'datei' => $datei,
+        'typ' => $typ
+    ], $extra);
+};
+
+foreach ($plaene as $plan) {
+    $addUploadedFile('Plan', $plan['name'] ?? '', $plan['hintergrund_bild'] ?? '', 'Hintergrundbild');
+    $adType = ($plan['werbung_media_typ'] ?? '') === 'video' ? 'Werbung (Video)' : 'Werbung (Bild)';
+    $addUploadedFile('Plan', $plan['name'] ?? '', $plan['werbung_media'] ?? '', $adType);
+}
+
+foreach ($saunen as $sauna) {
+    $addUploadedFile('Sauna', $sauna['name'] ?? '', $sauna['bild'] ?? '', 'Sauna-Bild');
+}
+
+foreach ($mitarbeiter as $mitarbeiterItem) {
+    $addUploadedFile('Mitarbeiter', $mitarbeiterItem['name'] ?? '', $mitarbeiterItem['bild'] ?? '', 'Mitarbeiter-Bild');
+}
+
 // Formular-Verarbeitung für neue Aufgüsse
 $message = '';
 $errors = [];
@@ -174,6 +202,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             max-height: 100%;
             object-fit: contain;
         }
+
+        .plan-table-scroll {
+            max-height: 520px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -269,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p class="text-sm">Erstelle Aufgüsse im Dashboard und weise sie diesem Plan zu</p>
                                         </div>
                                     <?php else: ?>
-                                        <div class="overflow-x-auto">
+                                        <div class="overflow-x-auto plan-table-scroll">
                                             <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
                                                 <thead class="bg-white/35">
                                                     <tr>
@@ -1112,6 +1145,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button onclick="showTab('mitarbeiter')" id="tab-mitarbeiter" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                                 Mitarbeiter (<?php echo count($mitarbeiter); ?>)
                             </button>
+                            <button onclick="showTab('dateien')" id="tab-dateien" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                                Dateien (<?php echo count($uploadedFiles); ?>)
+                            </button>
                         </nav>
                     </div>
                 </div>
@@ -1445,6 +1481,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
                                                 </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Dateien Tab -->
+                <div id="content-dateien" class="tab-content hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Vorschau
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Datei
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Typ
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Bereich
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Name
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-transparent divide-y divide-gray-200">
+                                <?php if (empty($uploadedFiles)): ?>
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                            Keine Dateien in der Datenbank gefunden.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($uploadedFiles as $file): ?>
+                                        <tr class="bg-white/5">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <?php
+                                                $isVideo = stripos($file['typ'], 'video') !== false;
+                                                $filePath = '../uploads/' . $file['datei'];
+                                                ?>
+                                                <?php if ($isVideo): ?>
+                                                    <video src="<?php echo htmlspecialchars($filePath); ?>" class="h-12 w-20 object-cover rounded border border-gray-200" muted></video>
+                                                <?php else: ?>
+                                                    <img src="<?php echo htmlspecialchars($filePath); ?>" alt="Datei" class="h-12 w-12 object-cover rounded border border-gray-200">
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars(basename($file['datei'])); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['typ']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['bereich']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['name']); ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
