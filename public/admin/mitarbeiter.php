@@ -51,17 +51,7 @@ require_once __DIR__ . '/../../src/db/connection.php';
     <link rel="stylesheet" href="../dist/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
-            <div>
-                <a href="index.php" class="mr-4 hover:underline">Dashboard</a>
-                <a href="aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
-                <a href="logout.php" class="hover:underline">Logout</a>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-100">    <?php include __DIR__ . '/partials/navbar.php'; ?>
 
     <div class="container mx-auto px-4 py-8">
         <div class="flex justify-between items-center mb-6">
@@ -116,3 +106,4 @@ require_once __DIR__ . '/../../src/db/connection.php';
     <script src="../assets/js/mitarbeiter.js"></script>
 </body>
 </html>
+

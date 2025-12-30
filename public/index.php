@@ -46,10 +46,41 @@ require_once __DIR__ . '/../src/config/config.php';
         html, body {
             overflow: hidden;
         }
+        .kiosk-admin-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: transform 200ms ease, opacity 200ms ease;
+            pointer-events: none;
+        }
+        .kiosk-admin-nav.is-visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 
 <body class="bg-gray-100">
+    <nav id="kiosk-admin-nav" class="kiosk-admin-nav bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
+            <div>
+                <a href="index.php" class="mr-4 hover:underline">Anzeige</a>
+                <a href="admin/index.php" class="mr-4 hover:underline">Dashboard</a>
+                <a href="admin/mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
+                <a href="admin/aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
+                <a href="admin/mitarbeiter.php" class="mr-4 hover:underline">Statistiken</a>
+                <a href="admin/aufguesse.php" class="mr-4 hover:underline">Umfrage</a>
+                <a href="admin/logout.php" class="hover:underline">Logout</a>
+            </div>
+        </div>
+    </nav>
+
     <!-- HAUPTCONTAINER -->
     <div class="w-full p-0">
         <!-- AUFGUSSPLAN-CONTAINER -->
@@ -81,6 +112,23 @@ require_once __DIR__ . '/../src/config/config.php';
             document.addEventListener('mousemove', resetCursor);
             document.addEventListener('keydown', resetCursor);
             resetCursor();
+        })();
+    </script>
+    <script>
+        (function() {
+            const nav = document.getElementById('kiosk-admin-nav');
+            if (!nav) return;
+            let hideTimer = null;
+            const show = () => {
+                nav.classList.add('is-visible');
+                if (hideTimer) clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => nav.classList.remove('is-visible'), 2000);
+            };
+            document.addEventListener('mousemove', (event) => {
+                if (event.clientY <= 30) {
+                    show();
+                }
+            });
         })();
     </script>
 

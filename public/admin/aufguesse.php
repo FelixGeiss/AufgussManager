@@ -177,17 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 
-<body class="bg-gray-100">
-    <nav class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
-            <div>
-                <a href="index.php" class="mr-4 hover:underline">Dashboard</a>
-                <a href="mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
-                <a href="logout.php" class="hover:underline">Logout</a>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-100">    <?php include __DIR__ . '/partials/navbar.php'; ?>
 
 
 
@@ -2862,3 +2852,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
+

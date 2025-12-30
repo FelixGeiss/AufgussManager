@@ -112,22 +112,8 @@ $plaene = $db->query("SELECT id, name FROM plaene ORDER BY name")->fetchAll();
     <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 
-<body class="bg-gray-100">
-    <!-- NAVIGATION -->
-    <nav class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
-            <div>
-                <!-- Links zu anderen Admin-Seiten -->
-                <a href="mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
-                <a href="aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
-                <a href="mitarbeiter.php" class="mr-4 hover:underline">Statistiken</a>
-                <a href="aufguesse.php" class="mr-4 hover:underline">Umfrage</a>
-                <!-- Logout-Link (würde Session beenden) -->
-                <a href="logout.php" class="hover:underline">Logout</a>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-100">    <!-- NAVIGATION -->
+    <?php include __DIR__ . '/partials/navbar.php'; ?>
 
     <div class="container mx-auto px-4 py-8">
         <!-- SEITENTITEL -->
