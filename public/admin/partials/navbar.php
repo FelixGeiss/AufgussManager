@@ -6,7 +6,7 @@
             <a href="../index.php" class="mr-4 hover:underline">Anzeige</a>
             <a href="mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
             <a href="aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
-            <a href="mitarbeiter.php" class="mr-4 hover:underline">Statistiken</a>
+            <a href="statistik.php" class="mr-4 hover:underline">Statistiken</a>
             <a href="aufguesse.php" class="mr-4 hover:underline">Umfrage</a>
             <a href="logout.php" class="hover:underline">Logout</a>
         </div>

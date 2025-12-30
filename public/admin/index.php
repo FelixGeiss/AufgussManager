@@ -152,7 +152,7 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-2">Statistiken</h3>
                 <p class="text-gray-600">Übersicht über Aktivitäten</p>
-                <button class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Anzeigen</button>
+                <a href="statistik.php" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Anzeigen</a>
             </div>
 
             <div class="bg-white rounded-lg shadow-md p-6">
@@ -177,7 +177,7 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
                 <?php else: ?>
                     <div id="plan-list" class="flex flex-wrap gap-4">
                         <?php foreach ($plaene as $p): ?>
-                            <div class="plan-item flex w-full flex-col gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.666rem)]" data-plan-id="<?php echo (int)$p['id']; ?>">
+                            <div class="plan-item flex w-full flex-col gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]" data-plan-id="<?php echo (int)$p['id']; ?>">
                                 <div>
                                     <div class="text-base font-semibold text-gray-900">
                                         <?php echo htmlspecialchars($p['name'] ?? ''); ?>
@@ -185,7 +185,7 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
                                     <div class="text-xs text-gray-500">
                                         <?php echo !empty($p['erstellt_am']) ? htmlspecialchars(date('d.m.Y', strtotime($p['erstellt_am']))) : 'Unbekanntes Datum'; ?>
                                     </div>
-                                    <div class="text-sm text-gray-600 mt-1">
+                                    <div class="text-sm text-gray-600 mt-1 break-words">
                                         <?php echo htmlspecialchars($p['beschreibung'] ?? 'Keine Beschreibung'); ?>
                                     </div>
                                 </div>

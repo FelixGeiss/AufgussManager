@@ -348,7 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php else: ?>
                                         <div class="overflow-x-auto plan-table-scroll">
                                             <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
-                                                <thead class="bg-white/35">
+                                                <thead class="bg-white">
                                                     <tr>
                                                         <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
                                                             Zeit

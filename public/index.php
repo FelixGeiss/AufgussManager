@@ -74,7 +74,7 @@ require_once __DIR__ . '/../src/config/config.php';
                 <a href="admin/index.php" class="mr-4 hover:underline">Dashboard</a>
                 <a href="admin/mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
                 <a href="admin/aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
-                <a href="admin/mitarbeiter.php" class="mr-4 hover:underline">Statistiken</a>
+                <a href="admin/statistik.php" class="mr-4 hover:underline">Statistiken</a>
                 <a href="admin/aufguesse.php" class="mr-4 hover:underline">Umfrage</a>
                 <a href="admin/logout.php" class="hover:underline">Logout</a>
             </div>
