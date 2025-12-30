@@ -43,6 +43,9 @@ require_once __DIR__ . '/../src/config/config.php';
             cursor: none !important;
         }
         /* TODO: Cursor-Ausblendung funktioniert im Kioskmodus noch nicht stabil. */
+        html, body {
+            overflow: hidden;
+        }
     </style>
 </head>
 

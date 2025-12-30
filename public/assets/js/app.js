@@ -318,19 +318,36 @@ function renderPlanView(planId, plaene, aufguesse) {
                 <p class="text-lg font-medium">Noch keine Aufguesse in diesem Plan</p>
             </div>
         `;
+    } else if (hideHeader) {
+        const rows = aufguesse.map(aufguss => renderPlanRowDiv(aufguss)).join('');
+        tableHtml = `
+            <div class="plan-list">
+                <div class="plan-list-head">
+                    <div class="plan-list-cell">Zeit</div>
+                    <div class="plan-list-cell">Aufguss</div>
+                    <div class="plan-list-cell">Staerke</div>
+                    <div class="plan-list-cell">Aufgiesser</div>
+                    <div class="plan-list-cell">Sauna</div>
+                    <div class="plan-list-cell">Duftmittel</div>
+                </div>
+                <div class="plan-list-body">
+                    ${rows}
+                </div>
+            </div>
+        `;
     } else {
         const rows = aufguesse.map(aufguss => renderPlanRow(aufguss)).join('');
         tableHtml = `
             <div class="overflow-x-auto">
                 <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
-                    <thead class="bg-white/80">
+                    <thead class="bg-white plan-table-head">
                         <tr>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Zeit</th>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Aufguss</th>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Staerke</th>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Aufgiesser</th>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Sauna</th>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Duftmittel</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Zeit</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Aufguss</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Staerke</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Aufgiesser</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Sauna</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Duftmittel</th>
                         </tr>
                     </thead>
                     <tbody class="bg-transparent divide-y divide-gray-200">
@@ -506,6 +523,31 @@ function renderPlanRow(aufguss) {
             <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${saunaHtml}</td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${escapeHtml(duftmittel)}</td>
         </tr>
+    `;
+}
+
+function renderPlanRowDiv(aufguss) {
+    const timeText = formatAufgussTime(aufguss);
+    const nameText = aufguss.name || aufguss.aufguss_name || 'Aufguss';
+    const staerke = formatStaerke(aufguss.staerke);
+    const aufgiesserHtml = formatAufgiesserHtml(aufguss);
+    const saunaHtml = formatSaunaHtml(aufguss);
+    const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
+    const startTs = getAufgussStartTimestamp(aufguss);
+
+    return `
+        <div class="plan-list-row" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
+            <div class="plan-list-cell text-lg font-bold text-blue-600">${escapeHtml(timeText)}</div>
+            <div class="plan-list-cell text-sm font-medium text-gray-900">${escapeHtml(nameText)}</div>
+            <div class="plan-list-cell">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${staerke.bgClass} ${staerke.textClass}">
+                    ${escapeHtml(staerke.text)}
+                </span>
+            </div>
+            <div class="plan-list-cell text-sm text-gray-900">${aufgiesserHtml}</div>
+            <div class="plan-list-cell text-sm text-gray-900">${saunaHtml}</div>
+            <div class="plan-list-cell text-sm text-gray-900">${escapeHtml(duftmittel)}</div>
+        </div>
     `;
 }
 
@@ -773,10 +815,9 @@ function updateNextAufgussIndicators() {
 
     if (!shouldShow && !shouldHighlight) {
         clearNextAufgussHighlight();
-        return;
     }
 
-    const rows = Array.from(document.querySelectorAll('tr[data-start-ts]'));
+    const rows = Array.from(document.querySelectorAll('[data-start-ts]'));
     rows.forEach(row => row.classList.remove('next-aufguss-row'));
     const now = Date.now();
 
@@ -793,6 +834,9 @@ function updateNextAufgussIndicators() {
 
     if (nextRow && shouldHighlight) {
         nextRow.classList.add('next-aufguss-row');
+    }
+    if (nextRow) {
+        focusNextRow(nextRow);
     }
 
     if (!shouldShow || !nextRow) return;
@@ -811,8 +855,17 @@ function updateNextAufgussIndicators() {
     }
 }
 
+function focusNextRow(row) {
+    if (!row) return;
+    const rect = row.getBoundingClientRect();
+    const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+    if (rect.bottom > viewHeight || rect.top < 0) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
 function clearNextAufgussHighlight() {
-    document.querySelectorAll('tr[data-start-ts]').forEach(row => row.classList.remove('next-aufguss-row'));
+    document.querySelectorAll('[data-start-ts]').forEach(row => row.classList.remove('next-aufguss-row'));
 }
 
 function getNextAufgussSettings(planId) {
