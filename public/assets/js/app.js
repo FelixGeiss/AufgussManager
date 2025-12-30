@@ -284,6 +284,7 @@ function initPlanChangeListener() {
 
 function renderPlanView(planId, plaene, aufguesse) {
     const container = document.getElementById('aufgussplan');
+    const hideHeader = !!(container && container.dataset && container.dataset.hidePlanHeader === 'true');
     const plan = Array.isArray(plaene)
         ? plaene.find(item => String(item.id) === String(planId))
         : null;
@@ -307,6 +308,8 @@ function renderPlanView(planId, plaene, aufguesse) {
     const adMediaPath = plan.werbung_media ? `uploads/${plan.werbung_media}` : '';
     const adMediaType = plan.werbung_media_typ || '';
 
+    applyPlanBackground(backgroundImage);
+
     let tableHtml = '';
     if (!aufguesse || aufguesse.length === 0) {
         tableHtml = `
@@ -320,14 +323,14 @@ function renderPlanView(planId, plaene, aufguesse) {
         tableHtml = `
             <div class="overflow-x-auto">
                 <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
-                    <thead class="bg-white/35">
+                    <thead class="bg-white/80">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">Zeit</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">Aufguss</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">Staerke</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">Aufgiesser</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">Sauna</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">Duftmittel</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Zeit</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Aufguss</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Staerke</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Aufgiesser</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Sauna</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b">Duftmittel</th>
                         </tr>
                     </thead>
                     <tbody class="bg-transparent divide-y divide-gray-200">
@@ -338,24 +341,49 @@ function renderPlanView(planId, plaene, aufguesse) {
         `;
     }
 
+    const headerHtml = hideHeader
+        ? ''
+        : `
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">${planInitial}</span>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">${escapeHtml(planName)}</h2>
+                        ${planBeschreibung ? `<p class="text-lg text-gray-600 mt-1">${escapeHtml(planBeschreibung)}</p>` : ''}
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500">Erstellt am</div>
+                    <div class="text-sm font-medium text-gray-900">${createdAt}</div>
+                </div>
+            </div>
+        `;
+
+    if (hideHeader) {
+        container.innerHTML = `
+            <div class="relative rounded-lg overflow-hidden">
+                ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
+                <div class="relative">
+                    <div class="plan-table-wrap">
+                        ${tableHtml}
+                    </div>
+                    <div id="plan-ad-wrap" class="plan-ad-wrap${adMediaPath ? '' : ' is-hidden'}">
+                        <div id="plan-ad-media" class="plan-ad-media"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        setupPlanAd(plan, adMediaPath, adMediaType);
+        updateNextAufgussIndicators();
+        return;
+    }
+
     container.innerHTML = `
         <div class="bg-white rounded-lg shadow-md relative">
             <div class="relative p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-4">
-                        <div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">${planInitial}</span>
-                        </div>
-                        <div>
-                            <h2 class="text-3xl font-bold text-gray-900">${escapeHtml(planName)}</h2>
-                            ${planBeschreibung ? `<p class="text-lg text-gray-600 mt-1">${escapeHtml(planBeschreibung)}</p>` : ''}
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm text-gray-500">Erstellt am</div>
-                        <div class="text-sm font-medium text-gray-900">${createdAt}</div>
-                    </div>
-                </div>
+                ${headerHtml}
                 <div class="relative rounded-lg overflow-hidden">
                     ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                     <div class="relative">
@@ -373,6 +401,24 @@ function renderPlanView(planId, plaene, aufguesse) {
 
     setupPlanAd(plan, adMediaPath, adMediaType);
     updateNextAufgussIndicators();
+}
+
+function applyPlanBackground(imagePath) {
+    const body = document.body;
+    if (!body) return;
+    if (imagePath) {
+        body.style.backgroundImage = `url('${imagePath}')`;
+        body.style.backgroundSize = 'cover';
+        body.style.backgroundPosition = 'center';
+        body.style.backgroundRepeat = 'no-repeat';
+        body.style.backgroundAttachment = 'fixed';
+    } else {
+        body.style.backgroundImage = '';
+        body.style.backgroundSize = '';
+        body.style.backgroundPosition = '';
+        body.style.backgroundRepeat = '';
+        body.style.backgroundAttachment = '';
+    }
 }
 
 function setupPlanAd(plan, adMediaPath, adMediaType) {

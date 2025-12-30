@@ -37,14 +37,21 @@ require_once __DIR__ . '/../src/config/config.php';
     <link rel="stylesheet" href="dist/style.css">
     <!-- Zusätzliche Styles für die öffentliche Anzeige -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body.hide-cursor,
+        body.hide-cursor * {
+            cursor: none !important;
+        }
+        /* TODO: Cursor-Ausblendung funktioniert im Kioskmodus noch nicht stabil. */
+    </style>
 </head>
 
 <body class="bg-gray-100">
     <!-- HAUPTCONTAINER -->
-    <div class="w-full px-6 py-8">
+    <div class="w-full p-0">
         <!-- AUFGUSSPLAN-CONTAINER -->
         <!-- Hier wird der dynamische Inhalt über JavaScript geladen -->
-        <div id="aufgussplan" class="bg-white rounded-lg shadow-md p-6">
+        <div id="aufgussplan" class="bg-white rounded-lg shadow-md p-0" data-hide-plan-header="true">
             <!-- Platzhalter für JavaScript-Inhalt -->
             <!-- Wird von app.js mit Daten gefüllt -->
         </div>
@@ -53,6 +60,26 @@ require_once __DIR__ . '/../src/config/config.php';
     <!-- JAVASCRIPT -->
     <!-- Haupt-JavaScript für die öffentliche Anzeige -->
     <script src="assets/js/app.js"></script>
+    <script>
+        (function() {
+            const hideDelay = 2000;
+            let cursorTimer = null;
+
+            function resetCursor() {
+                document.body.classList.remove('hide-cursor');
+                if (cursorTimer) {
+                    clearTimeout(cursorTimer);
+                }
+                cursorTimer = setTimeout(() => {
+                    document.body.classList.add('hide-cursor');
+                }, hideDelay);
+            }
+
+            document.addEventListener('mousemove', resetCursor);
+            document.addEventListener('keydown', resetCursor);
+            resetCursor();
+        })();
+    </script>
 
     <!-- NAECHSTER AUFGUSS POPUP -->
     <div id="next-aufguss-overlay" class="next-aufguss-overlay hidden">
