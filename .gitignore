@@ -51,3 +51,5 @@ phpunit.xml
 # Build-Verzeichnisse
 build/
 dist/
+
+Datenbank/aufgussplan (1).sql
