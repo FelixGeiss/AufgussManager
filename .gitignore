@@ -12,6 +12,8 @@ Thumbs.db
 
 # Vendor-Verzeichnis (Composer)
 vendor/
+!public/assets/vendor/
+!public/assets/vendor/apexcharts.min.js
 
 # Uploads (sollten nicht versioniert werden)
 public/uploads/*

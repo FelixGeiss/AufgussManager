@@ -69,13 +69,13 @@ function renderLineChart(array $items, $strokeClass, array $options = []) {
     $count = count($items);
     $pointWidth = $options['pointWidth'] ?? 48;
     $width = max(320, $count * $pointWidth);
-    $height = 140;
+    $height = 360;
     $paddingLeft = 28;
-    $paddingRight = 10;
+    $paddingRight = 0;
     $paddingY = 14;
     $plotWidth = $width - $paddingLeft - $paddingRight;
     $plotHeight = $height - ($paddingY * 2);
-    $gridLines = 4;
+    $gridLines = 6;
     $showArea = $options['area'] ?? false;
     $fillClass = $options['fillClass'] ?? 'fill-blue-100/70';
 
@@ -113,7 +113,7 @@ function renderLineChart(array $items, $strokeClass, array $options = []) {
     }
 
     echo '<div class="w-full overflow-x-auto">';
-    echo '<svg viewBox="0 0 ' . $width . ' ' . $height . '" class="h-36" style="min-width:' . $width . 'px">';
+    echo '<svg viewBox="0 0 ' . $width . ' ' . $height . '" class="h-96" style="min-width:' . $width . 'px">';
     for ($i = 0; $i <= $gridLines; $i++) {
         $y = $paddingY + ($plotHeight * $i / $gridLines);
         $yPos = number_format($y, 2, '.', '');
@@ -151,6 +151,97 @@ function renderAreaChart(array $items, $strokeClass, $fillClass) {
         'area' => true,
         'fillClass' => $fillClass
     ]);
+}
+
+function renderMultiLineChart(array $series, array $options = []) {
+    if (empty($series)) {
+        echo '<div class="text-sm text-gray-500">Keine Daten vorhanden.</div>';
+        return;
+    }
+
+    $baseKey = $options['baseKey'] ?? '';
+    $pointWidth = $options['pointWidth'] ?? 48;
+    $labels = [];
+    if (!empty($series[0]['items'])) {
+        foreach ($series[0]['items'] as $item) {
+            $labels[] = $item['label'];
+        }
+    }
+    $count = count($labels);
+    $width = max(320, $count * $pointWidth);
+    $height = 140;
+    $paddingLeft = 28;
+    $paddingRight = 10;
+    $paddingY = 14;
+    $plotWidth = $width - $paddingLeft - $paddingRight;
+    $plotHeight = $height - ($paddingY * 2);
+    $gridLines = 4;
+
+    $maxValue = 1;
+    foreach ($series as $set) {
+        foreach ($set['items'] as $item) {
+            $maxValue = max($maxValue, (int)$item['value']);
+        }
+    }
+
+    echo '<div class="w-full overflow-x-auto">';
+    echo '<svg viewBox="0 0 ' . $width . ' ' . $height . '" class="h-36" style="min-width:' . $width . 'px">';
+    for ($i = 0; $i <= $gridLines; $i++) {
+        $y = $paddingY + ($plotHeight * $i / $gridLines);
+        $yPos = number_format($y, 2, '.', '');
+        echo '<line x1="' . $paddingLeft . '" y1="' . $yPos . '" x2="' . ($width - $paddingRight) . '" y2="' . $yPos . '" class="stroke-gray-200" stroke-width="1" />';
+    }
+    echo '<text x="2" y="' . ($paddingY + 6) . '" class="fill-gray-400 text-[10px]">' . $maxValue . '</text>';
+    echo '<text x="2" y="' . ($paddingY + $plotHeight + 4) . '" class="fill-gray-400 text-[10px]">0</text>';
+
+    foreach ($series as $set) {
+        $items = $set['items'] ?? [];
+        $key = $set['key'] ?? '';
+        $strokeClass = $set['strokeClass'] ?? 'stroke-blue-500';
+        $hidden = $key !== $baseKey;
+        $points = [];
+
+        foreach ($items as $index => $item) {
+            $x = $paddingLeft;
+            if ($count > 1) {
+                $x += ($plotWidth * $index) / ($count - 1);
+            }
+            $value = (int)$item['value'];
+            $y = $paddingY + ($plotHeight * (1 - ($value / $maxValue)));
+            $points[] = [
+                'x' => number_format($x, 2, '.', ''),
+                'y' => number_format($y, 2, '.', ''),
+                'label' => $item['label'],
+                'value' => $value
+            ];
+        }
+
+        $polyPoints = [];
+        foreach ($points as $point) {
+            $polyPoints[] = $point['x'] . ',' . $point['y'];
+        }
+
+        $hiddenClass = $hidden ? ' hidden' : '';
+        if (!empty($polyPoints)) {
+            echo '<polyline fill="none" stroke-width="3" class="' . $strokeClass . $hiddenClass . '" data-series="' . htmlspecialchars($key) . '" points="' . implode(' ', $polyPoints) . '"></polyline>';
+        }
+
+        foreach ($points as $point) {
+            $label = htmlspecialchars($point['label']);
+            $value = (int)$point['value'];
+            echo '<circle cx="' . $point['x'] . '" cy="' . $point['y'] . '" r="3.5" class="fill-white stroke-2 ' . $strokeClass . $hiddenClass . '" data-series="' . htmlspecialchars($key) . '"></circle>';
+        $seriesLabel = htmlspecialchars($set['label'] ?? '');
+        echo '<circle cx="' . $point['x'] . '" cy="' . $point['y'] . '" r="10" class="chart-point fill-transparent stroke-transparent' . $hiddenClass . '" data-series="' . htmlspecialchars($key) . '" data-series-label="' . $seriesLabel . '" data-label="' . $label . '" data-value="' . $value . '"></circle>';
+        }
+    }
+
+    echo '</svg>';
+    echo '<div class="mt-3 flex text-xs text-gray-500" style="min-width:' . $width . 'px;padding-left:' . $paddingLeft . 'px;padding-right:' . $paddingRight . 'px">';
+    foreach ($labels as $label) {
+        echo '<span class="flex-1 text-center truncate">' . htmlspecialchars($label) . '</span>';
+    }
+    echo '</div>';
+    echo '</div>';
 }
 
 function renderColumnChart(array $items, $barClass, array $options = []) {
@@ -506,6 +597,9 @@ $periodWeek = "s.datum >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)";
 $periodMonth = "s.datum >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
 $periodYear = "s.datum >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)";
 
+$duftmittelList = $db->query("SELECT id, name FROM duftmittel ORDER BY name ASC")->fetchAll();
+$saunaList = $db->query("SELECT id, name FROM saunen ORDER BY name ASC")->fetchAll();
+
 $duftDayMap = fetchTimeSeriesMap($db, "DATE(datum)", buildStatsWhere($periodDay . " AND s.duftmittel_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
 $duftWeekMap = fetchTimeSeriesMap($db, "YEARWEEK(datum, 3)", buildStatsWhere($periodWeek . " AND s.duftmittel_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
 $duftMonthMap = fetchTimeSeriesMap($db, "DATE_FORMAT(datum, '%Y-%m')", buildStatsWhere($periodMonth . " AND s.duftmittel_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
@@ -572,6 +666,159 @@ $aufgussWeekItems = buildTimeSeriesItems($weekLabels, $weekKeys, $aufgussWeekMap
 $aufgussMonthItems = buildTimeSeriesItems($monthLabels, $monthKeys, $aufgussMonthMap);
 $aufgussYearItems = buildTimeSeriesItems($yearLabels, $yearKeys, $aufgussYearMap);
 
+$duftItemsById = [
+    'day' => [],
+    'week' => [],
+    'month' => [],
+    'year' => []
+];
+$saunaItemsById = [
+    'day' => [],
+    'week' => [],
+    'month' => [],
+    'year' => []
+];
+foreach ($duftmittelList as $duft) {
+    $id = (int)$duft['id'];
+    $duftDayMapId = fetchTimeSeriesMap($db, "DATE(datum)", buildStatsWhere($periodDay . " AND s.duftmittel_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+    $duftWeekMapId = fetchTimeSeriesMap($db, "YEARWEEK(datum, 3)", buildStatsWhere($periodWeek . " AND s.duftmittel_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+    $duftMonthMapId = fetchTimeSeriesMap($db, "DATE_FORMAT(datum, '%Y-%m')", buildStatsWhere($periodMonth . " AND s.duftmittel_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+    $duftYearMapId = fetchTimeSeriesMap($db, "YEAR(datum)", buildStatsWhere("s.duftmittel_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+
+    $duftItemsById['day'][$id] = buildTimeSeriesItems($dayLabels, $dayKeys, $duftDayMapId);
+    $duftItemsById['week'][$id] = buildTimeSeriesItems($weekLabels, $weekKeys, $duftWeekMapId);
+    $duftItemsById['month'][$id] = buildTimeSeriesItems($monthLabels, $monthKeys, $duftMonthMapId);
+    $duftItemsById['year'][$id] = buildTimeSeriesItems($yearLabels, $yearKeys, $duftYearMapId);
+}
+foreach ($saunaList as $sauna) {
+    $id = (int)$sauna['id'];
+    $saunaDayMapId = fetchTimeSeriesMap($db, "DATE(datum)", buildStatsWhere($periodDay . " AND s.sauna_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+    $saunaWeekMapId = fetchTimeSeriesMap($db, "YEARWEEK(datum, 3)", buildStatsWhere($periodWeek . " AND s.sauna_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+    $saunaMonthMapId = fetchTimeSeriesMap($db, "DATE_FORMAT(datum, '%Y-%m')", buildStatsWhere($periodMonth . " AND s.sauna_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+    $saunaYearMapId = fetchTimeSeriesMap($db, "YEAR(datum)", buildStatsWhere("s.sauna_id = " . $id, $planFilterStats['sql']), $planFilterStats['params']);
+
+    $saunaItemsById['day'][$id] = buildTimeSeriesItems($dayLabels, $dayKeys, $saunaDayMapId);
+    $saunaItemsById['week'][$id] = buildTimeSeriesItems($weekLabels, $weekKeys, $saunaWeekMapId);
+    $saunaItemsById['month'][$id] = buildTimeSeriesItems($monthLabels, $monthKeys, $saunaMonthMapId);
+    $saunaItemsById['year'][$id] = buildTimeSeriesItems($yearLabels, $yearKeys, $saunaYearMapId);
+}
+
+$seriesDays = [
+    ['key' => 'base', 'label' => 'Aufguesse gesamt', 'items' => $byDayItems, 'strokeClass' => 'stroke-blue-500'],
+    ['key' => 'aufguss', 'label' => 'Aufguesse', 'items' => $aufgussDayItems, 'strokeClass' => 'stroke-orange-500'],
+];
+foreach ($duftmittelList as $duft) {
+    $seriesDays[] = [
+        'key' => 'duft-' . $duft['id'],
+        'label' => 'Duftmittel: ' . $duft['name'],
+        'items' => $duftItemsById['day'][(int)$duft['id']] ?? [],
+        'strokeClass' => 'stroke-sky-500'
+    ];
+}
+foreach ($saunaList as $sauna) {
+    $seriesDays[] = [
+        'key' => 'sauna-' . $sauna['id'],
+        'label' => 'Sauna: ' . $sauna['name'],
+        'items' => $saunaItemsById['day'][(int)$sauna['id']] ?? [],
+        'strokeClass' => 'stroke-emerald-500'
+    ];
+}
+for ($level = 1; $level <= 6; $level++) {
+    $seriesDays[] = [
+        'key' => 'staerke-' . $level,
+        'label' => 'Staerke ' . $level,
+        'items' => $staerkeDayItemsByLevel[$level],
+        'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
+    ];
+}
+
+$seriesWeeks = [
+    ['key' => 'base', 'label' => 'Aufguesse gesamt', 'items' => $byWeekItems, 'strokeClass' => 'stroke-indigo-500'],
+    ['key' => 'aufguss', 'label' => 'Aufguesse', 'items' => $aufgussWeekItems, 'strokeClass' => 'stroke-orange-600'],
+];
+foreach ($duftmittelList as $duft) {
+    $seriesWeeks[] = [
+        'key' => 'duft-' . $duft['id'],
+        'label' => 'Duftmittel: ' . $duft['name'],
+        'items' => $duftItemsById['week'][(int)$duft['id']] ?? [],
+        'strokeClass' => 'stroke-sky-600'
+    ];
+}
+foreach ($saunaList as $sauna) {
+    $seriesWeeks[] = [
+        'key' => 'sauna-' . $sauna['id'],
+        'label' => 'Sauna: ' . $sauna['name'],
+        'items' => $saunaItemsById['week'][(int)$sauna['id']] ?? [],
+        'strokeClass' => 'stroke-emerald-600'
+    ];
+}
+for ($level = 1; $level <= 6; $level++) {
+    $seriesWeeks[] = [
+        'key' => 'staerke-' . $level,
+        'label' => 'Staerke ' . $level,
+        'items' => $staerkeWeekItemsByLevel[$level],
+        'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
+    ];
+}
+
+$seriesMonths = [
+    ['key' => 'base', 'label' => 'Aufguesse gesamt', 'items' => $byMonthItems, 'strokeClass' => 'stroke-teal-500'],
+    ['key' => 'aufguss', 'label' => 'Aufguesse', 'items' => $aufgussMonthItems, 'strokeClass' => 'stroke-orange-700'],
+];
+foreach ($duftmittelList as $duft) {
+    $seriesMonths[] = [
+        'key' => 'duft-' . $duft['id'],
+        'label' => 'Duftmittel: ' . $duft['name'],
+        'items' => $duftItemsById['month'][(int)$duft['id']] ?? [],
+        'strokeClass' => 'stroke-sky-700'
+    ];
+}
+foreach ($saunaList as $sauna) {
+    $seriesMonths[] = [
+        'key' => 'sauna-' . $sauna['id'],
+        'label' => 'Sauna: ' . $sauna['name'],
+        'items' => $saunaItemsById['month'][(int)$sauna['id']] ?? [],
+        'strokeClass' => 'stroke-emerald-700'
+    ];
+}
+for ($level = 1; $level <= 6; $level++) {
+    $seriesMonths[] = [
+        'key' => 'staerke-' . $level,
+        'label' => 'Staerke ' . $level,
+        'items' => $staerkeMonthItemsByLevel[$level],
+        'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
+    ];
+}
+
+$seriesYears = [
+    ['key' => 'base', 'label' => 'Aufguesse gesamt', 'items' => $byYearItems, 'strokeClass' => 'stroke-emerald-500'],
+    ['key' => 'aufguss', 'label' => 'Aufguesse', 'items' => $aufgussYearItems, 'strokeClass' => 'stroke-orange-800'],
+];
+foreach ($duftmittelList as $duft) {
+    $seriesYears[] = [
+        'key' => 'duft-' . $duft['id'],
+        'label' => 'Duftmittel: ' . $duft['name'],
+        'items' => $duftItemsById['year'][(int)$duft['id']] ?? [],
+        'strokeClass' => 'stroke-sky-800'
+    ];
+}
+foreach ($saunaList as $sauna) {
+    $seriesYears[] = [
+        'key' => 'sauna-' . $sauna['id'],
+        'label' => 'Sauna: ' . $sauna['name'],
+        'items' => $saunaItemsById['year'][(int)$sauna['id']] ?? [],
+        'strokeClass' => 'stroke-emerald-800'
+    ];
+}
+for ($level = 1; $level <= 6; $level++) {
+    $seriesYears[] = [
+        'key' => 'staerke-' . $level,
+        'label' => 'Staerke ' . $level,
+        'items' => $staerkeYearItemsByLevel[$level],
+        'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
+    ];
+}
+
 $datasets = [
     'days' => ['title' => 'Aufguesse pro Tag (7 Tage)', 'items' => $byDayItems],
     'weeks' => ['title' => 'Aufguesse pro Woche (8 Wochen)', 'items' => $byWeekItems],
@@ -619,27 +866,19 @@ $datasets = [
     'staerke_year_6' => ['title' => 'Staerke 6 letztes Jahr', 'items' => $staerkeYearItemsByLevel[6]],
 ];
 
-if (isset($_GET['download'])) {
-    $key = preg_replace('/[^a-z0-9_-]/i', '', $_GET['download']);
-    if (!isset($datasets[$key])) {
-        header('Content-Type: text/plain; charset=utf-8');
-        echo 'Unbekannter Download-Schluessel.';
-        exit;
-    }
-
-    $filename = 'statistik_' . $key . '_' . date('Y-m-d') . '.csv';
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-    header('Pragma: no-cache');
-    header('Expires: 0');
-
-    $output = fopen('php://output', 'w');
-    fputcsv($output, ['Label', 'Wert']);
-    foreach ($datasets[$key]['items'] as $item) {
-        fputcsv($output, [$item['label'], $item['value']]);
-    }
-    fclose($output);
-    exit;
+foreach ($duftmittelList as $duft) {
+    $id = (int)$duft['id'];
+    $datasets['duft_day_' . $id] = ['title' => 'Duftmittel ' . $duft['name'] . ' heute', 'items' => $duftItemsById['day'][$id]];
+    $datasets['duft_week_' . $id] = ['title' => 'Duftmittel ' . $duft['name'] . ' letzte 7 Tage', 'items' => $duftItemsById['week'][$id]];
+    $datasets['duft_month_' . $id] = ['title' => 'Duftmittel ' . $duft['name'] . ' letzter Monat', 'items' => $duftItemsById['month'][$id]];
+    $datasets['duft_year_' . $id] = ['title' => 'Duftmittel ' . $duft['name'] . ' letztes Jahr', 'items' => $duftItemsById['year'][$id]];
+}
+foreach ($saunaList as $sauna) {
+    $id = (int)$sauna['id'];
+    $datasets['sauna_day_' . $id] = ['title' => 'Sauna ' . $sauna['name'] . ' heute', 'items' => $saunaItemsById['day'][$id]];
+    $datasets['sauna_week_' . $id] = ['title' => 'Sauna ' . $sauna['name'] . ' letzte 7 Tage', 'items' => $saunaItemsById['week'][$id]];
+    $datasets['sauna_month_' . $id] = ['title' => 'Sauna ' . $sauna['name'] . ' letzter Monat', 'items' => $saunaItemsById['month'][$id]];
+    $datasets['sauna_year_' . $id] = ['title' => 'Sauna ' . $sauna['name'] . ' letztes Jahr', 'items' => $saunaItemsById['year'][$id]];
 }
 
 function renderDataAccordion($id, $title, array $items) {
@@ -650,9 +889,6 @@ function renderDataAccordion($id, $title, array $items) {
     echo '<span class="text-gray-400 transition" data-accordion-icon="' . htmlspecialchars($panelId) . '">▼</span>';
     echo '</button>';
     echo '<div id="' . htmlspecialchars($panelId) . '" class="absolute left-0 right-0 z-50 mt-0 hidden w-full rounded-lg border border-gray-200 bg-white p-4 shadow-lg">';
-    echo '<div class="flex justify-end">';
-    echo '<a href="statistik.php?download=' . htmlspecialchars($id) . '" class="text-sm text-blue-600 hover:underline">CSV herunterladen</a>';
-    echo '</div>';
     echo '<div class="mt-3 max-h-72 overflow-auto">';
     echo '<table class="min-w-full text-sm">';
     echo '<thead>';
@@ -695,226 +931,60 @@ function renderDataAccordion($id, $title, array $items) {
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex flex-wrap items-center gap-4">
                     <span class="text-sm font-semibold text-gray-700">Zeitreihen anzeigen:</span>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-days" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-days" data-toggle-group="period" aria-pressed="true">
                     Tage
                 </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-weeks" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-weeks" data-toggle-group="period" aria-pressed="false">
                     Wochen
                 </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-months" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-months" data-toggle-group="period" aria-pressed="false">
                     Monate
                 </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-years" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-years" data-toggle-group="period" aria-pressed="false">
                     Jahre
                 </button>
                 </div>
             </div>
         </div>
 
-        <div class="mb-8">
+        <div id="period-days" class="mb-8" data-period="days">
+            <div class="flex items-center gap-4 mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Tage</h3>
+                <div class="flex-1 border-t border-gray-200"></div>
+            </div>
             <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex flex-wrap items-center gap-4">
-                    <span class="text-sm font-semibold text-gray-700">Zusatzcharts:</span>
-                    <button type="button" class="plan-select-btn" data-category-toggle="aufguesse-main" aria-pressed="false">Aufguesse gesamt</button>
-                    <button type="button" class="plan-select-btn" data-category-toggle="duft" aria-pressed="false">Duftmittel</button>
-                    <button type="button" class="plan-select-btn" data-category-toggle="sauna" aria-pressed="false">Sauna</button>
-                    <button type="button" class="plan-select-btn" data-category-toggle="aufguss" aria-pressed="false">Aufguesse</button>
-                    <button type="button" class="plan-select-btn" data-category-toggle="staerke" aria-pressed="false">Staerke</button>
-                </div>
-                <div class="mt-4 flex flex-wrap items-center gap-3" data-strength-controls>
-                    <span class="text-sm font-semibold text-gray-700">Staerke:</span>
-                    <button type="button" class="plan-select-btn" data-strength-toggle="1" aria-pressed="true">1</button>
-                    <button type="button" class="plan-select-btn" data-strength-toggle="2" aria-pressed="false">2</button>
-                    <button type="button" class="plan-select-btn" data-strength-toggle="3" aria-pressed="false">3</button>
-                    <button type="button" class="plan-select-btn" data-strength-toggle="4" aria-pressed="false">4</button>
-                    <button type="button" class="plan-select-btn" data-strength-toggle="5" aria-pressed="false">5</button>
-                    <button type="button" class="plan-select-btn" data-strength-toggle="6" aria-pressed="false">6</button>
-                </div>
+                <div id="apex-chart-days" class="apex-chart"></div>
             </div>
         </div>
 
-        <div id="period-days" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="lg:col-span-2">
-                <div class="flex items-center gap-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Tage</h3>
-                    <div class="flex-1 border-t border-gray-200"></div>
-                </div>
+        <div id="period-weeks" class="mb-8 hidden" data-period="weeks">
+            <div class="flex items-center gap-4 mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Wochen</h3>
+                <div class="flex-1 border-t border-gray-200"></div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse pro Tag (7 Tage)</h3>
-                <?php renderLineChart($byDayItems, 'stroke-blue-500'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('days', $datasets['days']['title'], $datasets['days']['items']); ?>
-                </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div id="apex-chart-weeks" class="apex-chart"></div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
-                <h3 class="text-lg font-semibold mb-4">Duftmittel heute</h3>
-                <?php renderLineChart($duftDayItems, 'stroke-sky-500'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('duft_day', $datasets['duft_day']['title'], $datasets['duft_day']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
-                <h3 class="text-lg font-semibold mb-4">Sauna heute</h3>
-                <?php renderLineChart($saunaDayItems, 'stroke-emerald-500'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('sauna_day', $datasets['sauna_day']['title'], $datasets['sauna_day']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse heute</h3>
-                <?php renderLineChart($aufgussDayItems, 'stroke-orange-500'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('aufguss_day', $datasets['aufguss_day']['title'], $datasets['aufguss_day']['items']); ?>
-                </div>
-            </div>
-            <?php for ($level = 1; $level <= 6; $level++) : ?>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
-                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> heute</h3>
-                <?php renderLineChart($staerkeDayItemsByLevel[$level], 'stroke-slate-600'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('staerke_day_' . $level, $datasets['staerke_day_' . $level]['title'], $datasets['staerke_day_' . $level]['items']); ?>
-                </div>
-            </div>
-            <?php endfor; ?>
         </div>
 
-        <div id="period-weeks" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="lg:col-span-2">
-                <div class="flex items-center gap-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Wochen</h3>
-                    <div class="flex-1 border-t border-gray-200"></div>
-                </div>
+        <div id="period-months" class="mb-8 hidden" data-period="months">
+            <div class="flex items-center gap-4 mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Monate</h3>
+                <div class="flex-1 border-t border-gray-200"></div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse pro Woche (8 Wochen)</h3>
-                <?php renderLineChart($byWeekItems, 'stroke-indigo-500'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('weeks', $datasets['weeks']['title'], $datasets['weeks']['items']); ?>
-                </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div id="apex-chart-months" class="apex-chart"></div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
-                <h3 class="text-lg font-semibold mb-4">Duftmittel letzte 7 Tage</h3>
-                <?php renderLineChart($duftWeekItems, 'stroke-sky-600'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('duft_week', $datasets['duft_week']['title'], $datasets['duft_week']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
-                <h3 class="text-lg font-semibold mb-4">Sauna letzte 7 Tage</h3>
-                <?php renderLineChart($saunaWeekItems, 'stroke-emerald-600'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('sauna_week', $datasets['sauna_week']['title'], $datasets['sauna_week']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse letzte 7 Tage</h3>
-                <?php renderLineChart($aufgussWeekItems, 'stroke-orange-600'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('aufguss_week', $datasets['aufguss_week']['title'], $datasets['aufguss_week']['items']); ?>
-                </div>
-            </div>
-            <?php for ($level = 1; $level <= 6; $level++) : ?>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
-                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> letzte 7 Tage</h3>
-                <?php renderLineChart($staerkeWeekItemsByLevel[$level], 'stroke-slate-600'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('staerke_week_' . $level, $datasets['staerke_week_' . $level]['title'], $datasets['staerke_week_' . $level]['items']); ?>
-                </div>
-            </div>
-            <?php endfor; ?>
         </div>
 
-        <div id="period-months" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="lg:col-span-2">
-                <div class="flex items-center gap-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Monate</h3>
-                    <div class="flex-1 border-t border-gray-200"></div>
-                </div>
+        <div id="period-years" class="mb-8 hidden" data-period="years">
+            <div class="flex items-center gap-4 mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Jahre</h3>
+                <div class="flex-1 border-t border-gray-200"></div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse pro Monat (12 Monate)</h3>
-                <?php renderLineChart($byMonthItems, 'stroke-teal-500'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('months', $datasets['months']['title'], $datasets['months']['items']); ?>
-                </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div id="apex-chart-years" class="apex-chart"></div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
-                <h3 class="text-lg font-semibold mb-4">Duftmittel letzter Monat</h3>
-                <?php renderLineChart($duftMonthItems, 'stroke-sky-700'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('duft_month', $datasets['duft_month']['title'], $datasets['duft_month']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
-                <h3 class="text-lg font-semibold mb-4">Sauna letzter Monat</h3>
-                <?php renderLineChart($saunaMonthItems, 'stroke-emerald-700'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('sauna_month', $datasets['sauna_month']['title'], $datasets['sauna_month']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse letzter Monat</h3>
-                <?php renderLineChart($aufgussMonthItems, 'stroke-orange-700'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('aufguss_month', $datasets['aufguss_month']['title'], $datasets['aufguss_month']['items']); ?>
-                </div>
-            </div>
-            <?php for ($level = 1; $level <= 6; $level++) : ?>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
-                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> letzter Monat</h3>
-                <?php renderLineChart($staerkeMonthItemsByLevel[$level], 'stroke-slate-700'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('staerke_month_' . $level, $datasets['staerke_month_' . $level]['title'], $datasets['staerke_month_' . $level]['items']); ?>
-                </div>
-            </div>
-            <?php endfor; ?>
-        </div>
-
-        <div id="period-years" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="lg:col-span-2">
-                <div class="flex items-center gap-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Jahre</h3>
-                    <div class="flex-1 border-t border-gray-200"></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse pro Jahr</h3>
-                <?php renderLineChart($byYearItems, 'stroke-emerald-500'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('years', $datasets['years']['title'], $datasets['years']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
-                <h3 class="text-lg font-semibold mb-4">Duftmittel letztes Jahr</h3>
-                <?php renderLineChart($duftYearItems, 'stroke-sky-800'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('duft_year', $datasets['duft_year']['title'], $datasets['duft_year']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
-                <h3 class="text-lg font-semibold mb-4">Sauna letztes Jahr</h3>
-                <?php renderLineChart($saunaYearItems, 'stroke-emerald-800'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('sauna_year', $datasets['sauna_year']['title'], $datasets['sauna_year']['items']); ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse letztes Jahr</h3>
-                <?php renderLineChart($aufgussYearItems, 'stroke-orange-800'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('aufguss_year', $datasets['aufguss_year']['title'], $datasets['aufguss_year']['items']); ?>
-                </div>
-            </div>
-            <?php for ($level = 1; $level <= 6; $level++) : ?>
-            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
-                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> letztes Jahr</h3>
-                <?php renderLineChart($staerkeYearItemsByLevel[$level], 'stroke-slate-800'); ?>
-                <div class="mt-4">
-                    <?php renderDataAccordion('staerke_year_' . $level, $datasets['staerke_year_' . $level]['title'], $datasets['staerke_year_' . $level]['items']); ?>
-                </div>
-            </div>
-            <?php endfor; ?>
         </div>
 
         <div class="my-8 border-t border-gray-200"></div>
@@ -980,9 +1050,70 @@ function renderDataAccordion($id, $title, array $items) {
 
     <div id="chart-tooltip" class="fixed z-50 hidden rounded bg-gray-900 text-white text-xs px-2 py-1 shadow pointer-events-none"></div>
 
+    <script src="../assets/vendor/apexcharts.min.js"></script>
     <script>
+        const chartData = <?php echo json_encode([
+            'days' => [
+                'categories' => $dayLabels,
+                'series' => array_map(function ($set) {
+                    return [
+                        'key' => $set['key'],
+                        'name' => $set['label'],
+                        'data' => array_map(function ($item) {
+                            return (int)$item['value'];
+                        }, $set['items'] ?? [])
+                    ];
+                }, $seriesDays)
+            ],
+            'weeks' => [
+                'categories' => $weekLabels,
+                'series' => array_map(function ($set) {
+                    return [
+                        'key' => $set['key'],
+                        'name' => $set['label'],
+                        'data' => array_map(function ($item) {
+                            return (int)$item['value'];
+                        }, $set['items'] ?? [])
+                    ];
+                }, $seriesWeeks)
+            ],
+            'months' => [
+                'categories' => $monthLabels,
+                'series' => array_map(function ($set) {
+                    return [
+                        'key' => $set['key'],
+                        'name' => $set['label'],
+                        'data' => array_map(function ($item) {
+                            return (int)$item['value'];
+                        }, $set['items'] ?? [])
+                    ];
+                }, $seriesMonths)
+            ],
+            'years' => [
+                'categories' => $yearLabels,
+                'series' => array_map(function ($set) {
+                    return [
+                        'key' => $set['key'],
+                        'name' => $set['label'],
+                        'data' => array_map(function ($item) {
+                            return (int)$item['value'];
+                        }, $set['items'] ?? [])
+                    ];
+                }, $seriesYears)
+            ]
+        ], JSON_UNESCAPED_UNICODE); ?>;
+        const datasets = <?php echo json_encode($datasets, JSON_UNESCAPED_UNICODE); ?>;
+        let currentPeriod = 'days';
+        const chartInstances = {};
+        const seriesNameByKey = {};
+        const seriesKeyByName = {};
+        const chartPeriods = Object.keys(chartData).filter((period) => {
+            return document.getElementById(`apex-chart-${period}`);
+        });
+
         document.querySelectorAll('[data-toggle-target]').forEach((button) => {
             const targetId = button.getAttribute('data-toggle-target');
+            const group = button.getAttribute('data-toggle-group');
             const target = document.getElementById(targetId);
             if (!target) return;
 
@@ -993,53 +1124,25 @@ function renderDataAccordion($id, $title, array $items) {
             };
 
             button.addEventListener('click', () => {
-                const isActive = button.getAttribute('aria-pressed') === 'true';
-                button.setAttribute('aria-pressed', isActive ? 'false' : 'true');
-                apply();
-            });
-
-            apply();
-        });
-
-        const categoryButtons = Array.from(document.querySelectorAll('[data-category-toggle]'));
-        const getActiveStrength = () => {
-            const active = document.querySelector('[data-strength-toggle][aria-pressed="true"]');
-            return active ? active.getAttribute('data-strength-toggle') : null;
-        };
-        const isStaerkeEnabled = () => {
-            const staerkeBtn = document.querySelector('[data-category-toggle="staerke"]');
-            return staerkeBtn ? staerkeBtn.getAttribute('aria-pressed') === 'true' : false;
-        };
-
-        const applyStaerkeFilter = () => {
-            const selected = getActiveStrength();
-            const enabled = isStaerkeEnabled();
-            document.querySelectorAll('[data-strength-controls]').forEach((panel) => {
-                panel.classList.toggle('hidden', !enabled);
-            });
-            document.querySelectorAll('[data-category="staerke"]').forEach((panel) => {
-                const strength = panel.getAttribute('data-strength');
-                const isMatch = selected && strength === selected;
-                panel.classList.toggle('hidden', !enabled || !isMatch);
-            });
-        };
-
-        categoryButtons.forEach((button) => {
-            const category = button.getAttribute('data-category-toggle');
-            if (!category) return;
-            const apply = () => {
-                const isActive = button.getAttribute('aria-pressed') === 'true';
-                if (category === 'staerke') {
-                    applyStaerkeFilter();
-                } else {
-                    document.querySelectorAll(`[data-category="${category}"]`).forEach((panel) => {
-                        panel.classList.toggle('hidden', !isActive);
+                if (group) {
+                    document.querySelectorAll(`[data-toggle-group="${group}"]`).forEach((btn) => {
+                        btn.setAttribute('aria-pressed', btn === button ? 'true' : 'false');
+                        const otherTargetId = btn.getAttribute('data-toggle-target');
+                        const otherTarget = otherTargetId ? document.getElementById(otherTargetId) : null;
+                        if (otherTarget) {
+                            const isActive = btn === button;
+                            otherTarget.classList.toggle('hidden', !isActive);
+                            btn.classList.toggle('is-active', isActive);
+                        }
                     });
+                    if (group === 'period') {
+                        const period = target.getAttribute('data-period') || 'days';
+                        currentPeriod = period;
+                        syncTableToChart();
+                    }
+                    return;
                 }
-                button.classList.toggle('is-active', isActive);
-            };
 
-            button.addEventListener('click', () => {
                 const isActive = button.getAttribute('aria-pressed') === 'true';
                 button.setAttribute('aria-pressed', isActive ? 'false' : 'true');
                 apply();
@@ -1048,35 +1151,202 @@ function renderDataAccordion($id, $title, array $items) {
             apply();
         });
 
-        const strengthButtons = Array.from(document.querySelectorAll('[data-strength-toggle]'));
-        if (strengthButtons.length > 0) {
-            const updateStrengthButtons = (selected) => {
-                strengthButtons.forEach((button) => {
-                    const value = button.getAttribute('data-strength-toggle');
-                    const isActive = selected === value;
-                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-                    button.classList.toggle('is-active', isActive);
-                });
-            };
+        let lastSelectedSeries = 'base';
+        const tableSelection = document.getElementById('table-selection');
+        const tableTitle = document.getElementById('table-title');
+        const tableBody = document.getElementById('table-body');
 
-            strengthButtons.forEach((button) => {
-                button.addEventListener('click', () => {
-                    const value = button.getAttribute('data-strength-toggle');
-                    updateStrengthButtons(value);
-                    applyStaerkeFilter();
+        const updateSelectedSeriesFromChart = (period, preferredKey = '') => {
+            const chart = chartInstances[period];
+            if (!chart) return;
+            const globals = chart.w.globals;
+            const hidden = new Set(globals.collapsedSeriesIndices || []);
+            const names = globals.seriesNames || [];
+            let nextKey = '';
+            if (preferredKey) {
+                const preferredName = seriesNameByKey[period] ? seriesNameByKey[period][preferredKey] : '';
+                const preferredIndex = names.indexOf(preferredName);
+                if (preferredIndex >= 0 && !hidden.has(preferredIndex)) {
+                    nextKey = preferredKey;
+                }
+            }
+            if (!nextKey) {
+                for (let i = 0; i < names.length; i++) {
+                    if (hidden.has(i)) continue;
+                    const key = seriesKeyByName[period] ? seriesKeyByName[period][names[i]] : '';
+                    if (key) {
+                        nextKey = key;
+                        break;
+                    }
+                }
+            }
+            lastSelectedSeries = nextKey || 'base';
+            updateTable();
+        };
+
+        const buildChartOptions = (period) => {
+            const data = chartData[period];
+            return {
+                chart: {
+                    type: 'line',
+                    height: 420,
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: false,
+                            zoom: false,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: false
+                        },
+                        export: {
+                            csv: {
+                                filename: `statistik_${period}`,
+                                headerCategory: 'Label',
+                                headerValue: 'Wert'
+                            },
+                            svg: {
+                                filename: `statistik_${period}`
+                            },
+                            png: {
+                                filename: `statistik_${period}`
+                            }
+                        }
+                    },
+                    zoom: { enabled: false },
+                    animations: { enabled: true },
+                    events: {
+                        legendClick: (chartContext, seriesIndex) => {
+                            const names = chartContext.w.globals.seriesNames || [];
+                            const name = names[seriesIndex] || '';
+                            const key = seriesKeyByName[period] ? seriesKeyByName[period][name] : '';
+                            setTimeout(() => {
+                                updateSelectedSeriesFromChart(period, key);
+                            }, 0);
+                        }
+                    }
+                },
+                series: data.series.map((item) => ({ name: item.name, data: item.data })),
+                xaxis: {
+                    categories: data.categories,
+                    labels: { rotate: -35 }
+                },
+                stroke: { width: 3, curve: 'straight' },
+                markers: { size: 3 },
+                dataLabels: { enabled: false },
+                grid: { strokeDashArray: 3 },
+                legend: {
+                    show: true,
+                    position: 'top',
+                    onItemClick: { toggleDataSeries: true }
+                },
+                tooltip: { shared: true, intersect: false }
+            };
+        };
+
+        const initCharts = () => {
+            let readyCount = 0;
+            const total = chartPeriods.length;
+            chartPeriods.forEach((period) => {
+                const container = document.getElementById(`apex-chart-${period}`);
+                const data = chartData[period];
+                if (!container || !data) return;
+                seriesNameByKey[period] = {};
+                seriesKeyByName[period] = {};
+                data.series.forEach((item) => {
+                    seriesNameByKey[period][item.key] = item.name;
+                    seriesKeyByName[period][item.name] = item.key;
+                });
+                const chart = new ApexCharts(container, buildChartOptions(period));
+                chartInstances[period] = chart;
+                chart.render().then(() => {
+                    data.series.forEach((item) => {
+                        if (item.key !== 'base') {
+                            chart.hideSeries(item.name);
+                        }
+                    });
+                    readyCount += 1;
+                    if (readyCount === total) {
+                        updateSelectedSeriesFromChart(currentPeriod, 'base');
+                    }
                 });
             });
+        };
 
-            const initial = strengthButtons.find((btn) => btn.getAttribute('aria-pressed') === 'true');
-            const selected = initial ? initial.getAttribute('data-strength-toggle') : null;
-            updateStrengthButtons(selected);
-            applyStaerkeFilter();
+        const syncTableToChart = () => {
+            updateSelectedSeriesFromChart(currentPeriod, lastSelectedSeries);
+        };
+        initCharts();
+
+        const periodKeyMap = {
+            days: 'day',
+            weeks: 'week',
+            months: 'month',
+            years: 'year'
+        };
+
+        function buildTableKey() {
+            const series = lastSelectedSeries || 'base';
+            const periodKey = periodKeyMap[currentPeriod] || 'day';
+            if (series === 'base') return currentPeriod;
+            if (series.startsWith('duft-')) {
+                const id = series.split('-')[1] || '';
+                return id ? `duft_${periodKey}_${id}` : `duft_${periodKey}`;
+            }
+            if (series.startsWith('sauna-')) {
+                const id = series.split('-')[1] || '';
+                return id ? `sauna_${periodKey}_${id}` : `sauna_${periodKey}`;
+            }
+            if (series === 'aufguss') return `aufguss_${periodKey}`;
+            if (series.startsWith('staerke-')) {
+                const level = series.split('-')[1] || '1';
+                return `staerke_${periodKey}_${level}`;
+            }
+            return currentPeriod;
         }
+
+        function updateTable() {
+            if (!tableBody || !tableTitle) return;
+            const key = buildTableKey();
+            const data = datasets[key];
+            tableTitle.textContent = data && data.title ? data.title : 'Keine Daten';
+            if (tableSelection) {
+                tableSelection.textContent = data && data.title ? data.title : 'Keine Daten';
+            }
+            tableBody.innerHTML = '';
+            const items = data && Array.isArray(data.items) ? data.items : [];
+            if (items.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 2;
+                cell.className = 'py-2 text-gray-500';
+                cell.textContent = 'Keine Daten vorhanden.';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+                return;
+            }
+            items.forEach((item) => {
+                const row = document.createElement('tr');
+                const labelCell = document.createElement('td');
+                labelCell.className = 'py-2 pr-4 text-gray-700';
+                labelCell.textContent = item.label ?? '';
+                const valueCell = document.createElement('td');
+                valueCell.className = 'py-2 text-gray-700';
+                valueCell.textContent = item.value ?? 0;
+                row.appendChild(labelCell);
+                row.appendChild(valueCell);
+                tableBody.appendChild(row);
+            });
+        }
+        syncTableToChart();
 
         const tooltip = document.getElementById('chart-tooltip');
         if (tooltip) {
-            const showTooltip = (event, label, value) => {
-                tooltip.textContent = `${label}: ${value}`;
+            const showTooltip = (event, label, value, seriesLabel) => {
+                const head = seriesLabel ? `${seriesLabel} • ` : '';
+                tooltip.textContent = `${head}${label}: ${value}`;
                 tooltip.classList.remove('hidden');
                 tooltip.style.left = `${event.clientX + 8}px`;
                 tooltip.style.top = `${event.clientY - 8}px`;
@@ -1086,16 +1356,6 @@ function renderDataAccordion($id, $title, array $items) {
                 tooltip.style.left = `${event.clientX + 8}px`;
                 tooltip.style.top = `${event.clientY - 8}px`;
             };
-
-            document.querySelectorAll('.chart-point').forEach((point) => {
-                point.addEventListener('mouseenter', (event) => {
-                    showTooltip(event, point.dataset.label || '-', point.dataset.value || '0');
-                });
-                point.addEventListener('mousemove', moveTooltip);
-                point.addEventListener('mouseleave', () => {
-                    tooltip.classList.add('hidden');
-                });
-            });
 
             document.querySelectorAll('.chart-bar').forEach((bar) => {
                 bar.addEventListener('mouseenter', (event) => {
