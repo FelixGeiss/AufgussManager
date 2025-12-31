@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAufgussplan();
     initPlanChangeListener();
     initNextAufgussTimer();
+    loadStatsLogged();
 
     /**
      * VOLLBILD-MODUS FR TV-ANZEIGE
@@ -73,6 +74,8 @@ let nextAufgussCountdownTarget = null;
 let nextAufgussActive = false;
 let nextAufgussActivePlanId = null;
 let nextAufgussPlanId = null;
+let statsLogged = new Set();
+const statsLoggedStorageKey = 'aufgussplanStatsLogged';
 
 function loadPlans() {
     fetch('api/plaene.php')
@@ -793,6 +796,69 @@ function startTimer(aufguss) {
     // Alle 1000ms (1 Sekunde) aktualisieren
     setInterval(updateTimer, 1000);
 }
+function getAufgussEndTimestamp(aufguss, startTs) {
+    const baseTs = startTs || getAufgussStartTimestamp(aufguss);
+    if (!baseTs) return null;
+    if (aufguss.zeit_ende) {
+        const endTs = buildAufgussTimestamp(aufguss.datum, aufguss.zeit_ende);
+        if (endTs) return endTs;
+    }
+    const minutes = Number(aufguss.dauer) || 15;
+    return baseTs + (minutes * 60000);
+}
+
+function buildAufgussTimestamp(dateValue, timeValue) {
+    if (!timeValue) return null;
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const todayValue = `${today.getFullYear()}-${month}-${day}`;
+    const datePart = dateValue || todayValue;
+    const normalizedTime = timeValue.length === 5 ? `${timeValue}:00` : timeValue;
+    const ts = new Date(`${datePart}T${normalizedTime}`).getTime();
+    return Number.isNaN(ts) ? null : ts;
+}
+
+function getStatsKey(aufguss) {
+    const datum = aufguss.datum || '';
+    return `${aufguss.id}:${datum}`;
+}
+
+function loadStatsLogged() {
+    try {
+        const raw = localStorage.getItem(statsLoggedStorageKey);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return;
+        statsLogged = new Set(parsed);
+    } catch (error) {
+        statsLogged = new Set();
+    }
+}
+
+function saveStatsLogged() {
+    try {
+        localStorage.setItem(statsLoggedStorageKey, JSON.stringify(Array.from(statsLogged)));
+    } catch (error) {
+        // ignore
+    }
+}
+
+function logAufgussCompleted(aufguss) {
+    const key = getStatsKey(aufguss);
+    if (statsLogged.has(key)) return;
+    statsLogged.add(key);
+    saveStatsLogged();
+
+    fetch('api/statistik.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aufguss_id: aufguss.id })
+    }).catch(() => {
+        // ignore logging failures
+    });
+}
+
 
 /**
  * VOLLBILD-MODUS EIN-/AUSSCHALTEN
@@ -849,6 +915,19 @@ function updateNextAufgussIndicators() {
     const rows = Array.from(document.querySelectorAll('[data-start-ts]'));
     rows.forEach(row => row.classList.remove('next-aufguss-row'));
     const now = Date.now();
+
+    rows.forEach(row => {
+        const aufgussId = row.getAttribute('data-aufguss-id');
+        if (!aufgussId) return;
+        const aufguss = aufgussById.get(String(aufgussId));
+        if (!aufguss) return;
+        const startTs = Number(row.getAttribute('data-start-ts') || 0) || getAufgussStartTimestamp(aufguss);
+        const endTs = getAufgussEndTimestamp(aufguss, startTs);
+        if (!startTs || !endTs) return;
+        if (now >= startTs && now <= endTs) {
+            logAufgussCompleted(aufguss);
+        }
+    });
 
     let nextRow = null;
     let nextStart = null;

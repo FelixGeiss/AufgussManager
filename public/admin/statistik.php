@@ -138,7 +138,7 @@ function renderLineChart(array $items, $strokeClass, array $options = []) {
     }
 
     echo '</svg>';
-    echo '<div class="mt-3 flex text-xs text-gray-500" style="min-width:' . $width . 'px">';
+    echo '<div class="mt-3 flex text-xs text-gray-500" style="min-width:' . $width . 'px;padding-left:' . $paddingLeft . 'px;padding-right:' . $paddingRight . 'px">';
     foreach ($items as $item) {
         echo '<span class="flex-1 text-center truncate">' . htmlspecialchars($item['label']) . '</span>';
     }
@@ -216,12 +216,92 @@ function mapCountsByKey(array $rows, $keyField, $valueField) {
     return $map;
 }
 
-function buildPlanFilter(array $selectedPlanIds) {
+function buildPlanFilter(array $selectedPlanIds, $alias = 'a') {
     if (empty($selectedPlanIds)) {
         return ['sql' => '', 'params' => []];
     }
     $placeholders = implode(',', array_fill(0, count($selectedPlanIds), '?'));
-    return ['sql' => 'a.plan_id IN (' . $placeholders . ')', 'params' => $selectedPlanIds];
+    return ['sql' => $alias . '.plan_id IN (' . $placeholders . ')', 'params' => $selectedPlanIds];
+}
+
+function buildStatsWhere($periodCondition, $planFilterSql) {
+    $parts = [];
+    if ($periodCondition) {
+        $parts[] = $periodCondition;
+    }
+    if ($planFilterSql) {
+        $parts[] = $planFilterSql;
+    }
+    return implode(' AND ', $parts);
+}
+
+function fetchStatsItems(PDO $db, $labelExpr, $joinSql, $whereSql, array $params) {
+    $sql = "SELECT " . $labelExpr . " AS label, COALESCE(SUM(s.anzahl), 0) AS cnt
+            FROM statistik s " . $joinSql;
+    if ($whereSql) {
+        $sql .= " WHERE " . $whereSql;
+    }
+    $sql .= " GROUP BY " . $labelExpr . " ORDER BY cnt DESC, label ASC";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+    $items = [];
+    foreach ($rows as $row) {
+        $items[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
+    }
+    return $items;
+}
+
+function fetchStaerkeItems(PDO $db, $whereSql, array $params) {
+    $sql = "SELECT s.staerke, COALESCE(SUM(s.anzahl), 0) AS cnt
+            FROM statistik s";
+    if ($whereSql) {
+        $sql .= " WHERE " . $whereSql;
+    }
+    $sql .= " GROUP BY s.staerke";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+    $map = [];
+    $ohne = 0;
+    foreach ($rows as $row) {
+        if ($row['staerke'] === null) {
+            $ohne = (int)$row['cnt'];
+            continue;
+        }
+        $map[(int)$row['staerke']] = (int)$row['cnt'];
+    }
+    $items = [];
+    for ($s = 1; $s <= 6; $s++) {
+        $items[] = ['label' => 'St ' . $s, 'value' => $map[$s] ?? 0];
+    }
+    if ($ohne > 0) {
+        $items[] = ['label' => 'Ohne Staerke', 'value' => $ohne];
+    }
+    return $items;
+}
+
+function fetchTimeSeriesMap(PDO $db, $labelExpr, $whereSql, array $params) {
+    $sql = "SELECT " . $labelExpr . " AS label, COALESCE(SUM(s.anzahl), 0) AS cnt
+            FROM statistik s";
+    if ($whereSql) {
+        $sql .= " WHERE " . $whereSql;
+    }
+    $sql .= " GROUP BY " . $labelExpr;
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    return mapCountsByKey($stmt->fetchAll(), 'label', 'cnt');
+}
+
+function buildTimeSeriesItems(array $labels, array $keys, array $map) {
+    $counts = [];
+    foreach ($keys as $key) {
+        $counts[] = $map[$key] ?? 0;
+    }
+    return buildBarItems($labels, $counts);
 }
 
 $planRows = $db->query("SELECT id, name FROM plaene ORDER BY name ASC")->fetchAll();
@@ -244,31 +324,35 @@ if (isset($_GET['plans']) && $_GET['plans'] !== '' && $_GET['plans'] !== 'all') 
 }
 
 if (!empty($allPlanIds) && (!empty($selectedPlanIds) && count($selectedPlanIds) < count($allPlanIds))) {
-    $planFilter = buildPlanFilter($selectedPlanIds);
+    $planFilter = buildPlanFilter($selectedPlanIds, 'a');
+    $planFilterStats = buildPlanFilter($selectedPlanIds, 's');
 } else {
     $selectedPlanIds = [];
     $planFilter = buildPlanFilter([]);
+    $planFilterStats = buildPlanFilter([], 's');
 }
 
 // Aufguesse pro Tag (letzte 7 Tage)
 $byDayRows = $db->prepare(
-    "SELECT DATE(datum) AS label, COUNT(*) AS cnt
-     FROM aufguesse a
-     WHERE a.datum >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)"
-     . ($planFilter['sql'] ? " AND " . $planFilter['sql'] : "") . "
+    "SELECT DATE(datum) AS label, COALESCE(SUM(anzahl), 0) AS cnt
+     FROM statistik s
+     WHERE s.datum >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)"
+     . ($planFilterStats['sql'] ? " AND " . $planFilterStats['sql'] : "") . "
      GROUP BY DATE(datum)
      ORDER BY label ASC"
 );
-$byDayRows->execute($planFilter['params']);
+$byDayRows->execute($planFilterStats['params']);
 $byDayMap = mapCountsByKey($byDayRows->fetchAll(), 'label', 'cnt');
 $dayLabels = [];
 $dayCounts = [];
+$dayKeys = [];
 $dayStart = new DateTime('today');
 $dayStart->modify('-6 days');
 for ($i = 0; $i < 7; $i++) {
     $label = $dayStart->format('d.m');
     $key = $dayStart->format('Y-m-d');
     $dayLabels[] = $label;
+    $dayKeys[] = $key;
     $dayCounts[] = $byDayMap[$key] ?? 0;
     $dayStart->modify('+1 day');
 }
@@ -276,22 +360,24 @@ $byDayItems = buildBarItems($dayLabels, $dayCounts);
 
 // Aufguesse pro Woche (letzte 8 Wochen)
 $byWeekRows = $db->prepare(
-    "SELECT YEARWEEK(datum, 3) AS yw, COUNT(*) AS cnt
-     FROM aufguesse a
-     WHERE a.datum >= DATE_SUB(CURDATE(), INTERVAL 7 WEEK)"
-     . ($planFilter['sql'] ? " AND " . $planFilter['sql'] : "") . "
+    "SELECT YEARWEEK(datum, 3) AS yw, COALESCE(SUM(anzahl), 0) AS cnt
+     FROM statistik s
+     WHERE s.datum >= DATE_SUB(CURDATE(), INTERVAL 7 WEEK)"
+     . ($planFilterStats['sql'] ? " AND " . $planFilterStats['sql'] : "") . "
      GROUP BY YEARWEEK(datum, 3)
      ORDER BY yw ASC"
 );
-$byWeekRows->execute($planFilter['params']);
+$byWeekRows->execute($planFilterStats['params']);
 $byWeekMap = mapCountsByKey($byWeekRows->fetchAll(), 'yw', 'cnt');
 $weekLabels = [];
 $weekCounts = [];
+$weekKeys = [];
 $weekStart = new DateTime('monday this week');
 $weekStart->modify('-7 weeks');
 for ($i = 0; $i < 8; $i++) {
     $key = $weekStart->format('oW');
     $weekLabels[] = 'KW ' . $weekStart->format('W');
+    $weekKeys[] = $key;
     $weekCounts[] = $byWeekMap[$key] ?? 0;
     $weekStart->modify('+1 week');
 }
@@ -299,22 +385,24 @@ $byWeekItems = buildBarItems($weekLabels, $weekCounts);
 
 // Aufguesse pro Monat (letzte 12 Monate)
 $byMonthRows = $db->prepare(
-    "SELECT DATE_FORMAT(datum, '%Y-%m') AS ym, COUNT(*) AS cnt
-     FROM aufguesse a
-     WHERE a.datum >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH)"
-     . ($planFilter['sql'] ? " AND " . $planFilter['sql'] : "") . "
+    "SELECT DATE_FORMAT(datum, '%Y-%m') AS ym, COALESCE(SUM(anzahl), 0) AS cnt
+     FROM statistik s
+     WHERE s.datum >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH)"
+     . ($planFilterStats['sql'] ? " AND " . $planFilterStats['sql'] : "") . "
      GROUP BY DATE_FORMAT(datum, '%Y-%m')
      ORDER BY ym ASC"
 );
-$byMonthRows->execute($planFilter['params']);
+$byMonthRows->execute($planFilterStats['params']);
 $byMonthMap = mapCountsByKey($byMonthRows->fetchAll(), 'ym', 'cnt');
 $monthLabels = [];
 $monthCounts = [];
+$monthKeys = [];
 $monthStart = new DateTime('first day of this month');
 $monthStart->modify('-11 months');
 for ($i = 0; $i < 12; $i++) {
     $key = $monthStart->format('Y-m');
     $monthLabels[] = $monthStart->format('m/Y');
+    $monthKeys[] = $key;
     $monthCounts[] = $byMonthMap[$key] ?? 0;
     $monthStart->modify('+1 month');
 }
@@ -322,19 +410,20 @@ $byMonthItems = buildBarItems($monthLabels, $monthCounts);
 
 // Aufguesse pro Jahr
 $byYearRows = $db->prepare(
-    "SELECT YEAR(datum) AS y, COUNT(*) AS cnt
-     FROM aufguesse a"
-     . ($planFilter['sql'] ? " WHERE " . $planFilter['sql'] : "") . "
+    "SELECT YEAR(datum) AS y, COALESCE(SUM(anzahl), 0) AS cnt
+     FROM statistik s"
+     . ($planFilterStats['sql'] ? " WHERE " . $planFilterStats['sql'] : "") . "
      GROUP BY YEAR(datum)
      ORDER BY y ASC"
 );
-$byYearRows->execute($planFilter['params']);
+$byYearRows->execute($planFilterStats['params']);
 $yearLabels = [];
 $yearCounts = [];
 foreach ($byYearRows->fetchAll() as $row) {
     $yearLabels[] = (string)$row['y'];
     $yearCounts[] = (int)$row['cnt'];
 }
+$yearKeys = $yearLabels;
 $byYearItems = buildBarItems($yearLabels, $yearCounts);
 
 // Wie oft welcher Aufguss
@@ -411,6 +500,78 @@ if ($ohneStaerkeCount > 0) {
     $staerkeItems[] = ['label' => 'Ohne Staerke', 'value' => $ohneStaerkeCount];
 }
 
+// Statistik nach Zeitraum (aus statistik-Tabelle)
+$periodDay = "s.datum = CURDATE()";
+$periodWeek = "s.datum >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)";
+$periodMonth = "s.datum >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
+$periodYear = "s.datum >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)";
+
+$duftDayMap = fetchTimeSeriesMap($db, "DATE(datum)", buildStatsWhere($periodDay . " AND s.duftmittel_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$duftWeekMap = fetchTimeSeriesMap($db, "YEARWEEK(datum, 3)", buildStatsWhere($periodWeek . " AND s.duftmittel_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$duftMonthMap = fetchTimeSeriesMap($db, "DATE_FORMAT(datum, '%Y-%m')", buildStatsWhere($periodMonth . " AND s.duftmittel_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$duftYearMap = fetchTimeSeriesMap($db, "YEAR(datum)", buildStatsWhere("s.duftmittel_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+
+$saunaDayMap = fetchTimeSeriesMap($db, "DATE(datum)", buildStatsWhere($periodDay . " AND s.sauna_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$saunaWeekMap = fetchTimeSeriesMap($db, "YEARWEEK(datum, 3)", buildStatsWhere($periodWeek . " AND s.sauna_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$saunaMonthMap = fetchTimeSeriesMap($db, "DATE_FORMAT(datum, '%Y-%m')", buildStatsWhere($periodMonth . " AND s.sauna_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$saunaYearMap = fetchTimeSeriesMap($db, "YEAR(datum)", buildStatsWhere("s.sauna_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+
+$aufgussDayMap = fetchTimeSeriesMap($db, "DATE(datum)", buildStatsWhere($periodDay . " AND s.aufguss_name_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$aufgussWeekMap = fetchTimeSeriesMap($db, "YEARWEEK(datum, 3)", buildStatsWhere($periodWeek . " AND s.aufguss_name_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$aufgussMonthMap = fetchTimeSeriesMap($db, "DATE_FORMAT(datum, '%Y-%m')", buildStatsWhere($periodMonth . " AND s.aufguss_name_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+$aufgussYearMap = fetchTimeSeriesMap($db, "YEAR(datum)", buildStatsWhere("s.aufguss_name_id IS NOT NULL", $planFilterStats['sql']), $planFilterStats['params']);
+
+$staerkeDayItemsByLevel = [];
+$staerkeWeekItemsByLevel = [];
+$staerkeMonthItemsByLevel = [];
+$staerkeYearItemsByLevel = [];
+for ($level = 1; $level <= 6; $level++) {
+    $staerkeDayMap = fetchTimeSeriesMap(
+        $db,
+        "DATE(datum)",
+        buildStatsWhere($periodDay . " AND s.staerke = " . $level, $planFilterStats['sql']),
+        $planFilterStats['params']
+    );
+    $staerkeWeekMap = fetchTimeSeriesMap(
+        $db,
+        "YEARWEEK(datum, 3)",
+        buildStatsWhere($periodWeek . " AND s.staerke = " . $level, $planFilterStats['sql']),
+        $planFilterStats['params']
+    );
+    $staerkeMonthMap = fetchTimeSeriesMap(
+        $db,
+        "DATE_FORMAT(datum, '%Y-%m')",
+        buildStatsWhere($periodMonth . " AND s.staerke = " . $level, $planFilterStats['sql']),
+        $planFilterStats['params']
+    );
+    $staerkeYearMap = fetchTimeSeriesMap(
+        $db,
+        "YEAR(datum)",
+        buildStatsWhere("s.staerke = " . $level, $planFilterStats['sql']),
+        $planFilterStats['params']
+    );
+
+    $staerkeDayItemsByLevel[$level] = buildTimeSeriesItems($dayLabels, $dayKeys, $staerkeDayMap);
+    $staerkeWeekItemsByLevel[$level] = buildTimeSeriesItems($weekLabels, $weekKeys, $staerkeWeekMap);
+    $staerkeMonthItemsByLevel[$level] = buildTimeSeriesItems($monthLabels, $monthKeys, $staerkeMonthMap);
+    $staerkeYearItemsByLevel[$level] = buildTimeSeriesItems($yearLabels, $yearKeys, $staerkeYearMap);
+}
+
+$duftDayItems = buildTimeSeriesItems($dayLabels, $dayKeys, $duftDayMap);
+$duftWeekItems = buildTimeSeriesItems($weekLabels, $weekKeys, $duftWeekMap);
+$duftMonthItems = buildTimeSeriesItems($monthLabels, $monthKeys, $duftMonthMap);
+$duftYearItems = buildTimeSeriesItems($yearLabels, $yearKeys, $duftYearMap);
+
+$saunaDayItems = buildTimeSeriesItems($dayLabels, $dayKeys, $saunaDayMap);
+$saunaWeekItems = buildTimeSeriesItems($weekLabels, $weekKeys, $saunaWeekMap);
+$saunaMonthItems = buildTimeSeriesItems($monthLabels, $monthKeys, $saunaMonthMap);
+$saunaYearItems = buildTimeSeriesItems($yearLabels, $yearKeys, $saunaYearMap);
+
+$aufgussDayItems = buildTimeSeriesItems($dayLabels, $dayKeys, $aufgussDayMap);
+$aufgussWeekItems = buildTimeSeriesItems($weekLabels, $weekKeys, $aufgussWeekMap);
+$aufgussMonthItems = buildTimeSeriesItems($monthLabels, $monthKeys, $aufgussMonthMap);
+$aufgussYearItems = buildTimeSeriesItems($yearLabels, $yearKeys, $aufgussYearMap);
+
 $datasets = [
     'days' => ['title' => 'Aufguesse pro Tag (7 Tage)', 'items' => $byDayItems],
     'weeks' => ['title' => 'Aufguesse pro Woche (8 Wochen)', 'items' => $byWeekItems],
@@ -420,6 +581,42 @@ $datasets = [
     'aufguss' => ['title' => 'Wie oft welcher Aufguss', 'items' => $aufgussNameItems],
     'duftmittel' => ['title' => 'Wie oft Duftmittel verwendet', 'items' => $duftmittelItems],
     'sauna' => ['title' => 'Wie oft welche Sauna', 'items' => $saunaItems],
+    'duft_day' => ['title' => 'Duftmittel heute', 'items' => $duftDayItems],
+    'duft_week' => ['title' => 'Duftmittel letzte 7 Tage', 'items' => $duftWeekItems],
+    'duft_month' => ['title' => 'Duftmittel letzter Monat', 'items' => $duftMonthItems],
+    'duft_year' => ['title' => 'Duftmittel letztes Jahr', 'items' => $duftYearItems],
+    'sauna_day' => ['title' => 'Sauna heute', 'items' => $saunaDayItems],
+    'sauna_week' => ['title' => 'Sauna letzte 7 Tage', 'items' => $saunaWeekItems],
+    'sauna_month' => ['title' => 'Sauna letzter Monat', 'items' => $saunaMonthItems],
+    'sauna_year' => ['title' => 'Sauna letztes Jahr', 'items' => $saunaYearItems],
+    'aufguss_day' => ['title' => 'Aufguesse heute', 'items' => $aufgussDayItems],
+    'aufguss_week' => ['title' => 'Aufguesse letzte 7 Tage', 'items' => $aufgussWeekItems],
+    'aufguss_month' => ['title' => 'Aufguesse letzter Monat', 'items' => $aufgussMonthItems],
+    'aufguss_year' => ['title' => 'Aufguesse letztes Jahr', 'items' => $aufgussYearItems],
+    'staerke_day_1' => ['title' => 'Staerke 1 heute', 'items' => $staerkeDayItemsByLevel[1]],
+    'staerke_day_2' => ['title' => 'Staerke 2 heute', 'items' => $staerkeDayItemsByLevel[2]],
+    'staerke_day_3' => ['title' => 'Staerke 3 heute', 'items' => $staerkeDayItemsByLevel[3]],
+    'staerke_day_4' => ['title' => 'Staerke 4 heute', 'items' => $staerkeDayItemsByLevel[4]],
+    'staerke_day_5' => ['title' => 'Staerke 5 heute', 'items' => $staerkeDayItemsByLevel[5]],
+    'staerke_day_6' => ['title' => 'Staerke 6 heute', 'items' => $staerkeDayItemsByLevel[6]],
+    'staerke_week_1' => ['title' => 'Staerke 1 letzte 7 Tage', 'items' => $staerkeWeekItemsByLevel[1]],
+    'staerke_week_2' => ['title' => 'Staerke 2 letzte 7 Tage', 'items' => $staerkeWeekItemsByLevel[2]],
+    'staerke_week_3' => ['title' => 'Staerke 3 letzte 7 Tage', 'items' => $staerkeWeekItemsByLevel[3]],
+    'staerke_week_4' => ['title' => 'Staerke 4 letzte 7 Tage', 'items' => $staerkeWeekItemsByLevel[4]],
+    'staerke_week_5' => ['title' => 'Staerke 5 letzte 7 Tage', 'items' => $staerkeWeekItemsByLevel[5]],
+    'staerke_week_6' => ['title' => 'Staerke 6 letzte 7 Tage', 'items' => $staerkeWeekItemsByLevel[6]],
+    'staerke_month_1' => ['title' => 'Staerke 1 letzter Monat', 'items' => $staerkeMonthItemsByLevel[1]],
+    'staerke_month_2' => ['title' => 'Staerke 2 letzter Monat', 'items' => $staerkeMonthItemsByLevel[2]],
+    'staerke_month_3' => ['title' => 'Staerke 3 letzter Monat', 'items' => $staerkeMonthItemsByLevel[3]],
+    'staerke_month_4' => ['title' => 'Staerke 4 letzter Monat', 'items' => $staerkeMonthItemsByLevel[4]],
+    'staerke_month_5' => ['title' => 'Staerke 5 letzter Monat', 'items' => $staerkeMonthItemsByLevel[5]],
+    'staerke_month_6' => ['title' => 'Staerke 6 letzter Monat', 'items' => $staerkeMonthItemsByLevel[6]],
+    'staerke_year_1' => ['title' => 'Staerke 1 letztes Jahr', 'items' => $staerkeYearItemsByLevel[1]],
+    'staerke_year_2' => ['title' => 'Staerke 2 letztes Jahr', 'items' => $staerkeYearItemsByLevel[2]],
+    'staerke_year_3' => ['title' => 'Staerke 3 letztes Jahr', 'items' => $staerkeYearItemsByLevel[3]],
+    'staerke_year_4' => ['title' => 'Staerke 4 letztes Jahr', 'items' => $staerkeYearItemsByLevel[4]],
+    'staerke_year_5' => ['title' => 'Staerke 5 letztes Jahr', 'items' => $staerkeYearItemsByLevel[5]],
+    'staerke_year_6' => ['title' => 'Staerke 6 letztes Jahr', 'items' => $staerkeYearItemsByLevel[6]],
 ];
 
 if (isset($_GET['download'])) {
@@ -498,51 +695,226 @@ function renderDataAccordion($id, $title, array $items) {
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex flex-wrap items-center gap-4">
                     <span class="text-sm font-semibold text-gray-700">Zeitreihen anzeigen:</span>
-                <button type="button" class="plan-select-btn" data-toggle-target="chart-days" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-days" aria-pressed="true">
                     Tage
                 </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="chart-weeks" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-weeks" aria-pressed="true">
                     Wochen
                 </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="chart-months" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-months" aria-pressed="true">
                     Monate
                 </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="chart-years" aria-pressed="true">
+                <button type="button" class="plan-select-btn" data-toggle-target="period-years" aria-pressed="true">
                     Jahre
                 </button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div id="chart-days" class="bg-white rounded-lg shadow-md p-6">
+        <div class="mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <span class="text-sm font-semibold text-gray-700">Zusatzcharts:</span>
+                    <button type="button" class="plan-select-btn" data-category-toggle="aufguesse-main" aria-pressed="false">Aufguesse gesamt</button>
+                    <button type="button" class="plan-select-btn" data-category-toggle="duft" aria-pressed="false">Duftmittel</button>
+                    <button type="button" class="plan-select-btn" data-category-toggle="sauna" aria-pressed="false">Sauna</button>
+                    <button type="button" class="plan-select-btn" data-category-toggle="aufguss" aria-pressed="false">Aufguesse</button>
+                    <button type="button" class="plan-select-btn" data-category-toggle="staerke" aria-pressed="false">Staerke</button>
+                </div>
+                <div class="mt-4 flex flex-wrap items-center gap-3" data-strength-controls>
+                    <span class="text-sm font-semibold text-gray-700">Staerke:</span>
+                    <button type="button" class="plan-select-btn" data-strength-toggle="1" aria-pressed="true">1</button>
+                    <button type="button" class="plan-select-btn" data-strength-toggle="2" aria-pressed="false">2</button>
+                    <button type="button" class="plan-select-btn" data-strength-toggle="3" aria-pressed="false">3</button>
+                    <button type="button" class="plan-select-btn" data-strength-toggle="4" aria-pressed="false">4</button>
+                    <button type="button" class="plan-select-btn" data-strength-toggle="5" aria-pressed="false">5</button>
+                    <button type="button" class="plan-select-btn" data-strength-toggle="6" aria-pressed="false">6</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="period-days" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="lg:col-span-2">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Tage</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
                 <h3 class="text-lg font-semibold mb-4">Aufguesse pro Tag (7 Tage)</h3>
                 <?php renderLineChart($byDayItems, 'stroke-blue-500'); ?>
                 <div class="mt-4">
                     <?php renderDataAccordion('days', $datasets['days']['title'], $datasets['days']['items']); ?>
                 </div>
             </div>
-            <div id="chart-weeks" class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
+                <h3 class="text-lg font-semibold mb-4">Duftmittel heute</h3>
+                <?php renderLineChart($duftDayItems, 'stroke-sky-500'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('duft_day', $datasets['duft_day']['title'], $datasets['duft_day']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
+                <h3 class="text-lg font-semibold mb-4">Sauna heute</h3>
+                <?php renderLineChart($saunaDayItems, 'stroke-emerald-500'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('sauna_day', $datasets['sauna_day']['title'], $datasets['sauna_day']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
+                <h3 class="text-lg font-semibold mb-4">Aufguesse heute</h3>
+                <?php renderLineChart($aufgussDayItems, 'stroke-orange-500'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('aufguss_day', $datasets['aufguss_day']['title'], $datasets['aufguss_day']['items']); ?>
+                </div>
+            </div>
+            <?php for ($level = 1; $level <= 6; $level++) : ?>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
+                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> heute</h3>
+                <?php renderLineChart($staerkeDayItemsByLevel[$level], 'stroke-slate-600'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('staerke_day_' . $level, $datasets['staerke_day_' . $level]['title'], $datasets['staerke_day_' . $level]['items']); ?>
+                </div>
+            </div>
+            <?php endfor; ?>
+        </div>
+
+        <div id="period-weeks" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="lg:col-span-2">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Wochen</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
                 <h3 class="text-lg font-semibold mb-4">Aufguesse pro Woche (8 Wochen)</h3>
                 <?php renderLineChart($byWeekItems, 'stroke-indigo-500'); ?>
                 <div class="mt-4">
                     <?php renderDataAccordion('weeks', $datasets['weeks']['title'], $datasets['weeks']['items']); ?>
                 </div>
             </div>
-            <div id="chart-months" class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
+                <h3 class="text-lg font-semibold mb-4">Duftmittel letzte 7 Tage</h3>
+                <?php renderLineChart($duftWeekItems, 'stroke-sky-600'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('duft_week', $datasets['duft_week']['title'], $datasets['duft_week']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
+                <h3 class="text-lg font-semibold mb-4">Sauna letzte 7 Tage</h3>
+                <?php renderLineChart($saunaWeekItems, 'stroke-emerald-600'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('sauna_week', $datasets['sauna_week']['title'], $datasets['sauna_week']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
+                <h3 class="text-lg font-semibold mb-4">Aufguesse letzte 7 Tage</h3>
+                <?php renderLineChart($aufgussWeekItems, 'stroke-orange-600'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('aufguss_week', $datasets['aufguss_week']['title'], $datasets['aufguss_week']['items']); ?>
+                </div>
+            </div>
+            <?php for ($level = 1; $level <= 6; $level++) : ?>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
+                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> letzte 7 Tage</h3>
+                <?php renderLineChart($staerkeWeekItemsByLevel[$level], 'stroke-slate-600'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('staerke_week_' . $level, $datasets['staerke_week_' . $level]['title'], $datasets['staerke_week_' . $level]['items']); ?>
+                </div>
+            </div>
+            <?php endfor; ?>
+        </div>
+
+        <div id="period-months" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="lg:col-span-2">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Monate</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
                 <h3 class="text-lg font-semibold mb-4">Aufguesse pro Monat (12 Monate)</h3>
                 <?php renderLineChart($byMonthItems, 'stroke-teal-500'); ?>
                 <div class="mt-4">
                     <?php renderDataAccordion('months', $datasets['months']['title'], $datasets['months']['items']); ?>
                 </div>
             </div>
-            <div id="chart-years" class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
+                <h3 class="text-lg font-semibold mb-4">Duftmittel letzter Monat</h3>
+                <?php renderLineChart($duftMonthItems, 'stroke-sky-700'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('duft_month', $datasets['duft_month']['title'], $datasets['duft_month']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
+                <h3 class="text-lg font-semibold mb-4">Sauna letzter Monat</h3>
+                <?php renderLineChart($saunaMonthItems, 'stroke-emerald-700'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('sauna_month', $datasets['sauna_month']['title'], $datasets['sauna_month']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
+                <h3 class="text-lg font-semibold mb-4">Aufguesse letzter Monat</h3>
+                <?php renderLineChart($aufgussMonthItems, 'stroke-orange-700'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('aufguss_month', $datasets['aufguss_month']['title'], $datasets['aufguss_month']['items']); ?>
+                </div>
+            </div>
+            <?php for ($level = 1; $level <= 6; $level++) : ?>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
+                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> letzter Monat</h3>
+                <?php renderLineChart($staerkeMonthItemsByLevel[$level], 'stroke-slate-700'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('staerke_month_' . $level, $datasets['staerke_month_' . $level]['title'], $datasets['staerke_month_' . $level]['items']); ?>
+                </div>
+            </div>
+            <?php endfor; ?>
+        </div>
+
+        <div id="period-years" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="lg:col-span-2">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Jahre</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguesse-main">
                 <h3 class="text-lg font-semibold mb-4">Aufguesse pro Jahr</h3>
                 <?php renderLineChart($byYearItems, 'stroke-emerald-500'); ?>
                 <div class="mt-4">
                     <?php renderDataAccordion('years', $datasets['years']['title'], $datasets['years']['items']); ?>
                 </div>
             </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="duft">
+                <h3 class="text-lg font-semibold mb-4">Duftmittel letztes Jahr</h3>
+                <?php renderLineChart($duftYearItems, 'stroke-sky-800'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('duft_year', $datasets['duft_year']['title'], $datasets['duft_year']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="sauna">
+                <h3 class="text-lg font-semibold mb-4">Sauna letztes Jahr</h3>
+                <?php renderLineChart($saunaYearItems, 'stroke-emerald-800'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('sauna_year', $datasets['sauna_year']['title'], $datasets['sauna_year']['items']); ?>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="aufguss">
+                <h3 class="text-lg font-semibold mb-4">Aufguesse letztes Jahr</h3>
+                <?php renderLineChart($aufgussYearItems, 'stroke-orange-800'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('aufguss_year', $datasets['aufguss_year']['title'], $datasets['aufguss_year']['items']); ?>
+                </div>
+            </div>
+            <?php for ($level = 1; $level <= 6; $level++) : ?>
+            <div class="bg-white rounded-lg shadow-md p-6 category-panel" data-category="staerke" data-strength="<?php echo $level; ?>">
+                <h3 class="text-lg font-semibold mb-4">Staerke <?php echo $level; ?> letztes Jahr</h3>
+                <?php renderLineChart($staerkeYearItemsByLevel[$level], 'stroke-slate-800'); ?>
+                <div class="mt-4">
+                    <?php renderDataAccordion('staerke_year_' . $level, $datasets['staerke_year_' . $level]['title'], $datasets['staerke_year_' . $level]['items']); ?>
+                </div>
+            </div>
+            <?php endfor; ?>
         </div>
 
         <div class="my-8 border-t border-gray-200"></div>
@@ -628,6 +1000,78 @@ function renderDataAccordion($id, $title, array $items) {
 
             apply();
         });
+
+        const categoryButtons = Array.from(document.querySelectorAll('[data-category-toggle]'));
+        const getActiveStrength = () => {
+            const active = document.querySelector('[data-strength-toggle][aria-pressed="true"]');
+            return active ? active.getAttribute('data-strength-toggle') : null;
+        };
+        const isStaerkeEnabled = () => {
+            const staerkeBtn = document.querySelector('[data-category-toggle="staerke"]');
+            return staerkeBtn ? staerkeBtn.getAttribute('aria-pressed') === 'true' : false;
+        };
+
+        const applyStaerkeFilter = () => {
+            const selected = getActiveStrength();
+            const enabled = isStaerkeEnabled();
+            document.querySelectorAll('[data-strength-controls]').forEach((panel) => {
+                panel.classList.toggle('hidden', !enabled);
+            });
+            document.querySelectorAll('[data-category="staerke"]').forEach((panel) => {
+                const strength = panel.getAttribute('data-strength');
+                const isMatch = selected && strength === selected;
+                panel.classList.toggle('hidden', !enabled || !isMatch);
+            });
+        };
+
+        categoryButtons.forEach((button) => {
+            const category = button.getAttribute('data-category-toggle');
+            if (!category) return;
+            const apply = () => {
+                const isActive = button.getAttribute('aria-pressed') === 'true';
+                if (category === 'staerke') {
+                    applyStaerkeFilter();
+                } else {
+                    document.querySelectorAll(`[data-category="${category}"]`).forEach((panel) => {
+                        panel.classList.toggle('hidden', !isActive);
+                    });
+                }
+                button.classList.toggle('is-active', isActive);
+            };
+
+            button.addEventListener('click', () => {
+                const isActive = button.getAttribute('aria-pressed') === 'true';
+                button.setAttribute('aria-pressed', isActive ? 'false' : 'true');
+                apply();
+            });
+
+            apply();
+        });
+
+        const strengthButtons = Array.from(document.querySelectorAll('[data-strength-toggle]'));
+        if (strengthButtons.length > 0) {
+            const updateStrengthButtons = (selected) => {
+                strengthButtons.forEach((button) => {
+                    const value = button.getAttribute('data-strength-toggle');
+                    const isActive = selected === value;
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                    button.classList.toggle('is-active', isActive);
+                });
+            };
+
+            strengthButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const value = button.getAttribute('data-strength-toggle');
+                    updateStrengthButtons(value);
+                    applyStaerkeFilter();
+                });
+            });
+
+            const initial = strengthButtons.find((btn) => btn.getAttribute('aria-pressed') === 'true');
+            const selected = initial ? initial.getAttribute('data-strength-toggle') : null;
+            updateStrengthButtons(selected);
+            applyStaerkeFilter();
+        }
 
         const tooltip = document.getElementById('chart-tooltip');
         if (tooltip) {
