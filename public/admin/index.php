@@ -3,36 +3,35 @@
 /**
  * ADMIN-DASHBOARD - Hauptseite des Admin-Bereichs
  *
- * Diese Seite ist das Herzstück der Verwaltung. Hier können Administratoren:
- * - Neue Aufgüsse erstellen und planen
- * - Übersicht über verschiedene Bereiche sehen
+ * Diese Seite ist das Herzstueck der Verwaltung. Hier koennen Administratoren:
+ * - Aufguesse planen
+ * - Uebersicht ueber Bereiche sehen
  * - Zu anderen Verwaltungsseiten navigieren
  *
- * Als Anfänger solltest du wissen:
- * - Diese Seite kombiniert PHP-Logik mit HTML-Formularen
- * - Sie verwendet Sessions für Sicherheit (auskommentiert)
- * - Formulare werden mit POST verarbeitet
- * - Daten kommen aus verschiedenen Datenbanktabellen
+ * Hinweise fuer Einsteiger:
+ * - Seite kombiniert PHP-Logik und HTML
+ * - Session-Login ist optional (auskommentiert)
+ * - Daten kommen aus der Datenbank
  *
  * URL: http://localhost/aufgussplan/admin/
- * Sicherheit: Sollte nur für eingeloggte Administratoren zugänglich sein
+ * Sicherheit: Nur fuer eingeloggte Administratoren gedacht
  */
 
-// PHP-SESSION starten (für Login-Status, Nachrichten, etc.)
+// Session starten (Login-Status, Nachrichten, etc.)
 session_start();
 
 // Konfiguration laden (Datenbank, Pfade, Sicherheit)
 require_once __DIR__ . '/../../src/config/config.php';
 
 /**
- * SICHERHEIT: LOGIN-PRÜFUNG
+ * SICHERHEIT: LOGIN-PRUEFUNG
  *
- * Diese Prüfung ist auskommentiert, damit du die Seite zum Testen verwenden kannst.
+ * Diese Pruefung ist auskommentiert, damit du die Seite testen kannst.
  * In Produktion solltest du sie aktivieren:
  *
- * - Prüft, ob der Benutzer eingeloggt ist
+ * - Prueft, ob der Benutzer eingeloggt ist
  * - Leitet zu login.php um, falls nicht eingeloggt
- * - Schützt den Admin-Bereich vor unbefugtem Zugriff
+ * - Schuetzt den Admin-Bereich vor unbefugtem Zugriff
  */
 // if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
 //     header('Location: login.php');
@@ -40,62 +39,16 @@ require_once __DIR__ . '/../../src/config/config.php';
 // }
 
 /**
- * FORMULAR-VERARBEITUNG
+ * DATEN FUER DAS DASHBOARD LADEN
  *
- * Wenn das Formular abgesendet wird (POST-Request), werden die Daten hier verarbeitet.
- * Dies ist die "Controller"-Logik in MVC-Architektur.
- */
-
-// Variablen für Erfolgs-/Fehlermeldungen initialisieren
-$message = '';  // Erfolgsmeldung
-$errors = [];   // Array mit Fehlermeldungen
-
-// Prüfen, ob ein POST-Request vorliegt (Formular abgesendet)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // AufgussService einbinden (für Geschäftslogik)
-    require_once __DIR__ . '/../../src/services/aufgussService.php';
-
-    // Service-Instanz erstellen
-    $service = new AufgussService();
-
-    // Formular verarbeiten lassen ($_POST = Formulardaten, $_FILES = hochgeladene Bilder)
-    $result = $service->verarbeiteFormular($_POST, $_FILES);
-
-    // Ergebnis prüfen
-    if ($result['success']) {
-        // ERFOLG: Meldung anzeigen und Formular zurücksetzen
-        $message = $result['message'];
-        $_POST = []; // Formularfelder leeren (optional)
-    } else {
-        // FEHLER: Fehlermeldungen sammeln
-        $errors = $result['errors'];
-    }
-}
-
-/**
- * DATEN FÜR SELECT-FELDER LADEN
- *
- * Das Formular hat Dropdown-Menüs für vorhandene Einträge.
- * Diese Daten müssen aus der Datenbank geladen werden.
+ * Aktuell braucht die Seite nur die Plaene fuer die Uebersicht.
  */
 
 // Datenbankverbindung herstellen
 require_once __DIR__ . '/../../src/db/connection.php';
 $db = Database::getInstance()->getConnection();
 
-// MITARBEITER für Dropdown laden (sortiert nach Name)
-$mitarbeiter = $db->query("SELECT id, name FROM mitarbeiter ORDER BY name")->fetchAll();
-
-// SAUNEN für Dropdown laden (sortiert nach Name)
-$saunen = $db->query("SELECT id, name FROM saunen ORDER BY name")->fetchAll();
-
-// DUFTMITTEL für Dropdown laden (sortiert nach Name)
-$duftmittel = $db->query("SELECT id, name FROM duftmittel ORDER BY name")->fetchAll();
-
-// AUFGÜSSE für Dropdown laden (sortiert nach Name)
-$aufguesse = $db->query("SELECT id, name FROM aufguss_namen ORDER BY name")->fetchAll();
-
-// PLÄNE für Übersicht laden (neueste zuerst)
+// Plaene fuer die Uebersicht laden (neueste zuerst)
 $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORDER BY erstellt_am DESC")->fetchAll();
 ?>
 
@@ -112,36 +65,16 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
     <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 
-<body class="bg-gray-100">    <!-- NAVIGATION -->
+<body class="bg-gray-100">
+    <!-- NAVIGATION -->
     <?php include __DIR__ . '/partials/navbar.php'; ?>
 
     <div class="container mx-auto px-4 py-8">
         <!-- SEITENTITEL -->
         <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
 
-        <!-- ERFOLGS-/FEHLERMELDUNGEN -->
-        <!-- Diese werden nur angezeigt, wenn das Formular verarbeitet wurde -->
-
-        <?php if ($message): ?>
-            <!-- ERFOLGSMELDUNG (grün) -->
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($errors)): ?>
-            <!-- FEHLERMELDUNGEN (rot) -->
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <ul>
-                    <?php foreach ($errors as $error): ?>
-                        <li><?php echo htmlspecialchars($error); ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-
         <!-- DASHBOARD-INHALTE -->
-        <!-- 3-spaltiges Grid-Layout für verschiedene Bereiche -->
+        <!-- 3-spaltiges Grid-Layout fuer verschiedene Bereiche -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
             <div class="bg-white rounded-lg  p-6">
@@ -151,7 +84,7 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
             </div>
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-2">Statistiken</h3>
-                <p class="text-gray-600">Übersicht über Aktivitäten</p>
+                <p class="text-gray-600">Uebersicht ueber Aktivitaeten</p>
                 <a href="statistik.php" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Anzeigen</a>
             </div>
 
@@ -165,8 +98,8 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
 
 
         <div class="bg-white rounded-lg  p-6">
-            <h3 class="text-lg font-semibold mb-2">Aufgüsse</h3>
-            <p class="text-gray-600">Planen Sie Ihre Aufgüsse</p>
+            <h3 class="text-lg font-semibold mb-2">Aufguesse</h3>
+            <p class="text-gray-600">Planen Sie Ihre Aufguesse</p>
             <a href="aufguesse.php" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Verwalten</a>
 
             <div class="mt-6 border-t border-gray-200 pt-6">
@@ -204,41 +137,42 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
     <script src="../assets/js/admin.js"></script>
     <script src="../assets/js/admin-functions.js"></script>
     <script>
-                (function() {
-                    const planButtons = document.querySelectorAll('[data-plan-select]');
-                    if (!planButtons.length) {
-                        return;
-                    }
+        (function() {
+            const planButtons = document.querySelectorAll('[data-plan-select]');
+            if (!planButtons.length) {
+                return;
+            }
 
-                    const storageKey = 'aufgussplanSelectedPlan';
-                    const setActive = (planId) => {
-                        planButtons.forEach(button => {
-                            const isActive = button.getAttribute('data-plan-select') === String(planId);
-                            button.classList.toggle('is-active', isActive);
-                            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-                        });
-                    };
+            const storageKey = 'aufgussplanSelectedPlan';
+            const setActive = (planId) => {
+                planButtons.forEach(button => {
+                    const isActive = button.getAttribute('data-plan-select') === String(planId);
+                    button.classList.toggle('is-active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            };
 
-                    const stored = localStorage.getItem(storageKey);
-                    if (stored) {
-                        setActive(stored);
-                    } else {
-                        const firstBtn = planButtons[0];
-                        if (firstBtn) {
-                            setActive(firstBtn.getAttribute('data-plan-select'));
-                        }
-                    }
+            const stored = localStorage.getItem(storageKey);
+            if (stored) {
+                setActive(stored);
+            } else {
+                const firstBtn = planButtons[0];
+                if (firstBtn) {
+                    setActive(firstBtn.getAttribute('data-plan-select'));
+                }
+            }
 
-                    planButtons.forEach(button => {
-                        button.addEventListener('click', () => {
-                            const planId = button.getAttribute('data-plan-select');
-                            if (!planId) return;
-                            setActive(planId);
-                            localStorage.setItem(storageKey, String(planId));
-                        });
-                    });
-                })();
+            planButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const planId = button.getAttribute('data-plan-select');
+                    if (!planId) return;
+                    setActive(planId);
+                    localStorage.setItem(storageKey, String(planId));
+                });
+            });
+        })();
     </script>
 </body>
 
 </html>
+
