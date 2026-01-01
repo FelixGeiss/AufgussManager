@@ -46,7 +46,7 @@ $aufgussModel = new Aufguss();
 $plaene = $aufgussModel->getAllPlans();
 // Daten für Formular-Select-Felder laden
 $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
-$saunen = $db->query("SELECT id, name, bild, beschreibung FROM saunen ORDER BY name")->fetchAll();
+$saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
 $duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
 $aufguss_optionen = $db->query("SELECT id, name FROM aufguss_namen ORDER BY name")->fetchAll();
 // #region agent log - hypothesis A: Check if aufguss_optionen is loaded correctly
@@ -759,7 +759,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <td class="px-6 py-4 whitespace-nowrap sauna-cell text-center">
                                                                 <!-- Anzeige-Modus -->
                                                                 <div class="display-mode flex flex-col items-center cursor-pointer hover:bg-green-50 transition-colors duration-150 rounded px-2 py-2 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'sauna')">
-                                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                                    <div class="relative flex-shrink-0 h-10 w-10">
                                                                         <?php if (!empty($aufguss['sauna_bild'])): ?>
                                                                             <!-- Bild anzeigen wenn vorhanden -->
                                                                             <img src="../uploads/<?php echo htmlspecialchars($aufguss['sauna_bild']); ?>"
@@ -770,6 +770,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
                                                                                 <span class="text-green-600 text-sm">🏠</span>
                                                                             </div>
+                                                                        <?php endif; ?>
+                                                                        <?php if ($aufguss['sauna_temperatur'] !== null && $aufguss['sauna_temperatur'] !== ''): ?>
+                                                                            <span class="absolute -top-1 -right-6 bg-white text-[10px] leading-none px-2 py-0.5 rounded-full border border-gray-200 text-gray-700">
+                                                                                <?php echo (int)$aufguss['sauna_temperatur']; ?>&deg;C
+                                                                            </span>
                                                                         <?php endif; ?>
                                                                     </div>
                                                                     <div class="mt-2 text-sm font-medium text-gray-900">
@@ -980,11 +985,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <select id="sauna-select-<?php echo $plan['id']; ?>" name="sauna_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                             <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Sauna auswählen --</option>
                                                             <?php foreach ($saunen as $s): ?>
-                                                                <option class="text-center" value="<?php echo $s['id']; ?>">
+                                                                <option class="text-center" value="<?php echo $s['id']; ?>" data-temperatur="<?php echo htmlspecialchars($s['temperatur'] ?? ''); ?>">
                                                                     <?php echo htmlspecialchars($s['name'] ?? ''); ?>
                                                                 </option>
                                                             <?php endforeach; ?>
                                                         </select>
+                                                    </div>
+                                                    <div class="mt-3">
+                                                        <label for="sauna-temperatur-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Temperatur (C)</label>
+                                                        <input type="number" id="sauna-temperatur-<?php echo $plan['id']; ?>" name="sauna_temperatur" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. 90" min="0" step="1" />
                                                     </div>
                                                 </div>
 
@@ -1417,6 +1426,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
                                         Beschreibung
                                     </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Temperatur
+                                    </th>
                                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                                         Aktionen
                                     </th>
@@ -1425,7 +1437,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <tbody class="bg-transparent divide-y divide-gray-200">
                                 <?php if (empty($saunen)): ?>
                                     <tr>
-                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                             Keine Saunen in der Datenbank gefunden.
                                         </td>
                                     </tr>
@@ -1488,6 +1500,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <button onclick="cancelSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
+                                            </td>
+
+                                            <!-- Temperatur -->
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php if ($sauna['temperatur'] !== null && $sauna['temperatur'] !== ''): ?>
+                                                    <?php echo (int)$sauna['temperatur']; ?>C
+                                                <?php else: ?>
+                                                    -
+                                                <?php endif; ?>
                                             </td>
 
                                             <!-- Aktionen -->
@@ -3222,6 +3243,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             showPlanAd(planId, settings.durationSeconds, true);
         }
 
+        function initSaunaTemperatureSync() {
+            const selects = document.querySelectorAll('select[id^="sauna-select-"]');
+            selects.forEach(select => {
+                select.addEventListener('change', () => {
+                    const planId = select.id.replace('sauna-select-', '');
+                    const tempInput = document.getElementById(`sauna-temperatur-${planId}`);
+                    if (!tempInput) return;
+                    const option = select.options[select.selectedIndex];
+                    const temp = option ? option.getAttribute('data-temperatur') : '';
+                    tempInput.value = temp ? temp : '';
+                });
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('[data-plan-id]').forEach(container => {
                 const planId = container.getAttribute('data-plan-id');
@@ -3262,6 +3297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
 
             initPlanSelectButtons();
+            initSaunaTemperatureSync();
             updateNextAufgussRowHighlight();
             setInterval(() => {
                 const rows = document.querySelectorAll('tr[data-aufguss-id]');

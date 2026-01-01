@@ -572,12 +572,18 @@ function formatAufgussTimeParts(aufguss) {
 function formatSaunaHtmlStacked(aufguss) {
     const name = aufguss.sauna_name || aufguss.sauna || '-';
     const image = aufguss.sauna_bild || '';
+    const tempBadge = formatSaunaTempBadge(aufguss);
     if (!image) {
-        return `<div class="plan-media-stack"><span>${escapeHtml(name)}</span></div>`;
+        const tempText = formatSaunaTempText(aufguss);
+        const tempSuffix = tempText ? ` <span class="text-xs text-gray-500">(${escapeHtml(tempText)}&deg;C)</span>` : '';
+        return `<div class="plan-media-stack"><span>${escapeHtml(name)}${tempSuffix}</span></div>`;
     }
     return `
         <div class="plan-media-stack">
-            <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-12 w-12 rounded-full object-cover border border-gray-200">
+            <div class="relative">
+                <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-12 w-12 rounded-full object-cover border border-gray-200">
+                ${tempBadge}
+            </div>
             <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}</span>
         </div>
     `;
@@ -719,15 +725,38 @@ function parseAufgiesserItems(aufguss) {
 function formatSaunaHtml(aufguss) {
     const name = aufguss.sauna_name || aufguss.sauna || '-';
     const image = aufguss.sauna_bild || '';
+    const tempBadge = formatSaunaTempBadge(aufguss);
     if (!image) {
-        return escapeHtml(name);
+        const tempText = formatSaunaTempText(aufguss);
+        return tempText ? `${escapeHtml(name)} <span class="text-xs text-gray-500">(${escapeHtml(tempText)}&deg;C)</span>` : escapeHtml(name);
     }
     return `
         <div class="flex items-center gap-3">
-            <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-10 w-10 rounded-full object-cover border border-gray-200">
+            <div class="relative">
+                <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-10 w-10 rounded-full object-cover border border-gray-200">
+                ${tempBadge}
+            </div>
             <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}</span>
         </div>
     `;
+}
+
+function formatSaunaTempText(aufguss) {
+    const tempValue = aufguss.sauna_temperatur;
+    if (tempValue === null || tempValue === undefined || tempValue === '') {
+        return '';
+    }
+    const numeric = Number(tempValue);
+    if (Number.isNaN(numeric)) {
+        return '';
+    }
+    return String(numeric);
+}
+
+function formatSaunaTempBadge(aufguss) {
+    const tempText = formatSaunaTempText(aufguss);
+    if (!tempText) return '';
+    return `<span class="absolute -top-1 -right-8 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${escapeHtml(tempText)}&deg;C</span>`;
 }
 
 function escapeHtml(value) {
@@ -1001,6 +1030,7 @@ function buildNextAufgussHtml(aufguss) {
     const staerkeText = aufguss.staerke ? `Staerke: ${aufguss.staerke}` : 'Staerke: -';
     const saunaName = aufguss.sauna_name || aufguss.sauna || '-';
     const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
+    const saunaTempText = formatSaunaTempText(aufguss);
     const people = parseAufgiesserItems(aufguss);
 
     const personCards = people.map(person => {
@@ -1017,8 +1047,11 @@ function buildNextAufgussHtml(aufguss) {
             ? `<img src="uploads/${aufguss.mitarbeiter_bild}" alt="Aufgiesser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
             : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgiesser-Bild</div>`);
 
+    const saunaBadge = saunaTempText
+        ? `<span class="absolute -top-2 -right-8 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${escapeHtml(saunaTempText)}&deg;C</span>`
+        : '';
     const saunaImg = aufguss.sauna_bild
-        ? `<img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
+        ? `<div class="relative">${saunaBadge}<img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>`
         : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
 
     return `

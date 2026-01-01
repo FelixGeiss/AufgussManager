@@ -195,6 +195,16 @@ class Aufguss {
             $data['duftmittel_id'] = null;
         }
 
+        $saunaTempRaw = $data['sauna_temperatur'] ?? null;
+        $saunaTemp = null;
+        if ($saunaTempRaw !== null && $saunaTempRaw !== '') {
+            $saunaTempValue = (int)$saunaTempRaw;
+            if ($saunaTempValue >= 0) {
+                $saunaTemp = $saunaTempValue;
+            }
+        }
+        $data['sauna_temperatur'] = $saunaTemp;
+
         /**
          * SAUNA: Automatische Erstellung neuer Einträge
          *
@@ -203,13 +213,16 @@ class Aufguss {
          */
         if (!empty($data['sauna']) && $data['sauna'] !== '') {
             // Neue Sauna - automatisch erstellen oder vorhandenes finden
-            $data['sauna_id'] = $this->getOrCreateSauna($data['sauna']);
+            $data['sauna_id'] = $this->getOrCreateSauna($data['sauna'], $data['sauna_temperatur']);
         } elseif (!empty($data['sauna_id']) && $data['sauna_id'] !== '') {
             // Vorhandene Sauna ausgewählt
             $data['sauna_id'] = $data['sauna_id'];
         } else {
             // Keine Sauna angegeben
             $data['sauna_id'] = null;
+        }
+        if (!empty($data['sauna_id']) && $data['sauna_temperatur'] !== null) {
+            $this->updateSaunaTemperatur($data['sauna_id'], $data['sauna_temperatur']);
         }
 
         /**
@@ -373,6 +386,23 @@ class Aufguss {
     }
 
     /**
+     * Sauna-Temperatur aktualisieren
+     *
+     * @param int $saunaId - ID der Sauna
+     * @param int $temperatur - Temperatur in C
+     * @return bool - true bei Erfolg
+     */
+    private function updateSaunaTemperatur($saunaId, $temperatur) {
+        try {
+            $sql = "UPDATE saunen SET temperatur = ? WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([(int)$temperatur, $saunaId]);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * Mitarbeiter-Bild aktualisieren
      *
      * @param int $mitarbeiterId - ID des Mitarbeiters
@@ -432,6 +462,9 @@ class Aufguss {
         $existing = $stmt->fetch();
 
         if ($existing) {
+            if ($temperatur !== null) {
+                $this->updateSaunaTemperatur($existing['id'], $temperatur);
+            }
             return $existing['id'];
         }
 
@@ -478,7 +511,7 @@ class Aufguss {
      * @param string $name - Name der Sauna
      * @return int - ID der Sauna
      */
-    private function getOrCreateSauna($name) {
+    private function getOrCreateSauna($name, $temperatur = null) {
         // Prüfen, ob Sauna bereits existiert
         $stmt = $this->db->prepare("SELECT id FROM saunen WHERE name = ?");
         $stmt->execute([$name]);
@@ -489,8 +522,8 @@ class Aufguss {
         }
 
         // Neuen Eintrag erstellen
-        $stmt = $this->db->prepare("INSERT INTO saunen (name) VALUES (?)");
-        $stmt->execute([$name]);
+        $stmt = $this->db->prepare("INSERT INTO saunen (name, temperatur) VALUES (?, ?)");
+        $stmt->execute([$name, $temperatur]);
         return $this->db->lastInsertId();
     }
 
@@ -592,7 +625,7 @@ class Aufguss {
                        aa_list.aufgieser_namen,
                        aa_list.aufgieser_items,
                        m.name as mitarbeiter_name, m.bild as mitarbeiter_bild,
-                       s.name as sauna_name, s.bild as sauna_bild,
+                       s.name as sauna_name, s.bild as sauna_bild, s.temperatur as sauna_temperatur,
                        d.name as duftmittel_name,
                        p.name as plan_name
                 FROM aufguesse a
@@ -716,7 +749,7 @@ class Aufguss {
                        aa_list.aufgieser_namen,
                        aa_list.aufgieser_items,
                        m.name as mitarbeiter_name, m.bild as mitarbeiter_bild,
-                       s.name as sauna_name, s.bild as sauna_bild,
+                       s.name as sauna_name, s.bild as sauna_bild, s.temperatur as sauna_temperatur,
                        d.name as duftmittel_name,
                        p.name as plan_name
                 FROM aufguesse a
