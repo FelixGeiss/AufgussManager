@@ -947,6 +947,30 @@ function renderDataAccordion($id, $title, array $items) {
             </div>
         </div>
 
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Legende filtern</h3>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-700">
+                    <label class="plan-select-btn legend-filter">
+                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="aufguss" checked>
+                        <span>Aufguesse</span>
+                    </label>
+                    <label class="plan-select-btn legend-filter">
+                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="duft" checked>
+                        <span>Duftmittel</span>
+                    </label>
+                    <label class="plan-select-btn legend-filter">
+                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="sauna" checked>
+                        <span>Sauna</span>
+                    </label>
+                    <label class="plan-select-btn legend-filter">
+                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="staerke" checked>
+                        <span>Staerke</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <div id="period-days" class="mb-8" data-period="days">
             <div class="flex items-center gap-4 mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Tage</h3>
@@ -1110,6 +1134,7 @@ function renderDataAccordion($id, $title, array $items) {
         const chartPeriods = Object.keys(chartData).filter((period) => {
             return document.getElementById(`apex-chart-${period}`);
         });
+        const legendGroupInputs = Array.from(document.querySelectorAll('[data-legend-group]'));
 
         document.querySelectorAll('[data-toggle-target]').forEach((button) => {
             const targetId = button.getAttribute('data-toggle-target');
@@ -1184,7 +1209,37 @@ function renderDataAccordion($id, $title, array $items) {
             updateTable();
         };
 
-        const buildChartOptions = (period) => {
+        const getLegendGroupForKey = (key) => {
+            if (!key) return '';
+            if (key === 'base' || key === 'aufguss') return 'aufguss';
+            if (key.startsWith('duft-')) return 'duft';
+            if (key.startsWith('sauna-')) return 'sauna';
+            if (key.startsWith('staerke-')) return 'staerke';
+            return '';
+        };
+
+        const getEnabledLegendGroups = () => {
+            if (legendGroupInputs.length === 0) return new Set(['aufguss', 'duft', 'sauna', 'staerke']);
+            return new Set(
+                legendGroupInputs
+                    .filter((input) => input.checked)
+                    .map((input) => input.getAttribute('data-legend-group'))
+                    .filter(Boolean)
+            );
+        };
+
+        const getFilteredSeries = (period) => {
+            const data = chartData[period];
+            if (!data) return [];
+            const enabledGroups = getEnabledLegendGroups();
+            return data.series.filter((item) => {
+                const group = getLegendGroupForKey(item.key);
+                if (!group) return false;
+                return enabledGroups.has(group);
+            });
+        };
+
+        const buildChartOptions = (period, series) => {
             const data = chartData[period];
             return {
                 chart: {
@@ -1228,7 +1283,7 @@ function renderDataAccordion($id, $title, array $items) {
                         }
                     }
                 },
-                series: data.series.map((item) => ({ name: item.name, data: item.data })),
+                series: series.map((item) => ({ name: item.name, data: item.data })),
                 xaxis: {
                     categories: data.categories,
                     labels: { rotate: -35 }
@@ -1259,14 +1314,19 @@ function renderDataAccordion($id, $title, array $items) {
                     seriesNameByKey[period][item.key] = item.name;
                     seriesKeyByName[period][item.name] = item.key;
                 });
-                const chart = new ApexCharts(container, buildChartOptions(period));
+                const filteredSeries = getFilteredSeries(period);
+                if (filteredSeries.length === 0) {
+                    container.innerHTML = '<div class="text-sm text-gray-500">Keine Daten vorhanden.</div>';
+                    readyCount += 1;
+                    if (readyCount === total) {
+                        updateSelectedSeriesFromChart(currentPeriod, 'base');
+                    }
+                    return;
+                }
+                container.innerHTML = '';
+                const chart = new ApexCharts(container, buildChartOptions(period, filteredSeries));
                 chartInstances[period] = chart;
                 chart.render().then(() => {
-                    data.series.forEach((item) => {
-                        if (item.key !== 'base') {
-                            chart.hideSeries(item.name);
-                        }
-                    });
                     readyCount += 1;
                     if (readyCount === total) {
                         updateSelectedSeriesFromChart(currentPeriod, 'base');
@@ -1278,6 +1338,18 @@ function renderDataAccordion($id, $title, array $items) {
         const syncTableToChart = () => {
             updateSelectedSeriesFromChart(currentPeriod, lastSelectedSeries);
         };
+
+        legendGroupInputs.forEach((input) => {
+            input.addEventListener('change', () => {
+                chartPeriods.forEach((period) => {
+                    if (chartInstances[period]) {
+                        chartInstances[period].destroy();
+                        delete chartInstances[period];
+                    }
+                });
+                initCharts();
+            });
+        });
         initCharts();
 
         const periodKeyMap = {

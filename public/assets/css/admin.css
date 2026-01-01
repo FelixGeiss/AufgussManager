@@ -121,6 +121,30 @@ input[type="radio"] {
     color: #ffffff;
 }
 
+.apexcharts-toolbar .apexcharts-menu-icon {
+    transform: scale(1.35);
+}
+
+.apexcharts-legend-series.is-hidden {
+    display: none !important;
+}
+
+.legend-filter {
+    cursor: pointer;
+}
+
+.legend-filter:has([data-legend-group]:checked) {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+.legend-filter:has([data-legend-group]:checked):hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
 
 /* ============================================================================
    LEICHT TRANSPARENTE TABELLENZEILEN
