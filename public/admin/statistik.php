@@ -133,19 +133,28 @@ foreach ($planRows as $planRow) {
 }
 
 $selectedPlanIds = [];
+$noPlansSelected = false;
 if (isset($_GET['plans']) && $_GET['plans'] !== '' && $_GET['plans'] !== 'all') {
-    $rawPlanIds = array_filter(array_map('trim', explode(',', $_GET['plans'])));
-    foreach ($rawPlanIds as $rawPlanId) {
-        if (ctype_digit($rawPlanId)) {
-            $selectedPlanIds[] = (int)$rawPlanId;
+    if ($_GET['plans'] === 'none') {
+        $noPlansSelected = true;
+    } else {
+        $rawPlanIds = array_filter(array_map('trim', explode(',', $_GET['plans'])));
+        foreach ($rawPlanIds as $rawPlanId) {
+            if (ctype_digit($rawPlanId)) {
+                $selectedPlanIds[] = (int)$rawPlanId;
+            }
         }
-    }
-    if (!empty($allPlanIds)) {
-        $selectedPlanIds = array_values(array_intersect($selectedPlanIds, $allPlanIds));
+        if (!empty($allPlanIds)) {
+            $selectedPlanIds = array_values(array_intersect($selectedPlanIds, $allPlanIds));
+        }
     }
 }
 
-if (!empty($allPlanIds) && (!empty($selectedPlanIds) && count($selectedPlanIds) < count($allPlanIds))) {
+if ($noPlansSelected) {
+    $selectedPlanIds = [];
+    $planFilter = ['sql' => '1=0', 'params' => []];
+    $planFilterStats = ['sql' => '1=0', 'params' => []];
+} elseif (!empty($allPlanIds) && (!empty($selectedPlanIds) && count($selectedPlanIds) < count($allPlanIds))) {
     $planFilter = buildPlanFilter($selectedPlanIds, 'a');
     $planFilterStats = buildPlanFilter($selectedPlanIds, 's');
 } else {
@@ -248,7 +257,7 @@ foreach ($byYearRows->fetchAll() as $row) {
 $yearKeys = $yearLabels;
 $byYearItems = buildBarItems($yearLabels, $yearCounts);
 
-// Wie oft welcher Aufguss
+// Wie oft welcher Aufguss (wie oft im Plan)
 $aufgussNameStmt = $db->prepare(
     "SELECT COALESCE(an.name, 'Ohne Name') AS label, COUNT(*) AS cnt
      FROM aufguesse a
@@ -263,8 +272,11 @@ $aufgussNameItems = [];
 foreach ($aufgussNameRows as $row) {
     $aufgussNameItems[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
 }
+if ($noPlansSelected) {
+    $aufgussNameItems = [];
+}
 
-// Wie oft ein Duftmittel verwendet wurde
+// Wie oft ein Duftmittel verwendet wurde (wie oft im Plan)
 $duftmittelStmt = $db->prepare(
     "SELECT COALESCE(d.name, 'Ohne Duftmittel') AS label, COUNT(*) AS cnt
      FROM aufguesse a
@@ -279,8 +291,11 @@ $duftmittelItems = [];
 foreach ($duftmittelRows as $row) {
     $duftmittelItems[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
 }
+if ($noPlansSelected) {
+    $duftmittelItems = [];
+}
 
-// Wie oft welche Sauna genutzt wurde
+// Wie oft welche Sauna genutzt wurde (wie oft im Plan)
 $saunaStmt = $db->prepare(
     "SELECT COALESCE(s.name, 'Ohne Sauna') AS label, COUNT(*) AS cnt
      FROM aufguesse a
@@ -295,13 +310,16 @@ $saunaItems = [];
 foreach ($saunaRows as $row) {
     $saunaItems[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
 }
+if ($noPlansSelected) {
+    $saunaItems = [];
+}
 
-// Aufguesse nach Staerke
+// Aufguesse nach Staerke (wie oft im Plan)
 $staerkeStmt = $db->prepare(
-    "SELECT staerke, COUNT(*) AS cnt
+    "SELECT a.staerke, COUNT(*) AS cnt
      FROM aufguesse a"
      . ($planFilter['sql'] ? " WHERE " . $planFilter['sql'] : "") . "
-     GROUP BY staerke"
+     GROUP BY a.staerke"
 );
 $staerkeStmt->execute($planFilter['params']);
 $staerkeRows = $staerkeStmt->fetchAll();
@@ -315,11 +333,14 @@ foreach ($staerkeRows as $row) {
     $staerkeMap[(int)$row['staerke']] = (int)$row['cnt'];
 }
 $staerkeItems = [];
-for ($s = 0; $s <= 6; $s++) {
+for ($s = 1; $s <= 6; $s++) {
     $staerkeItems[] = ['label' => 'St ' . $s, 'value' => $staerkeMap[$s] ?? 0];
 }
 if ($ohneStaerkeCount > 0) {
     $staerkeItems[] = ['label' => 'Ohne Staerke', 'value' => $ohneStaerkeCount];
+}
+if ($noPlansSelected) {
+    $staerkeItems = [];
 }
 
 // Statistik nach Zeitraum (aus statistik-Tabelle)
@@ -1007,6 +1028,8 @@ if (defined('STATISTIK_JSON')) {
         };
 
         const buildBarOptions = (data, color) => {
+            const maxValue = Math.max(0, ...data.data);
+            const tickAmount = maxValue <= 10 ? Math.max(1, maxValue) : 5;
             return {
                 chart: {
                     type: 'bar',
@@ -1043,6 +1066,19 @@ if (defined('STATISTIK_JSON')) {
                         data: data.data
                     }
                 ],
+                yaxis: {
+                    min: 0,
+                    max: maxValue <= 10 ? maxValue : undefined,
+                    tickAmount,
+                    forceNiceScale: true,
+                    decimalsInFloat: 0,
+                    labels: {
+                        formatter: (value) => {
+                            const rounded = Math.round(value);
+                            return Number.isInteger(value) ? rounded : '';
+                        }
+                    }
+                },
                 xaxis: {
                     categories: data.categories,
                     labels: { rotate: -35, trim: true }
@@ -1055,7 +1091,12 @@ if (defined('STATISTIK_JSON')) {
                 },
                 dataLabels: { enabled: false },
                 colors: [color],
-                grid: { strokeDashArray: 3 }
+                grid: { strokeDashArray: 3 },
+                tooltip: {
+                    y: {
+                        formatter: (value) => Math.round(value)
+                    }
+                }
             };
         };
 
@@ -1135,7 +1176,9 @@ if (defined('STATISTIK_JSON')) {
 
             const updateUrl = (selected) => {
                 const params = new URLSearchParams(window.location.search);
-                if (selected.length === 0 || selected.length === allIds.length) {
+                if (selected.length === 0) {
+                    params.set('plans', 'none');
+                } else if (selected.length === allIds.length) {
                     params.delete('plans');
                 } else {
                     params.set('plans', selected.join(','));
@@ -1149,7 +1192,9 @@ if (defined('STATISTIK_JSON')) {
             const loadPlanData = async (selected) => {
                 const savedScroll = window.scrollY;
                 const params = new URLSearchParams();
-                if (selected.length > 0 && selected.length < allIds.length) {
+                if (selected.length === 0) {
+                    params.set('plans', 'none');
+                } else if (selected.length < allIds.length) {
                     params.set('plans', selected.join(','));
                 }
                 const url = params.toString() ? `statistik_data.php?${params}` : 'statistik_data.php';
