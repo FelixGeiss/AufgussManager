@@ -145,6 +145,14 @@ input[type="radio"] {
     color: #ffffff;
 }
 
+.apex-chart-line {
+    min-height: 420px;
+}
+
+.apex-chart-bar {
+    min-height: 260px;
+}
+
 
 /* ============================================================================
    LEICHT TRANSPARENTE TABELLENZEILEN
