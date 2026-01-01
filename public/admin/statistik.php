@@ -343,6 +343,32 @@ if ($noPlansSelected) {
     $staerkeItems = [];
 }
 
+// Umfrage-Bewertungen nach Kriterium (Durchschnitt)
+$ratingItems = [];
+try {
+    $planFilterRatings = $noPlansSelected ? ['sql' => '1=0', 'params' => []] : buildPlanFilter($selectedPlanIds, 'r');
+    $ratingStmt = $db->prepare(
+        "SELECT r.kriterium AS label, AVG(r.rating) AS avg_rating, COUNT(*) AS cnt
+         FROM umfrage_bewertungen r"
+        . ($planFilterRatings['sql'] ? " WHERE " . $planFilterRatings['sql'] : "") . "
+         GROUP BY r.kriterium
+         ORDER BY avg_rating DESC, label ASC"
+    );
+    $ratingStmt->execute($planFilterRatings['params']);
+    foreach ($ratingStmt->fetchAll() as $row) {
+        $ratingItems[] = [
+            'label' => $row['label'],
+            'value' => round((float)$row['avg_rating'], 2),
+            'count' => (int)$row['cnt']
+        ];
+    }
+    if ($noPlansSelected) {
+        $ratingItems = [];
+    }
+} catch (Exception $e) {
+    $ratingItems = [];
+}
+
 // Statistik nach Zeitraum (aus statistik-Tabelle)
 $periodDay = "s.datum = CURDATE()";
 $periodWeek = "s.datum >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)";
@@ -641,6 +667,10 @@ if (defined('STATISTIK_JSON')) {
         'sauna' => [
             'categories' => array_map(function ($item) { return $item['label']; }, $saunaItems),
             'data' => array_map(function ($item) { return (int)$item['value']; }, $saunaItems)
+        ],
+        'bewertung' => [
+            'categories' => array_map(function ($item) { return $item['label']; }, $ratingItems),
+            'data' => array_map(function ($item) { return (float)$item['value']; }, $ratingItems)
         ]
     ];
 
@@ -790,6 +820,11 @@ if (defined('STATISTIK_JSON')) {
                 <h3 class="text-lg font-semibold mb-4">Wie oft welche Sauna</h3>
                 <div id="apex-bar-sauna" class="apex-chart apex-chart-bar"></div>
             </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Umfrage</h3>
+                <p class="text-sm text-gray-500 mb-4">Durchschnittliche Bewertungen pro Kriterium.</p>
+                <div id="apex-bar-bewertung" class="apex-chart apex-chart-bar"></div>
+            </div>
         </div>
     </div>
 
@@ -862,6 +897,10 @@ if (defined('STATISTIK_JSON')) {
             'sauna' => [
                 'categories' => array_map(function ($item) { return $item['label']; }, $saunaItems),
                 'data' => array_map(function ($item) { return (int)$item['value']; }, $saunaItems)
+            ],
+            'bewertung' => [
+                'categories' => array_map(function ($item) { return $item['label']; }, $ratingItems),
+                'data' => array_map(function ($item) { return (float)$item['value']; }, $ratingItems)
             ]
         ], JSON_UNESCAPED_UNICODE); ?>;
                 let currentPeriod = 'days';
@@ -1100,12 +1139,76 @@ if (defined('STATISTIK_JSON')) {
             };
         };
 
+        const buildRatingOptions = (data, color) => {
+            return {
+                chart: {
+                    type: 'bar',
+                    height: 260,
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: false,
+                            zoom: false,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: false
+                        },
+                        export: {
+                            csv: {
+                                filename: 'umfrage_bewertungen',
+                                headerCategory: 'Kriterium',
+                                headerValue: 'Durchschnitt'
+                            },
+                            svg: { filename: 'umfrage_bewertungen' },
+                            png: { filename: 'umfrage_bewertungen' }
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Durchschnitt',
+                        data: data.data
+                    }
+                ],
+                yaxis: {
+                    min: 0,
+                    max: 5,
+                    tickAmount: 5,
+                    forceNiceScale: true,
+                    labels: {
+                        formatter: (value) => value.toFixed(1)
+                    }
+                },
+                xaxis: {
+                    categories: data.categories,
+                    labels: { rotate: -35, trim: true }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        columnWidth: '55%'
+                    }
+                },
+                dataLabels: { enabled: false },
+                colors: [color],
+                grid: { strokeDashArray: 3 },
+                tooltip: {
+                    y: {
+                        formatter: (value) => Number(value).toFixed(2)
+                    }
+                }
+            };
+        };
+
         const initBarCharts = () => {
             const configs = [
                 { key: 'staerke', id: 'apex-bar-staerke', color: '#2563eb' },
                 { key: 'aufguss', id: 'apex-bar-aufguss', color: '#f97316' },
                 { key: 'duftmittel', id: 'apex-bar-duftmittel', color: '#f59e0b' },
-                { key: 'sauna', id: 'apex-bar-sauna', color: '#f43f5e' }
+                { key: 'sauna', id: 'apex-bar-sauna', color: '#f43f5e' },
+                { key: 'bewertung', id: 'apex-bar-bewertung', color: '#10b981' }
             ];
             configs.forEach((config) => {
                 const container = document.getElementById(config.id);
@@ -1115,7 +1218,10 @@ if (defined('STATISTIK_JSON')) {
                     container.innerHTML = '<div class="text-sm text-gray-500">Keine Daten vorhanden.</div>';
                     return;
                 }
-                const chart = new ApexCharts(container, buildBarOptions(data, config.color));
+                const options = config.key === 'bewertung'
+                    ? buildRatingOptions(data, config.color)
+                    : buildBarOptions(data, config.color);
+                const chart = new ApexCharts(container, options);
                 barChartInstances[config.id] = chart;
                 chart.render();
             });
@@ -1146,7 +1252,7 @@ if (defined('STATISTIK_JSON')) {
                 barChartInstances[key].destroy();
                 delete barChartInstances[key];
             });
-            ['apex-bar-staerke', 'apex-bar-aufguss', 'apex-bar-duftmittel', 'apex-bar-sauna'].forEach((id) => {
+            ['apex-bar-staerke', 'apex-bar-aufguss', 'apex-bar-duftmittel', 'apex-bar-sauna', 'apex-bar-bewertung'].forEach((id) => {
                 const container = document.getElementById(id);
                 if (container) {
                     container.innerHTML = '';
