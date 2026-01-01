@@ -348,16 +348,21 @@ $ratingItems = [];
 try {
     $planFilterRatings = $noPlansSelected ? ['sql' => '1=0', 'params' => []] : buildPlanFilter($selectedPlanIds, 'r');
     $ratingStmt = $db->prepare(
-        "SELECT r.kriterium AS label, AVG(r.rating) AS avg_rating, COUNT(*) AS cnt
-         FROM umfrage_bewertungen r"
+        "SELECT r.kriterium AS label,
+                COALESCE(an.name, 'Unbekannter Aufguss') AS aufguss,
+                AVG(r.rating) AS avg_rating,
+                COUNT(*) AS cnt
+         FROM umfrage_bewertungen r
+         LEFT JOIN aufguss_namen an ON r.aufguss_name_id = an.id"
         . ($planFilterRatings['sql'] ? " WHERE " . $planFilterRatings['sql'] : "") . "
-         GROUP BY r.kriterium
+         GROUP BY r.kriterium, r.aufguss_name_id
          ORDER BY avg_rating DESC, label ASC"
     );
     $ratingStmt->execute($planFilterRatings['params']);
     foreach ($ratingStmt->fetchAll() as $row) {
         $ratingItems[] = [
             'label' => $row['label'],
+            'aufguss' => $row['aufguss'],
             'value' => round((float)$row['avg_rating'], 2),
             'count' => (int)$row['cnt']
         ];
@@ -368,6 +373,26 @@ try {
 } catch (Exception $e) {
     $ratingItems = [];
 }
+
+$ratingAufguesse = [];
+$ratingKriterien = [];
+if (!empty($ratingItems)) {
+    foreach ($ratingItems as $item) {
+        $aufgussLabel = trim((string)($item['aufguss'] ?? ''));
+        $kriteriumLabel = trim((string)($item['label'] ?? ''));
+        if ($aufgussLabel !== '') {
+            $ratingAufguesse[$aufgussLabel] = true;
+        }
+        if ($kriteriumLabel !== '') {
+            $ratingKriterien[$kriteriumLabel] = true;
+        }
+    }
+    $ratingAufguesse = array_keys($ratingAufguesse);
+    $ratingKriterien = array_keys($ratingKriterien);
+    sort($ratingAufguesse, SORT_NATURAL | SORT_FLAG_CASE);
+    sort($ratingKriterien, SORT_NATURAL | SORT_FLAG_CASE);
+}
+
 
 // Statistik nach Zeitraum (aus statistik-Tabelle)
 $periodDay = "s.datum = CURDATE()";
@@ -667,10 +692,6 @@ if (defined('STATISTIK_JSON')) {
         'sauna' => [
             'categories' => array_map(function ($item) { return $item['label']; }, $saunaItems),
             'data' => array_map(function ($item) { return (int)$item['value']; }, $saunaItems)
-        ],
-        'bewertung' => [
-            'categories' => array_map(function ($item) { return $item['label']; }, $ratingItems),
-            'data' => array_map(function ($item) { return (float)$item['value']; }, $ratingItems)
         ]
     ];
 
@@ -820,11 +841,119 @@ if (defined('STATISTIK_JSON')) {
                 <h3 class="text-lg font-semibold mb-4">Wie oft welche Sauna</h3>
                 <div id="apex-bar-sauna" class="apex-chart apex-chart-bar"></div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-semibold mb-4">Umfrage</h3>
-                <p class="text-sm text-gray-500 mb-4">Durchschnittliche Bewertungen pro Kriterium.</p>
-                <div id="apex-bar-bewertung" class="apex-chart apex-chart-bar"></div>
-            </div>
+        </div>
+
+        <div class="my-8 border-t border-gray-200"></div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Umfrage</h3>
+        <div class="mb-6">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">Umfragepunkte</h4>
+            <?php if (!empty($ratingItems)) : ?>
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div>
+                            <label for="umfrage-filter-aufguss" class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Aufguss filtern</label>
+                            <select id="umfrage-filter-aufguss" class="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                <option value="">Alle Aufguesse</option>
+                                <?php foreach ($ratingAufguesse as $aufgussOption) : ?>
+                                    <option value="<?php echo htmlspecialchars(strtolower($aufgussOption)); ?>">
+                                        <?php echo htmlspecialchars($aufgussOption); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="umfrage-filter-kriterium" class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Umfragepunkt filtern</label>
+                            <select id="umfrage-filter-kriterium" class="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                <option value="">Alle Umfragepunkte</option>
+                                <?php foreach ($ratingKriterien as $kriteriumOption) : ?>
+                                    <option value="<?php echo htmlspecialchars(strtolower($kriteriumOption)); ?>">
+                                        <?php echo htmlspecialchars($kriteriumOption); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="umfrage-filter-avg" class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Ø Sterne filtern</label>
+                            <select id="umfrage-filter-avg" class="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                <option value="">Alle Bewertungen</option>
+                                <option value="4">Ab 4.0</option>
+                                <option value="3">Ab 3.0</option>
+                                <option value="2">Ab 2.0</option>
+                                <option value="1">Ab 1.0</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <div class="flex w-full gap-2">
+                                <button type="button" id="umfrage-filter-reset" class="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">
+                                    Filter zuruecksetzen
+                                </button>
+                                <button type="button" id="umfrage-download-csv" class="w-full rounded-md border border-blue-500 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100">
+                                    CSV Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if (empty($ratingItems)) : ?>
+                <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
+                    Noch keine Bewertungen vorhanden.
+                </div>
+            <?php else : ?>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="umfrage-karten">
+                    <?php foreach ($ratingItems as $item) :
+                        $avg = (float)($item['value'] ?? 0);
+                        $count = (int)($item['count'] ?? 0);
+                        if ($avg >= 4.0) {
+                            $cardClass = 'border-emerald-200 bg-emerald-50';
+                            $badgeClass = 'bg-emerald-600';
+                        } elseif ($avg >= 2.5) {
+                            $cardClass = 'border-amber-200 bg-amber-50';
+                            $badgeClass = 'bg-amber-600';
+                        } else {
+                            $cardClass = 'border-rose-200 bg-rose-50';
+                            $badgeClass = 'bg-rose-600';
+                        }
+                    ?>
+                        <div class="rounded-lg border <?php echo $cardClass; ?> shadow-sm px-5 py-4" data-aufguss="<?php echo htmlspecialchars(strtolower($item['aufguss'] ?? '')); ?>" data-kriterium="<?php echo htmlspecialchars(strtolower($item['label'] ?? '')); ?>" data-avg="<?php echo number_format($avg, 1, '.', ''); ?>">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <div class="text-xs uppercase tracking-wide text-gray-500">Umfragepunkt</div>
+                                    <div class="text-lg font-semibold text-gray-900 mt-1">
+                                        <?php echo htmlspecialchars($item['label']); ?>
+                                    </div>
+                                    <div class="text-sm text-gray-600 mt-1">
+                                        <?php echo htmlspecialchars($item['aufguss'] ?? 'Unbekannter Aufguss'); ?>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-white px-2 py-1 rounded-full <?php echo $badgeClass; ?>">
+                                    <?php echo number_format($avg, 1, '.', ''); ?> / 5
+                                </span>
+                            </div>
+                            <div class="mt-4 text-sm text-gray-700">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="flex items-center gap-1 text-amber-500">
+                                        <?php
+                                        $fullStars = (int)floor($avg);
+                                        $emptyStars = 5 - $fullStars;
+                                        for ($i = 0; $i < $fullStars; $i++) {
+                                            echo '<span aria-hidden="true">★</span>';
+                                        }
+                                        for ($i = 0; $i < $emptyStars; $i++) {
+                                            echo '<span aria-hidden="true" class="text-gray-300">★</span>';
+                                        }
+                                        ?>
+                                    </div>
+                                    <span class="text-gray-600"><?php echo number_format($avg, 1, '.', ''); ?> Ø Sterne</span>
+                                </div>
+                                <div><span class="font-semibold text-gray-900"><?php echo $count; ?></span> Bewertungen</div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         </div>
     </div>
 
@@ -897,13 +1026,9 @@ if (defined('STATISTIK_JSON')) {
             'sauna' => [
                 'categories' => array_map(function ($item) { return $item['label']; }, $saunaItems),
                 'data' => array_map(function ($item) { return (int)$item['value']; }, $saunaItems)
-            ],
-            'bewertung' => [
-                'categories' => array_map(function ($item) { return $item['label']; }, $ratingItems),
-                'data' => array_map(function ($item) { return (float)$item['value']; }, $ratingItems)
             ]
         ], JSON_UNESCAPED_UNICODE); ?>;
-                let currentPeriod = 'days';
+        let currentPeriod = 'days';
         const chartInstances = {};
         const barChartInstances = {};
         const seriesNameByKey = {};
@@ -1139,76 +1264,12 @@ if (defined('STATISTIK_JSON')) {
             };
         };
 
-        const buildRatingOptions = (data, color) => {
-            return {
-                chart: {
-                    type: 'bar',
-                    height: 260,
-                    toolbar: {
-                        show: true,
-                        tools: {
-                            download: true,
-                            selection: false,
-                            zoom: false,
-                            zoomin: false,
-                            zoomout: false,
-                            pan: false,
-                            reset: false
-                        },
-                        export: {
-                            csv: {
-                                filename: 'umfrage_bewertungen',
-                                headerCategory: 'Kriterium',
-                                headerValue: 'Durchschnitt'
-                            },
-                            svg: { filename: 'umfrage_bewertungen' },
-                            png: { filename: 'umfrage_bewertungen' }
-                        }
-                    }
-                },
-                series: [
-                    {
-                        name: 'Durchschnitt',
-                        data: data.data
-                    }
-                ],
-                yaxis: {
-                    min: 0,
-                    max: 5,
-                    tickAmount: 5,
-                    forceNiceScale: true,
-                    labels: {
-                        formatter: (value) => value.toFixed(1)
-                    }
-                },
-                xaxis: {
-                    categories: data.categories,
-                    labels: { rotate: -35, trim: true }
-                },
-                plotOptions: {
-                    bar: {
-                        borderRadius: 4,
-                        columnWidth: '55%'
-                    }
-                },
-                dataLabels: { enabled: false },
-                colors: [color],
-                grid: { strokeDashArray: 3 },
-                tooltip: {
-                    y: {
-                        formatter: (value) => Number(value).toFixed(2)
-                    }
-                }
-            };
-        };
-
         const initBarCharts = () => {
             const configs = [
                 { key: 'staerke', id: 'apex-bar-staerke', color: '#2563eb' },
                 { key: 'aufguss', id: 'apex-bar-aufguss', color: '#f97316' },
                 { key: 'duftmittel', id: 'apex-bar-duftmittel', color: '#f59e0b' },
-                { key: 'sauna', id: 'apex-bar-sauna', color: '#f43f5e' },
-                { key: 'bewertung', id: 'apex-bar-bewertung', color: '#10b981' }
+                { key: 'sauna', id: 'apex-bar-sauna', color: '#f43f5e' }
             ];
             configs.forEach((config) => {
                 const container = document.getElementById(config.id);
@@ -1218,10 +1279,7 @@ if (defined('STATISTIK_JSON')) {
                     container.innerHTML = '<div class="text-sm text-gray-500">Keine Daten vorhanden.</div>';
                     return;
                 }
-                const options = config.key === 'bewertung'
-                    ? buildRatingOptions(data, config.color)
-                    : buildBarOptions(data, config.color);
-                const chart = new ApexCharts(container, options);
+                const chart = new ApexCharts(container, buildBarOptions(data, config.color));
                 barChartInstances[config.id] = chart;
                 chart.render();
             });
@@ -1252,7 +1310,7 @@ if (defined('STATISTIK_JSON')) {
                 barChartInstances[key].destroy();
                 delete barChartInstances[key];
             });
-            ['apex-bar-staerke', 'apex-bar-aufguss', 'apex-bar-duftmittel', 'apex-bar-sauna', 'apex-bar-bewertung'].forEach((id) => {
+            ['apex-bar-staerke', 'apex-bar-aufguss', 'apex-bar-duftmittel', 'apex-bar-sauna'].forEach((id) => {
                 const container = document.getElementById(id);
                 if (container) {
                     container.innerHTML = '';
@@ -1349,6 +1407,71 @@ if (defined('STATISTIK_JSON')) {
                 }
             });
         });
+
+        (function() {
+            const aufgussInput = document.getElementById('umfrage-filter-aufguss');
+            const kriteriumInput = document.getElementById('umfrage-filter-kriterium');
+            const avgInput = document.getElementById('umfrage-filter-avg');
+            const resetButton = document.getElementById('umfrage-filter-reset');
+            const downloadButton = document.getElementById('umfrage-download-csv');
+            const cards = Array.from(document.querySelectorAll('#umfrage-karten > div'));
+            if (!aufgussInput || !kriteriumInput || !avgInput || cards.length === 0) return;
+
+            const normalize = (value) => (value || '').toString().trim().toLowerCase();
+            const applyFilters = () => {
+                const aufgussValue = normalize(aufgussInput.value);
+                const kriteriumValue = normalize(kriteriumInput.value);
+                const avgValue = parseFloat(avgInput.value || '0');
+                cards.forEach((card) => {
+                    const aufguss = normalize(card.getAttribute('data-aufguss'));
+                    const kriterium = normalize(card.getAttribute('data-kriterium'));
+                    const avg = parseFloat(card.getAttribute('data-avg') || '0');
+                    const matchAufguss = !aufgussValue || aufguss.includes(aufgussValue);
+                    const matchKriterium = !kriteriumValue || kriterium.includes(kriteriumValue);
+                    const matchAvg = !avgValue || avg >= avgValue;
+                    card.classList.toggle('hidden', !(matchAufguss && matchKriterium && matchAvg));
+                });
+            };
+
+            aufgussInput.addEventListener('change', applyFilters);
+            kriteriumInput.addEventListener('change', applyFilters);
+            avgInput.addEventListener('change', applyFilters);
+            if (resetButton) {
+                resetButton.addEventListener('click', () => {
+                    aufgussInput.value = '';
+                    kriteriumInput.value = '';
+                    avgInput.value = '';
+                    applyFilters();
+                });
+            }
+
+            if (downloadButton) {
+                downloadButton.addEventListener('click', () => {
+                    const rows = [['Aufguss', 'Umfragepunkt', 'Avg_Sterne', 'Bewertungen']];
+                    cards.forEach((card) => {
+                        if (card.classList.contains('hidden')) return;
+                        const aufguss = card.querySelector('.text-sm.text-gray-600')?.textContent?.trim() || '';
+                        const kriterium = card.querySelector('.text-lg.font-semibold')?.textContent?.trim() || '';
+                        const avg = card.getAttribute('data-avg') || '';
+                        const countMatch = card.querySelector('.mt-4 .font-semibold')?.textContent?.trim() || '';
+                        rows.push([aufguss, kriterium, avg, countMatch]);
+                    });
+                    const csv = rows.map((row) => row.map((cell) => {
+                        const safe = (cell || '').toString().replace(/"/g, '""');
+                        return `"${safe}"`;
+                    }).join(',')).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'umfrage_kacheln.csv';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                });
+            }
+        })();
     </script>
 </body>
 </html>

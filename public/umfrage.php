@@ -9,11 +9,29 @@ require_once __DIR__ . '/../src/config/config.php';
 require_once __DIR__ . '/../src/models/aufguss.php';
 require_once __DIR__ . '/../src/db/connection.php';
 
-$planId = isset($_POST['plan_id']) ? (int)$_POST['plan_id'] : 0;
+$planId = isset($_POST['plan_id']) ? (int)$_POST['plan_id'] : (int)($_GET['plan_id'] ?? 0);
 $clearSurvey = isset($_POST['clear']) && (int)$_POST['clear'] === 1;
 $rawBewertungen = $_POST['bewertungen'] ?? [];
 $rawCriteria = $_POST['criteria'] ?? ($_POST['criteria_labels'] ?? []);
 $isSubmit = isset($_POST['submit_ratings']) && $_POST['submit_ratings'] === '1';
+
+$aufgussModel = new Aufguss();
+if ($planId <= 0) {
+    $plaene = $aufgussModel->getAllPlans();
+    if (!empty($plaene)) {
+        $planId = (int)$plaene[0]['id'];
+    }
+}
+
+$db = Database::getInstance()->getConnection();
+if (!$clearSurvey && empty($rawCriteria) && $planId > 0) {
+    $stmt = $db->prepare("SELECT k1, k2, k3, k4, k5, k6 FROM umfrage_kriterien WHERE plan_id = ?");
+    $stmt->execute([$planId]);
+    $row = $stmt->fetch();
+    if ($row) {
+        $rawCriteria = $row;
+    }
+}
 
 $criteriaByAufguss = [];
 $globalCriteria = [];
@@ -48,7 +66,6 @@ if (!$clearSurvey && is_array($rawBewertungen)) {
     }
 }
 
-$aufgussModel = new Aufguss();
 $aufgussMap = [];
 if ($planId > 0) {
     foreach ($aufgussModel->getAufgüsseByPlan($planId) as $aufguss) {
@@ -95,7 +112,6 @@ if ($isSubmit && !$clearSurvey) {
 
     if (!empty($ratings) && !empty($criteriaLabels) && !empty($aufgussMap)) {
         try {
-            $db = Database::getInstance()->getConnection();
             $db->beginTransaction();
             $stmt = $db->prepare(
                 "INSERT INTO umfrage_bewertungen (aufguss_id, plan_id, aufguss_name_id, kriterium, rating, datum)

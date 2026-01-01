@@ -10,11 +10,18 @@ session_start();
 
 require_once __DIR__ . '/../../src/config/config.php';
 require_once __DIR__ . '/../../src/models/aufguss.php';
+require_once __DIR__ . '/../../src/db/connection.php';
 
 $aufgussModel = new Aufguss();
 $plaene = $aufgussModel->getAllPlans();
 
 $planId = isset($_GET['plan_id']) ? (int)$_GET['plan_id'] : 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $postedPlanId = (int)($_POST['plan_id'] ?? 0);
+    if ($postedPlanId > 0) {
+        $planId = $postedPlanId;
+    }
+}
 if ($planId <= 0 && !empty($plaene)) {
     $planId = (int)$plaene[0]['id'];
 }
@@ -40,6 +47,67 @@ $aufguesse = $planId > 0 ? $aufgussModel->getAufgüsseByPlan($planId) : [];
 $criteriaDefaults = [];
 for ($i = 1; $i <= 6; $i++) {
     $criteriaDefaults["k{$i}"] = '';
+}
+$saveMessage = '';
+$saveError = '';
+
+$db = Database::getInstance()->getConnection();
+$storedCriteria = [];
+if ($planId > 0) {
+    $stmt = $db->prepare("SELECT k1, k2, k3, k4, k5, k6 FROM umfrage_kriterien WHERE plan_id = ?");
+    $stmt->execute([$planId]);
+    $storedCriteria = $stmt->fetch() ?: [];
+}
+foreach ($criteriaDefaults as $key => $value) {
+    if (isset($storedCriteria[$key])) {
+        $criteriaDefaults[$key] = (string)$storedCriteria[$key];
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
+    $clear = isset($_POST['clear']) && (int)$_POST['clear'] === 1;
+    $postedCriteria = [];
+    for ($i = 1; $i <= 6; $i++) {
+        $key = "k{$i}";
+        $postedCriteria[$key] = trim((string)($_POST['criteria'][$key] ?? ''));
+    }
+
+    try {
+        if ($clear) {
+            $stmt = $db->prepare("DELETE FROM umfrage_kriterien WHERE plan_id = ?");
+            $stmt->execute([$planId]);
+            foreach ($criteriaDefaults as $key => $value) {
+                $criteriaDefaults[$key] = '';
+            }
+            $saveMessage = 'Umfrage wurde geloescht.';
+        } else {
+            $stmt = $db->prepare(
+                "INSERT INTO umfrage_kriterien (plan_id, k1, k2, k3, k4, k5, k6)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE
+                    k1 = VALUES(k1),
+                    k2 = VALUES(k2),
+                    k3 = VALUES(k3),
+                    k4 = VALUES(k4),
+                    k5 = VALUES(k5),
+                    k6 = VALUES(k6),
+                    updated_at = CURRENT_TIMESTAMP"
+            );
+            $stmt->execute([
+                $planId,
+                $postedCriteria['k1'],
+                $postedCriteria['k2'],
+                $postedCriteria['k3'],
+                $postedCriteria['k4'],
+                $postedCriteria['k5'],
+                $postedCriteria['k6']
+            ]);
+            $criteriaDefaults = $postedCriteria;
+            $saveMessage = 'Umfrage gespeichert.';
+        }
+    } catch (Exception $e) {
+        $saveError = 'Speichern fehlgeschlagen. Bitte erneut versuchen.';
+    }
 }
 ?>
 
@@ -96,9 +164,19 @@ for ($i = 1; $i <= 6; $i++) {
                     Dieser Plan enthaelt noch keine Aufguesse.
                 </div>
             <?php else: ?>
-                <form action="../umfrage.php" method="post" class="space-y-6" id="survey-form">
+                <form action="" method="post" class="space-y-6" id="survey-form">
                     <input type="hidden" name="plan_id" value="<?php echo (int)$planId; ?>">
                     <input type="hidden" name="clear" value="0" id="survey-clear-flag">
+
+                    <?php if ($saveMessage): ?>
+                        <div class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                            <?php echo htmlspecialchars($saveMessage); ?>
+                        </div>
+                    <?php elseif ($saveError): ?>
+                        <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            <?php echo htmlspecialchars($saveError); ?>
+                        </div>
+                    <?php endif; ?>
 
                     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
                         <h4 class="text-sm font-semibold text-gray-900 mb-3">Kriterien fuer alle Aufguesse</h4>
@@ -128,12 +206,12 @@ for ($i = 1; $i <= 6; $i++) {
 
                     <div class="flex flex-wrap gap-3 pt-2">
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                            Weiter zur Umfrage
+                            Umfrage speichern
                         </button>
                         <button type="button" id="survey-delete" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                             Umfrage loeschen
                         </button>
-                        <span class="text-sm text-gray-500 self-center">Einstellungen werden an umfrage.php uebergeben.</span>
+                        <span class="text-sm text-gray-500 self-center">Die Umfrage wird beim ausgewaehlten Plan gespeichert.</span>
                     </div>
                 </form>
             <?php endif; ?>
