@@ -125,10 +125,6 @@ input[type="radio"] {
     transform: scale(1.35);
 }
 
-.apexcharts-legend-series.is-hidden {
-    display: none !important;
-}
-
 .legend-filter {
     cursor: pointer;
 }
