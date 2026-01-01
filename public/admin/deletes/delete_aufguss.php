@@ -2,9 +2,9 @@
 // public/admin/delete_aufguss.php
 
 session_start();
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/db/connection.php';
-require_once __DIR__ . '/../../src/models/aufguss.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/models/aufguss.php';
 
 if (!isset($_GET['id'])) {
     header('Location: aufguesse.php?error=no_id');

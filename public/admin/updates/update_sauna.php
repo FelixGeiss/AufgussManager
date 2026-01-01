@@ -1,16 +1,16 @@
 <?php
 /**
- * Aufgussnamen-Update-Script fuer Inline-Editing
+ * Sauna-Update-Script für Inline-Editing
  */
 
-// Session fuer Sicherheit starten
+// Session für Sicherheit starten
 session_start();
 
 // Konfiguration laden
-require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../../src/config/config.php';
 
 // Datenbankverbindung
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 
 header('Content-Type: application/json');
 
@@ -27,12 +27,12 @@ try {
         throw new Exception('Invalid input data');
     }
 
-    $aufgussId = (int)$input['id'];
+    $saunaId = (int)$input['id'];
     $field = $input['field'];
     $value = trim($input['value']);
 
     // Validierung
-    if (!in_array($field, ['name', 'beschreibung'])) {
+    if (!in_array($field, ['name', 'beschreibung', 'temperatur'])) {
         throw new Exception('Invalid field');
     }
 
@@ -40,10 +40,21 @@ try {
         throw new Exception('Name darf nicht leer sein');
     }
 
-    // Update durchfuehren
-    $sql = "UPDATE aufguss_namen SET {$field} = ? WHERE id = ?";
+    $valueToSave = $value;
+    if ($field === 'temperatur') {
+        if ($value === '') {
+            $valueToSave = null;
+        } elseif (is_numeric($value)) {
+            $valueToSave = (int)$value;
+        } else {
+            throw new Exception('Temperatur muss eine Zahl sein');
+        }
+    }
+
+    // Update durchführen
+    $sql = "UPDATE saunen SET {$field} = ? WHERE id = ?";
     $stmt = $db->prepare($sql);
-    $success = $stmt->execute([$value, $aufgussId]);
+    $success = $stmt->execute([$valueToSave, $saunaId]);
 
     if ($success) {
         echo json_encode(['success' => true]);
@@ -52,7 +63,7 @@ try {
     }
 
 } catch (Exception $e) {
-    error_log('Aufgussnamen update error: ' . $e->getMessage());
+    error_log('Sauna update error: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()

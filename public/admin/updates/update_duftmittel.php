@@ -1,16 +1,16 @@
 <?php
 /**
- * Sauna-Update-Script für Inline-Editing
+ * Duftmittel-Update-Script für Inline-Editing
  */
 
 // Session für Sicherheit starten
 session_start();
 
 // Konfiguration laden
-require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../../src/config/config.php';
 
 // Datenbankverbindung
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 
 header('Content-Type: application/json');
 
@@ -27,12 +27,12 @@ try {
         throw new Exception('Invalid input data');
     }
 
-    $saunaId = (int)$input['id'];
+    $duftmittelId = (int)$input['id'];
     $field = $input['field'];
     $value = trim($input['value']);
 
     // Validierung
-    if (!in_array($field, ['name', 'beschreibung', 'temperatur'])) {
+    if (!in_array($field, ['name', 'beschreibung'])) {
         throw new Exception('Invalid field');
     }
 
@@ -40,21 +40,10 @@ try {
         throw new Exception('Name darf nicht leer sein');
     }
 
-    $valueToSave = $value;
-    if ($field === 'temperatur') {
-        if ($value === '') {
-            $valueToSave = null;
-        } elseif (is_numeric($value)) {
-            $valueToSave = (int)$value;
-        } else {
-            throw new Exception('Temperatur muss eine Zahl sein');
-        }
-    }
-
     // Update durchführen
-    $sql = "UPDATE saunen SET {$field} = ? WHERE id = ?";
+    $sql = "UPDATE duftmittel SET {$field} = ? WHERE id = ?";
     $stmt = $db->prepare($sql);
-    $success = $stmt->execute([$valueToSave, $saunaId]);
+    $success = $stmt->execute([$value, $duftmittelId]);
 
     if ($success) {
         echo json_encode(['success' => true]);
@@ -63,7 +52,7 @@ try {
     }
 
 } catch (Exception $e) {
-    error_log('Sauna update error: ' . $e->getMessage());
+    error_log('Duftmittel update error: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()

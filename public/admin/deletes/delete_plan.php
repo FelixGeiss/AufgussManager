@@ -10,7 +10,7 @@
 session_start();
 
 // Konfiguration laden
-require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../../src/config/config.php';
 
 /**
  * SICHERHEIT: LOGIN-PRÜFUNG (auskommentiert für Entwicklung)
@@ -24,10 +24,10 @@ require_once __DIR__ . '/../../src/config/config.php';
 // }
 
 // Datenbankverbindung
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 
 // Aufguss-Model laden
-require_once __DIR__ . '/../../src/models/aufguss.php';
+require_once __DIR__ . '/../../../src/models/aufguss.php';
 
 // Nur POST-Requests erlauben
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

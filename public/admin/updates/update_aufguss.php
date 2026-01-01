@@ -10,8 +10,8 @@ header('Content-Type: application/json');
 session_start();
 
 // Konfiguration laden
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 
 $response = ['success' => false, 'error' => ''];
 

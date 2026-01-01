@@ -1,16 +1,16 @@
 <?php
 /**
- * Mitarbeiter-Update-Script für Inline-Editing
+ * Aufgussnamen-Update-Script fuer Inline-Editing
  */
 
-// Session für Sicherheit starten
+// Session fuer Sicherheit starten
 session_start();
 
 // Konfiguration laden
-require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../../src/config/config.php';
 
 // Datenbankverbindung
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 
 header('Content-Type: application/json');
 
@@ -27,12 +27,12 @@ try {
         throw new Exception('Invalid input data');
     }
 
-    $mitarbeiterId = (int)$input['id'];
+    $aufgussId = (int)$input['id'];
     $field = $input['field'];
     $value = trim($input['value']);
 
     // Validierung
-    if (!in_array($field, ['name'])) {
+    if (!in_array($field, ['name', 'beschreibung'])) {
         throw new Exception('Invalid field');
     }
 
@@ -40,10 +40,10 @@ try {
         throw new Exception('Name darf nicht leer sein');
     }
 
-    // Update durchführen
-    $sql = "UPDATE mitarbeiter SET {$field} = ? WHERE id = ?";
+    // Update durchfuehren
+    $sql = "UPDATE aufguss_namen SET {$field} = ? WHERE id = ?";
     $stmt = $db->prepare($sql);
-    $success = $stmt->execute([$value, $mitarbeiterId]);
+    $success = $stmt->execute([$value, $aufgussId]);
 
     if ($success) {
         echo json_encode(['success' => true]);
@@ -52,7 +52,7 @@ try {
     }
 
 } catch (Exception $e) {
-    error_log('Mitarbeiter update error: ' . $e->getMessage());
+    error_log('Aufgussnamen update error: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()

@@ -251,7 +251,7 @@ function saveEdit(aufgussId, field) {
         });
 
         // AJAX Request zum Speichern
-        fetch('update_aufguss.php', {
+        fetch('updates/update_aufguss.php', {
                 method: 'POST',
                 body: formData
             })
@@ -290,7 +290,7 @@ function deletePlan(planId, planName) {
     }
 
     // AJAX Request zum Löschen
-    fetch('delete_plan.php', {
+    fetch('deletes/delete_plan.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -329,7 +329,7 @@ function deleteAufguss(aufgussId) {
     }
 
     // Stattdessen: Seite neu laden mit Lösch-Parameter
-    window.location.href = 'delete_aufguss.php?id=' + encodeURIComponent(aufgussId);
+    window.location.href = 'deletes/delete_aufguss.php?id=' + encodeURIComponent(aufgussId);
 }
 
 // Zeit-Validierung für Formulare

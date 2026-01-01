@@ -2147,7 +2147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Erstelle ein Formular für den DELETE-Request
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = 'delete-entry.php'; // Neue PHP-Datei für Lösch-Operationen
+                form.action = 'deletes/delete-entry.php'; // Neue PHP-Datei für Lösch-Operationen
 
                 const typeInput = document.createElement('input');
                 typeInput.type = 'hidden';
@@ -2346,7 +2346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('update_sauna.php', {
+                const response = await fetch('updates/update_sauna.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2407,7 +2407,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('update_mitarbeiter.php', {
+                const response = await fetch('updates/update_mitarbeiter.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2462,7 +2462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('update_aufguss_name.php', {
+                const response = await fetch('updates/update_aufguss_name.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2516,7 +2516,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('update_duftmittel.php', {
+                const response = await fetch('updates/update_duftmittel.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2579,7 +2579,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('delete_upload_file.php', {
+                const response = await fetch('deletes/delete_upload_file.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2606,7 +2606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('delete_entity_image.php', {
+                const response = await fetch('deletes/delete_entity_image.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3171,7 +3171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('update_plan_ad.php', {
+                const response = await fetch('updates/update_plan_ad.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -3212,7 +3212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const backgroundPath = select.value;
 
             try {
-                const response = await fetch('update_plan_background.php', {
+                const response = await fetch('updates/update_plan_background.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -3245,7 +3245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('update_plan_ad_select.php', {
+                const response = await fetch('updates/update_plan_ad_select.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -3284,7 +3284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('delete_plan_ad_media.php', {
+                const response = await fetch('deletes/delete_plan_ad_media.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
