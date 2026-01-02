@@ -18,6 +18,9 @@ vendor/
 # Uploads (sollten nicht versioniert werden)
 public/uploads/*
 
+# Runtime storage files
+storage/*.json
+
 # Konfiguration (sensible Daten)
 src/config/local.php
 .env
