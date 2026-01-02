@@ -3015,6 +3015,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             updateNextAufgussControls(planId);
             updateNextAufgussRowHighlight();
             notifyPublicPlanChange(planId);
+            syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled);
 
             if (!enabled) {
                 for (let i = nextAufgussQueue.length - 1; i >= 0; i -= 1) {
@@ -3026,6 +3027,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     closeNextAufgussPopup();
                 }
             }
+        }
+
+        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled) {
+            fetch('../api/next_aufguss_settings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    plan_id: String(planId),
+                    enabled: !!enabled,
+                    lead_seconds: Number(leadSeconds),
+                    highlight_enabled: !!highlightEnabled
+                })
+            }).catch(() => {});
         }
 
         async function saveAllPlanSettings(planId) {

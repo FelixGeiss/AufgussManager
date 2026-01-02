@@ -65,9 +65,11 @@ let selectedPlanId = null;
 const selectedPlansStorageKey = 'aufgussplanSelectedPlan';
 const planChangeStorageKey = 'aufgussplanPlanChanged';
 const selectedPlanApiUrl = 'api/selected_plan.php';
+const nextAufgussSettingsApiUrl = 'api/next_aufguss_settings.php';
 let serverSelectedPlanId = null;
 let serverPlanSyncInFlight = false;
 let serverSelectedPlanUpdatedAt = null;
+let serverNextAufgussSettings = new Map();
 let planAdIntervalId = null;
 let planAdHideTimeout = null;
 let activeAdPlanId = null;
@@ -154,6 +156,22 @@ function fetchSelectedPlanId() {
         });
 }
 
+function fetchNextAufgussSettings(planId) {
+    if (!planId) {
+        return Promise.resolve(null);
+    }
+    return fetch(`${nextAufgussSettingsApiUrl}?plan_id=${encodeURIComponent(planId)}`, { cache: 'no-store' })
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            const payload = data && data.data ? data.data : null;
+            if (!payload || !payload.settings) return null;
+            return {
+                planId: String(payload.plan_id),
+                settings: payload.settings
+            };
+        });
+}
+
 function syncSelectedPlanIdFromServer() {
     if (serverPlanSyncInFlight) return;
     serverPlanSyncInFlight = true;
@@ -163,7 +181,8 @@ function syncSelectedPlanIdFromServer() {
             serverPlanSyncInFlight = false;
             if (!result || !result.planId) return;
             const { planId, updatedAt } = result;
-            if (serverSelectedPlanId === planId && serverSelectedPlanUpdatedAt === updatedAt) {
+            const samePlanAndTimestamp = serverSelectedPlanId === planId && serverSelectedPlanUpdatedAt === updatedAt;
+            if (samePlanAndTimestamp) {
                 return;
             }
             serverSelectedPlanId = planId;
@@ -176,6 +195,11 @@ function syncSelectedPlanIdFromServer() {
             }
             loadPlans();
             loadAufgussplan();
+            fetchNextAufgussSettings(planId).then(resultSettings => {
+                if (resultSettings && resultSettings.settings) {
+                    serverNextAufgussSettings.set(resultSettings.planId, resultSettings.settings);
+                }
+            }).catch(() => {});
         })
         .catch(error => {
             serverPlanSyncInFlight = false;
@@ -1291,13 +1315,20 @@ function getNextAufgussSettings(planId) {
     const leadKey = `nextAufgussLeadSeconds_${planId}`;
     const highlightKey = `nextAufgussHighlightEnabled_${planId}`;
 
+    const serverSettings = serverNextAufgussSettings.get(String(planId)) || null;
     const enabledStored = localStorage.getItem(enabledKey);
     const leadStored = localStorage.getItem(leadKey);
     const highlightStored = localStorage.getItem(highlightKey);
 
-    const enabled = enabledStored === null ? true : enabledStored === 'true';
-    const leadSeconds = leadStored ? Math.max(1, parseInt(leadStored, 10)) : 5;
-    const highlightEnabled = highlightStored === null ? true : highlightStored === 'true';
+    const enabled = serverSettings && typeof serverSettings.enabled === 'boolean'
+        ? serverSettings.enabled
+        : (enabledStored === null ? true : enabledStored === 'true');
+    const leadSeconds = serverSettings && Number.isFinite(Number(serverSettings.lead_seconds))
+        ? Math.max(1, parseInt(serverSettings.lead_seconds, 10))
+        : (leadStored ? Math.max(1, parseInt(leadStored, 10)) : 5);
+    const highlightEnabled = serverSettings && typeof serverSettings.highlight_enabled === 'boolean'
+        ? serverSettings.highlight_enabled
+        : (highlightStored === null ? true : highlightStored === 'true');
 
     return {
         enabled,
