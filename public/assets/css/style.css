@@ -467,8 +467,6 @@
 .plan-list-row {
     background: rgba(255, 255, 255, 0.35);
     border-bottom: 1px solid #e5e7eb;
-    border-left: 1px solid #e5e7eb;
-    border-right: 1px solid #e5e7eb;
     scroll-margin-top: 80px;
 }
 

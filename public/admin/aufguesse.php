@@ -463,13 +463,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-left: 0;
         }
 
-        .plan-table-scroll tbody tr td:first-child {
-            border-left: 1px solid #e5e7eb;
-        }
-
-        .plan-table-scroll tbody tr td:last-child {
-            border-right: 1px solid #e5e7eb;
-        }
     </style>
 </head>
 
@@ -3227,7 +3220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             updateNextAufgussControls(planId);
         }
 
-        function savePlanSettings(planId) {
+        function savePlanSettings(planId, options = {}) {
             const enabledInput = document.getElementById(`next-aufguss-enabled-${planId}`);
             const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
@@ -3235,6 +3228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
             const themeColorInput = document.getElementById(`next-aufguss-theme-color-${planId}`);
             if (!enabledInput || !leadInput) return;
+            const persist = !!options.persist;
 
             const enabled = enabledInput.checked;
             const leadSeconds = Math.max(1, parseInt(leadInput.value || '5', 10));
@@ -3276,21 +3270,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             toggleAdminClock(planId, clockEnabled);
             updateNextAufgussControls(planId);
             updateNextAufgussRowHighlight();
-            notifyPublicPlanChange(planId);
-            syncNextAufgussSettings(
-                planId,
-                enabled,
-                leadSeconds,
-                highlightEnabled,
-                clockEnabled,
-                bannerEnabled,
-                currentSettings ? currentSettings.bannerMode : 'text',
-                bannerText,
-                bannerImage,
-                bannerHeight,
-                bannerWidth,
-                themeColor
-            );
+            if (persist) {
+                syncNextAufgussSettings(
+                    planId,
+                    enabled,
+                    leadSeconds,
+                    highlightEnabled,
+                    clockEnabled,
+                    bannerEnabled,
+                    currentSettings ? currentSettings.bannerMode : 'text',
+                    bannerText,
+                    bannerImage,
+                    bannerHeight,
+                    bannerWidth,
+                    themeColor
+                );
+                notifyPublicPlanChange(planId);
+            }
 
             if (!enabled) {
                 for (let i = nextAufgussQueue.length - 1; i >= 0; i -= 1) {
@@ -3326,7 +3322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         async function saveAllPlanSettings(planId) {
-            savePlanSettings(planId);
+            savePlanSettings(planId, { persist: true });
             await savePlanAdSettings(planId);
         }
 
@@ -4037,21 +4033,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 bannerHeight
             });
 
-            syncNextAufgussSettings(
-                planId,
-                currentSettings.enabled,
-                currentSettings.leadSeconds,
-                currentSettings.highlightEnabled,
-                currentSettings.clockEnabled,
-                bannerEnabled,
-                bannerMode,
-                bannerText,
-                bannerImage,
-                bannerHeight,
-                bannerWidth,
-                currentSettings.themeColor
-            );
-            notifyPublicPlanChange(planId);
             closePlanBannerModal();
         }
 
