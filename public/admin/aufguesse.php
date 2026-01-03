@@ -4033,6 +4033,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 bannerHeight
             });
 
+            const updatedSettings = nextAufgussSettings.get(String(planId)) || currentSettings;
+            syncNextAufgussSettings(
+                planId,
+                updatedSettings.enabled,
+                updatedSettings.leadSeconds,
+                updatedSettings.highlightEnabled,
+                updatedSettings.clockEnabled,
+                bannerEnabled,
+                bannerMode,
+                bannerText,
+                bannerImage,
+                bannerHeight,
+                bannerWidth,
+                updatedSettings.themeColor
+            );
+            notifyPublicPlanChange(planId);
             closePlanBannerModal();
         }
 
