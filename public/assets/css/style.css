@@ -283,11 +283,14 @@
     scroll-padding-top: 80px;
 }
 
-.kiosk-view .plan-table-wrap .plan-list,
-.kiosk-view .plan-table-wrap table {
+.kiosk-view .plan-table-wrap {
+    height: 100vh;
+    max-height: 100vh;
+}
+
+.kiosk-view .plan-table-wrap {
     border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: 0.75rem;
-    overflow: hidden;
 }
 
 .kiosk-view .plan-table-wrap {
