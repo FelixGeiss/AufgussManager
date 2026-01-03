@@ -90,13 +90,15 @@ try {
         mkdir($uploadDir, 0755, true);
     }
 
-    // Altes Bild löschen falls vorhanden
-    $stmt = $db->prepare("SELECT {$column} FROM {$table} WHERE id = ?");
-    $stmt->execute([$entityId]);
-    $oldImage = $stmt->fetchColumn();
+    // Altes Bild nur loeschen, wenn es kein Plan-Hintergrund ist
+    if ($entityType !== 'plan') {
+        $stmt = $db->prepare("SELECT {$column} FROM {$table} WHERE id = ?");
+        $stmt->execute([$entityId]);
+        $oldImage = $stmt->fetchColumn();
 
-    if ($oldImage && file_exists($uploadBaseDir . $oldImage)) {
-        unlink($uploadBaseDir . $oldImage);
+        if ($oldImage && file_exists($uploadBaseDir . $oldImage)) {
+            unlink($uploadBaseDir . $oldImage);
+        }
     }
 
     // Neues Bild speichern
@@ -131,3 +133,4 @@ try {
     ]);
 }
 ?>
+
