@@ -448,6 +448,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .plan-table-scroll .zeit-cell .display-mode {
             color: #111827 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding-right: 1.25rem;
+        }
+
+        .plan-table-scroll .zeit-cell .display-mode svg {
+            position: absolute;
+            right: 0.35rem;
+            top: 0.35rem;
+            margin-left: 0;
         }
 
         .plan-table-scroll tbody tr td:first-child {
