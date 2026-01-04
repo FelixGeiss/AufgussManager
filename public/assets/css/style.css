@@ -355,7 +355,7 @@
     width: var(--plan-clock-width, 220px);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0;
 }
 
 .plan-view-with-clock .plan-clock {
