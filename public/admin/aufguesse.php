@@ -388,6 +388,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: var(--plan-accent-color, #ffffff);
         }
 
+        .plan-banner-status {
+            min-width: 88px;
+            min-height: 60px;
+            text-align: center;
+        }
+
         .plan-table-head,
         .plan-table-head th {
             background-color: var(--plan-accent-color, #ffffff);
@@ -556,9 +562,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            <div id="plan-clock-admin-<?php echo $plan['id']; ?>" class="plan-clock-admin hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex flex-col items-center justify-center bg-white/70 border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
-                                <div class="plan-clock-admin-time text-lg font-semibold text-gray-900">--:--</div>
-                                <div class="plan-clock-admin-date text-xs text-gray-600">--.--.----</div>
+                            <div class="flex-1 flex items-center justify-center gap-2">
+                                <span id="plan-banner-status-<?php echo $plan['id']; ?>" class="plan-banner-status inline-flex flex-col items-center justify-center text-xs font-semibold text-white bg-[#2563eb] border border-[#2563eb] rounded-lg px-3 py-2 shadow-sm">Banner: Aus</span>
+                                <div id="plan-clock-admin-<?php echo $plan['id']; ?>" class="plan-clock-admin hidden inline-flex flex-col items-center justify-center bg-white/70 border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+                                    <div class="plan-clock-admin-time text-lg font-semibold text-gray-900">--:--</div>
+                                    <div class="plan-clock-admin-date text-xs text-gray-600">--.--.----</div>
+                                </div>
                             </div>
                             <div class="text-right">
                                 <div class="flex flex-wrap items-center justify-end gap-2">
@@ -2145,15 +2154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <input type="hidden" id="planBannerPlanId" value="">
             <div class="space-y-4">
-                <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
-                    <input id="planBannerEnabled" type="checkbox" class="sr-only peer">
-                    <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
-                        <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
-                        </svg>
-                    </span>
-                    <span>Banner anzeigen</span>
-                </label>
+                <input id="planBannerEnabled" type="checkbox" class="sr-only">
                 <div>
                     <label for="planBannerText" class="block text-sm font-medium text-gray-700 mb-1">Banner-Text (optional)</label>
                     <textarea id="planBannerText" rows="5" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Text fuer den Info-Banner" style="width: 220px; box-sizing: border-box;"></textarea>
@@ -3218,9 +3219,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             toggleAdminClock(planId, settings.clockEnabled);
             updateNextAufgussControls(planId);
+            updatePlanBannerStatus(planId);
         }
 
-        function savePlanSettings(planId, options = {}) {
+                function updatePlanBannerStatus(planId) {
+            const statusEl = document.getElementById(`plan-banner-status-${planId}`);
+            if (!statusEl) return;
+            const settings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
+            let label = 'Banner: Aus';
+            if (settings && settings.bannerEnabled) {
+                label = settings.bannerMode === 'image' ? 'Banner: Bild' : 'Banner: Text';
+            }
+            statusEl.textContent = label;
+        }
+
+function savePlanSettings(planId, options = {}) {
             const enabledInput = document.getElementById(`next-aufguss-enabled-${planId}`);
             const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
@@ -3236,6 +3249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const clockEnabled = clockInput ? clockInput.checked : false;
             const currentSettings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
             const bannerEnabled = bannerInput ? bannerInput.checked : (currentSettings ? !!currentSettings.bannerEnabled : false);
+            const bannerMode = currentSettings ? String(currentSettings.bannerMode || 'text') : 'text';
             const bannerText = currentSettings ? String(currentSettings.bannerText || '') : '';
             const bannerImage = currentSettings ? String(currentSettings.bannerImage || '') : '';
             const bannerHeight = currentSettings ? Math.max(40, parseInt(currentSettings.bannerHeight || 160, 10)) : 160;
@@ -3257,6 +3271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 highlightEnabled,
                 clockEnabled,
                 bannerEnabled,
+                bannerMode,
                 bannerText,
                 bannerImage,
                 bannerHeight,
@@ -3278,7 +3293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     highlightEnabled,
                     clockEnabled,
                     bannerEnabled,
-                    currentSettings ? currentSettings.bannerMode : 'text',
+                    bannerMode,
                     bannerText,
                     bannerImage,
                     bannerHeight,
@@ -3319,6 +3334,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     theme_color: String(themeColor || '#ffffff')
                 })
             }).catch(() => {});
+        }
+
+        async function persistBannerSettings(planId) {
+            try {
+                const response = await fetch(`../api/next_aufguss_settings.php?plan_id=${encodeURIComponent(planId)}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                const serverSettings = data && data.data ? data.data.settings : null;
+                const currentSettings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
+                const payload = {
+                    plan_id: String(planId),
+                    enabled: serverSettings ? !!serverSettings.enabled : !!currentSettings.enabled,
+                    lead_seconds: serverSettings ? Number(serverSettings.lead_seconds || 5) : Number(currentSettings.leadSeconds || 5),
+                    highlight_enabled: serverSettings ? !!serverSettings.highlight_enabled : !!currentSettings.highlightEnabled,
+                    clock_enabled: serverSettings ? !!serverSettings.clock_enabled : !!currentSettings.clockEnabled,
+                    banner_enabled: !!currentSettings.bannerEnabled,
+                    banner_mode: String(currentSettings.bannerMode || 'text'),
+                    banner_text: String(currentSettings.bannerText || ''),
+                    banner_image: String(currentSettings.bannerImage || ''),
+                    banner_height: Number(currentSettings.bannerHeight || 160),
+                    banner_width: Number(currentSettings.bannerWidth || 220),
+                    theme_color: serverSettings && typeof serverSettings.theme_color === 'string'
+                        ? serverSettings.theme_color
+                        : String(currentSettings.themeColor || '#ffffff')
+                };
+                syncNextAufgussSettings(
+                    planId,
+                    payload.enabled,
+                    payload.lead_seconds,
+                    payload.highlight_enabled,
+                    payload.clock_enabled,
+                    payload.banner_enabled,
+                    payload.banner_mode,
+                    payload.banner_text,
+                    payload.banner_image,
+                    payload.banner_height,
+                    payload.banner_width,
+                    payload.theme_color
+                );
+                notifyPublicPlanChange(planId);
+            } catch (error) {
+                // keep local changes; server sync can be retried on save
+            }
         }
 
         async function saveAllPlanSettings(planId) {
@@ -3852,7 +3911,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     clockInput.addEventListener('change', () => savePlanSettings(planId));
                 }
                 if (bannerInput) {
-                    bannerInput.addEventListener('change', () => savePlanSettings(planId));
+                    bannerInput.addEventListener('change', () => {
+                        savePlanSettings(planId);
+                        updatePlanBannerStatus(planId);
+                        persistBannerSettings(planId);
+                    });
                 }
                 if (themeColorInput) {
                     themeColorInput.addEventListener('change', () => savePlanSettings(planId));
@@ -4032,6 +4095,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 bannerWidth,
                 bannerHeight
             });
+            updatePlanBannerStatus(planId);
 
             const updatedSettings = nextAufgussSettings.get(String(planId)) || currentSettings;
             syncNextAufgussSettings(
