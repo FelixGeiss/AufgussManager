@@ -469,6 +469,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-left: 0;
         }
 
+        .plan-temp-badge {
+            background: var(--plan-accent-color, #2563eb);
+            border-color: var(--plan-accent-color, #2563eb);
+            color: #111827;
+            font-weight: 600;
+        }
+
     </style>
 </head>
 
@@ -908,7 +915,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             </div>
                                                                         <?php endif; ?>
                                                                         <?php if ($aufguss['sauna_temperatur'] !== null && $aufguss['sauna_temperatur'] !== ''): ?>
-                                                                            <span class="absolute -top-1 -right-6 bg-white text-[10px] leading-none px-2 py-0.5 rounded-full border border-gray-200 text-gray-700">
+                                                                            <span class="plan-temp-badge absolute -top-1 -right-6 text-[10px] leading-none px-2 py-0.5 rounded-full border">
                                                                                 <?php echo (int)$aufguss['sauna_temperatur']; ?>&deg;C
                                                                             </span>
                                                                         <?php endif; ?>
@@ -3380,6 +3387,54 @@ function savePlanSettings(planId, options = {}) {
             }
         }
 
+        async function persistThemeColorSettings(planId) {
+            try {
+                const response = await fetch(`../api/next_aufguss_settings.php?plan_id=${encodeURIComponent(planId)}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                const serverSettings = data && data.data ? data.data.settings : null;
+                const currentSettings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
+                const payload = {
+                    plan_id: String(planId),
+                    enabled: serverSettings ? !!serverSettings.enabled : !!currentSettings.enabled,
+                    lead_seconds: serverSettings ? Number(serverSettings.lead_seconds || 5) : Number(currentSettings.leadSeconds || 5),
+                    highlight_enabled: serverSettings ? !!serverSettings.highlight_enabled : !!currentSettings.highlightEnabled,
+                    clock_enabled: serverSettings ? !!serverSettings.clock_enabled : !!currentSettings.clockEnabled,
+                    banner_enabled: serverSettings ? !!serverSettings.banner_enabled : !!currentSettings.bannerEnabled,
+                    banner_mode: serverSettings && typeof serverSettings.banner_mode === 'string'
+                        ? serverSettings.banner_mode
+                        : String(currentSettings.bannerMode || 'text'),
+                    banner_text: serverSettings && typeof serverSettings.banner_text === 'string'
+                        ? serverSettings.banner_text
+                        : String(currentSettings.bannerText || ''),
+                    banner_image: serverSettings && typeof serverSettings.banner_image === 'string'
+                        ? serverSettings.banner_image
+                        : String(currentSettings.bannerImage || ''),
+                    banner_height: serverSettings ? Number(serverSettings.banner_height || 160) : Number(currentSettings.bannerHeight || 160),
+                    banner_width: serverSettings ? Number(serverSettings.banner_width || 220) : Number(currentSettings.bannerWidth || 220),
+                    theme_color: String(currentSettings.themeColor || '#ffffff')
+                };
+                syncNextAufgussSettings(
+                    planId,
+                    payload.enabled,
+                    payload.lead_seconds,
+                    payload.highlight_enabled,
+                    payload.clock_enabled,
+                    payload.banner_enabled,
+                    payload.banner_mode,
+                    payload.banner_text,
+                    payload.banner_image,
+                    payload.banner_height,
+                    payload.banner_width,
+                    payload.theme_color
+                );
+                notifyPublicPlanChange(planId);
+            } catch (error) {
+                // keep local changes; server sync can be retried on save
+            }
+        }
+
         async function saveAllPlanSettings(planId) {
             savePlanSettings(planId, { persist: true });
             await savePlanAdSettings(planId);
@@ -3918,7 +3973,10 @@ function savePlanSettings(planId, options = {}) {
                     });
                 }
                 if (themeColorInput) {
-                    themeColorInput.addEventListener('change', () => savePlanSettings(planId));
+                    themeColorInput.addEventListener('change', () => {
+                        savePlanSettings(planId);
+                        persistThemeColorSettings(planId);
+                    });
                 }
                 if (planForm) {
                     planForm.addEventListener('submit', () => savePlanSettings(planId));

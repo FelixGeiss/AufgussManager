@@ -1151,7 +1151,7 @@ function formatSaunaTempText(aufguss) {
 function formatSaunaTempBadge(aufguss) {
     const tempText = formatSaunaTempText(aufguss);
     if (!tempText) return '';
-    return `<span class="absolute -top-1 -right-8 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${escapeHtml(tempText)}&deg;C</span>`;
+    return `<span class="plan-temp-badge absolute -top-1 -right-8 text-sm leading-none px-3 py-1.5 rounded-full border">${escapeHtml(tempText)}&deg;C</span>`;
 }
 
 function escapeHtml(value) {
@@ -1510,7 +1510,7 @@ function buildNextAufgussHtml(aufguss) {
             : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgiesser-Bild</div>`);
 
     const saunaBadge = saunaTempText
-        ? `<span class="absolute -top-2 -right-8 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${escapeHtml(saunaTempText)}&deg;C</span>`
+        ? `<span class="plan-temp-badge absolute -top-2 -right-8 text-sm leading-none px-3 py-1.5 rounded-full border">${escapeHtml(saunaTempText)}&deg;C</span>`
         : '';
     const saunaImg = aufguss.sauna_bild
         ? `<div class="relative">${saunaBadge}<img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>`

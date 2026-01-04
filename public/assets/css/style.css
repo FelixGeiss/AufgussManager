@@ -532,6 +532,13 @@
     font-size: 0.75rem;
 }
 
+.plan-temp-badge {
+    background: var(--plan-accent-color, #2563eb);
+    border-color: var(--plan-accent-color, #2563eb);
+    color: #111827 !important;
+    font-weight: 600;
+}
+
 .kiosk-view .plan-list-cell {
     font-size: clamp(0.95rem, 1.2vw, 1.4rem);
     padding: clamp(0.75rem, 1vw, 1.5rem) clamp(1rem, 1.6vw, 2rem);
