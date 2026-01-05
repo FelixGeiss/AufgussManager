@@ -462,6 +462,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 600;
         }
 
+        .plan-table-scope .plan-temp-badge-admin {
+            border: 1px solid #ffffff;
+        }
+
         .plan-table-scope {
             --plan-accent-color: #ffffff;
             --plan-text-color: #111827;
@@ -910,7 +914,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             </div>
                                                                         <?php endif; ?>
                                                                         <?php if ($aufguss['sauna_temperatur'] !== null && $aufguss['sauna_temperatur'] !== ''): ?>
-                                                                            <span class="plan-temp-badge absolute -top-1 -right-6 text-[10px] leading-none px-2 py-0.5 rounded-full border">
+                                                                            <span class="plan-temp-badge plan-temp-badge-admin absolute -top-1 -right-6 text-[10px] leading-none px-2 py-0.5 rounded-full">
                                                                                 <?php echo (int)$aufguss['sauna_temperatur']; ?>&deg;C
                                                                             </span>
                                                                         <?php endif; ?>
