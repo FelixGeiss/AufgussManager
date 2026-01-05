@@ -323,13 +323,13 @@
     font-size: 2rem;
     font-weight: 700;
     line-height: 1;
-    color: #111827;
+    color: var(--plan-text-color, #111827);
 }
 
 .plan-view-with-clock .plan-clock-date {
     margin-top: 0.3rem;
     font-size: 0.95rem;
-    color: #374151;
+    color: var(--plan-text-color, #111827);
 }
 
 .plan-view-with-clock .plan-clock-banner {
@@ -439,7 +439,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     font-size: 1.125rem;
-    color: #111827;
+    color: var(--plan-text-color, #111827);
     text-align: center;
     display: flex;
     align-items: center;
@@ -457,7 +457,7 @@
 .plan-list-row .plan-list-cell:first-child {
     font-size: 1.125rem;
     font-weight: 400;
-    color: #111827;
+    color: var(--plan-text-color, #111827);
 }
 
 .plan-media-stack {
@@ -494,8 +494,16 @@
 .plan-temp-badge {
     background: var(--plan-accent-color, #2563eb);
     border-color: var(--plan-accent-color, #2563eb);
-    color: #111827 !important;
+    color: var(--plan-text-color, #111827) !important;
     font-weight: 600;
+}
+
+.plan-color-scope {
+    --plan-text-color: #111827;
+}
+
+.plan-color-scope .text-gray-900 {
+    color: var(--plan-text-color, #111827) !important;
 }
 
 .kiosk-view .plan-list-cell {

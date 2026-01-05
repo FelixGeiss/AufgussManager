@@ -470,6 +470,10 @@ function displayAufgussplan(aufguesse) {
 function initPlanChangeListener() {
     window.addEventListener('storage', event => {
         if (!event || !event.key) return;
+        if (event.key === 'aufgussplanForceReload') {
+            window.location.reload();
+            return;
+        }
         if (event.key !== selectedPlansStorageKey && event.key !== planChangeStorageKey) return;
         restoreSelectedPlans();
         loadPlans();
@@ -509,6 +513,7 @@ function renderPlanView(planId, plaene, aufguesse) {
     const bannerText = planSettings ? planSettings.bannerText : '';
     const bannerImage = planSettings ? planSettings.bannerImage : '';
     const bannerWidth = planSettings ? planSettings.bannerWidth : 220;
+    const textColor = planSettings ? planSettings.textColor : '';
     const themeColor = planSettings ? planSettings.themeColor : '';
     const clockBlockHeight = 96;
     const clockClass = (clockEnabled || bannerEnabled) ? ' plan-view-with-clock' : '';
@@ -529,10 +534,12 @@ function renderPlanView(planId, plaene, aufguesse) {
     const clockVars = (clockEnabled || bannerContent)
         ? `--plan-clock-width: ${bannerWidth || 220}px; --plan-clock-stack-height: ${clockStackHeight}px;`
         : '';
+    const textVars = textColor ? `--plan-text-color: ${textColor};` : '';
     const accentVars = themeColor ? `--plan-accent-color: ${themeColor};` : '';
-    const wrapperStyle = (clockVars || accentVars)
-        ? ` style="${clockVars}${accentVars ? ` ${accentVars}` : ''}"`
+    const wrapperStyle = (clockVars || accentVars || textVars)
+        ? ` style="${clockVars}${accentVars ? ` ${accentVars}` : ''}${textVars ? ` ${textVars}` : ''}"`
         : '';
+    const outerStyle = textVars ? ` style="${textVars}"` : '';
     const clockStackStyle = clockVars ? ` style="${clockVars}"` : '';
     const bannerHtml = bannerContent
         ? `<div class="plan-clock-banner">${bannerContent}</div>`
@@ -623,7 +630,7 @@ function renderPlanView(planId, plaene, aufguesse) {
 
     if (hideHeader) {
         container.innerHTML = `
-            <div class="relative rounded-lg overflow-hidden${clockClass}"${wrapperStyle}>
+            <div class="relative rounded-lg overflow-hidden${clockClass} plan-color-scope"${wrapperStyle}>
                 ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                 <div class="relative">
                     ${clockHtml}
@@ -644,10 +651,10 @@ function renderPlanView(planId, plaene, aufguesse) {
     }
 
     container.innerHTML = `
-            <div class="bg-white rounded-lg shadow-md relative">
+            <div class="bg-white rounded-lg shadow-md relative plan-color-scope"${outerStyle}>
             <div class="relative p-6">
                 ${headerHtml}
-                <div class="relative rounded-lg overflow-hidden${clockClass}"${wrapperStyle}>
+                <div class="relative rounded-lg overflow-hidden${clockClass} plan-color-scope"${wrapperStyle}>
                     ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                     <div class="relative">
                         ${clockHtml}
@@ -1447,6 +1454,7 @@ function getNextAufgussSettings(planId) {
     const bannerHeightStored = localStorage.getItem(bannerHeightKey);
     const bannerWidthStored = localStorage.getItem(bannerWidthKey);
     const themeColorStored = localStorage.getItem(themeColorKey);
+    const textColorStored = localStorage.getItem(`nextAufgussTextColor_${planId}`);
 
     const enabled = serverSettings && typeof serverSettings.enabled === 'boolean'
         ? serverSettings.enabled
@@ -1481,6 +1489,9 @@ function getNextAufgussSettings(planId) {
     const themeColor = serverSettings && typeof serverSettings.theme_color === 'string'
         ? serverSettings.theme_color
         : (themeColorStored || '#ffffff');
+    const textColor = serverSettings && typeof serverSettings.text_color === 'string'
+        ? serverSettings.text_color
+        : (textColorStored || '#111827');
 
     return {
         enabled,
@@ -1493,7 +1504,8 @@ function getNextAufgussSettings(planId) {
         bannerImage,
         bannerHeight,
         bannerWidth,
-        themeColor
+        themeColor,
+        textColor
     };
 }
 
