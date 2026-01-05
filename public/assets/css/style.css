@@ -321,7 +321,7 @@
     padding: 0.75rem 1rem;
     background: var(--plan-accent-color, #ffffff);
     border: 0;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
     border-radius: 0;
     text-align: center;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
@@ -739,10 +739,6 @@
         border-width: 2px !important;
     }
 
-    .plan-view-with-clock .plan-clock {
-        border-bottom-width: 2px !important;
-        border-bottom-color: #e5e7eb !important;
-    }
 }
 
 @media (min-width: 3840px) {
@@ -837,6 +833,10 @@
         border-width: 5px !important;
     }
 
+    .plan-view-with-clock .plan-clock {
+        border-bottom-width: 5px !important;
+        border-bottom-color: #e5e7eb !important;
+    }
     .kiosk-view .plan-strength-badge {
         font-size: clamp(2.8rem, 3.4vw, 5.4rem) !important;
         padding: 1.8rem 3.8rem !important;
