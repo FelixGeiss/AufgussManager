@@ -743,3 +743,114 @@
     }
 }
 
+@media (min-width: 3840px) {
+    .kiosk-view .plan-list-head .plan-list-cell {
+        font-size: clamp(2.8rem, 3.2vw, 5.6rem) !important;
+        padding: clamp(2.2rem, 3vw, 4.8rem) clamp(2.4rem, 3.4vw, 5.2rem) !important;
+    }
+
+    .kiosk-view .plan-list-cell {
+        font-size: clamp(2.4rem, 2.9vw, 4.8rem) !important;
+        padding: clamp(2rem, 2.8vw, 4.2rem) clamp(2.2rem, 3.2vw, 4.8rem) !important;
+    }
+
+    .kiosk-view .plan-list-body .plan-list-cell {
+        font-size: clamp(2.2rem, 2.6vw, 4.2rem) !important;
+    }
+
+    .kiosk-view .plan-list-row .plan-list-cell:first-child {
+        font-size: clamp(2.6rem, 3vw, 5.2rem) !important;
+    }
+
+    .kiosk-view .plan-media-stack img,
+    .kiosk-view .plan-list-row img,
+    .kiosk-view .plan-list-people .h-10,
+    .kiosk-view .plan-list-people .w-10,
+    .kiosk-view .plan-list-people img {
+        width: clamp(160px, 12vw, 360px) !important;
+        height: clamp(160px, 12vw, 360px) !important;
+    }
+
+    .kiosk-view .plan-list-people .text-sm {
+        font-size: clamp(2.2rem, 2.8vw, 4.6rem) !important;
+    }
+
+    .kiosk-view .plan-list-people-wrap {
+        gap: clamp(1.4rem, 2.4vw, 3.6rem);
+    }
+
+    .kiosk-view .plan-list-cell.text-sm {
+        font-size: clamp(2.2rem, 2.8vw, 4.6rem) !important;
+    }
+
+    .kiosk-view .plan-list-cell.text-lg {
+        font-size: clamp(2.8rem, 3.4vw, 5.6rem) !important;
+    }
+
+    .kiosk-view .plan-list-time {
+        gap: clamp(0.6rem, 1.2vw, 1.6rem);
+    }
+
+    .plan-list-head,
+    .plan-list-row {
+        column-gap: clamp(0.8rem, 1.4vw, 2.2rem);
+    }
+
+    .plan-list-row {
+        scroll-margin-top: clamp(120px, 8vw, 200px);
+    }
+
+    .plan-media-stack {
+        gap: clamp(0.8rem, 1.2vw, 1.8rem);
+    }
+
+    .kiosk-view .plan-table-wrap {
+        padding: 0 clamp(2rem, 3vw, 5rem);
+    }
+
+    .plan-view-with-clock .plan-table-wrap {
+        padding-right: calc(
+            var(--plan-clock-display-width, var(--plan-clock-width, 220px)) +
+            var(--plan-clock-gap, 24px) +
+            clamp(2rem, 3vw, 5rem)
+        );
+        padding-left: clamp(2rem, 3vw, 5rem);
+    }
+
+    .plan-view-with-clock .plan-list-head {
+        right: calc(
+            var(--plan-clock-display-width, var(--plan-clock-width, 220px)) +
+            var(--plan-clock-gap, 24px) +
+            clamp(2rem, 3vw, 5rem)
+        );
+        left: clamp(2rem, 3vw, 5rem);
+    }
+
+    .plan-view-with-clock .plan-clock-stack {
+        right: clamp(2rem, 3vw, 5rem);
+    }
+
+    .plan-temp-badge,
+    .plan-strength-badge {
+        border-width: 5px !important;
+    }
+
+    .kiosk-view .plan-strength-badge {
+        font-size: clamp(2.8rem, 3.4vw, 5.4rem) !important;
+        padding: 1.8rem 3.8rem !important;
+        line-height: 1 !important;
+    }
+
+    .plan-view-with-clock .plan-clock-time {
+        font-size: clamp(4.2rem, 5vw, 7.2rem) !important;
+    }
+
+    .plan-view-with-clock .plan-clock-date {
+        font-size: clamp(2.2rem, 3vw, 4.2rem) !important;
+    }
+
+    .kiosk-view {
+        --plan-header-height: clamp(240px, 14vw, 340px);
+    }
+}
+

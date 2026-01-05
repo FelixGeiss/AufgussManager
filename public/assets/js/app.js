@@ -1104,7 +1104,7 @@ function formatAufgiesserHtml(aufguss) {
         `;
     });
 
-    return `<div class="flex flex-wrap justify-center gap-4 w-full">${cards.join('')}</div>`;
+    return `<div class="flex flex-wrap justify-center gap-4 w-full plan-list-people-wrap">${cards.join('')}</div>`;
 }
 
 function parseAufgiesserItems(aufguss) {
