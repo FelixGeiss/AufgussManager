@@ -17,7 +17,7 @@ require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../src/db/connection.php';
 
 require_login();
-require_admin();
+require_permission('mitarbeiter');
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -110,6 +110,15 @@ require_admin();
                                 </svg>
                             </span>
                             Umfrage
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="can_mitarbeiter" class="peer sr-only">
+                            <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                </svg>
+                            </span>
+                            Mitarbeiter
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="is_admin" class="peer sr-only">

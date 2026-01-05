@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../src/auth.php';
 
 $loggedIn = is_admin_logged_in();
-$isAdmin = is_admin_user();
+$canMitarbeiter = has_permission('mitarbeiter');
 $canAufguesse = has_permission('aufguesse');
 $canStatistik = has_permission('statistik');
 $canUmfragen = has_permission('umfragen');
@@ -15,9 +15,10 @@ $canUmfragen = has_permission('umfragen');
             <a href="../umfrage.php" class="mr-4 hover:underline">Umfrage anzeigen</a>
             <?php if ($loggedIn): ?>
                 <a href="index.php" class="mr-4 hover:underline">Dashboard</a>
-                <?php if ($isAdmin): ?>
+                <?php if ($canMitarbeiter): ?>
                     <a href="mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
                 <?php endif; ?>
+                <a href="bildschirme.php" class="mr-4 hover:underline">Bildschirme</a>
                 <?php if ($canAufguesse): ?>
                     <a href="aufguesse.php" class="mr-4 hover:underline">Aufguesse</a>
                 <?php endif; ?>

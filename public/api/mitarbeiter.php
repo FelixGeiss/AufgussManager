@@ -21,7 +21,7 @@ require_once __DIR__ . '/../../src/db/connection.php';
 if (!is_admin_logged_in()) {
     sendResponse(false, 'Nicht angemeldet', null, 401);
 }
-if (!is_admin_user()) {
+if (!has_permission('mitarbeiter')) {
     sendResponse(false, 'Keine Berechtigung', null, 403);
 }
 
@@ -52,7 +52,7 @@ try {
 
 function handleGetMitarbeiter($db) {
     $stmt = $db->query(
-        "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, is_admin
+        "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, is_admin
          FROM mitarbeiter
          ORDER BY name ASC"
     );
@@ -89,11 +89,12 @@ function handleCreateMitarbeiter($db) {
     $canAufguesse = normalizeBool($input['can_aufguesse'] ?? false);
     $canStatistik = normalizeBool($input['can_statistik'] ?? false);
     $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
+    $canMitarbeiter = normalizeBool($input['can_mitarbeiter'] ?? false);
     $isAdmin = normalizeBool($input['is_admin'] ?? false);
 
     $stmt = $db->prepare(
-        "INSERT INTO mitarbeiter (name, position, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, is_admin)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO mitarbeiter (name, position, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, is_admin)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     $stmt->execute([
         $name,
@@ -104,6 +105,7 @@ function handleCreateMitarbeiter($db) {
         $canAufguesse,
         $canStatistik,
         $canUmfragen,
+        $canMitarbeiter,
         $isAdmin
     ]);
 
@@ -160,11 +162,12 @@ function handleUpdateMitarbeiter($db) {
     $canAufguesse = normalizeBool($input['can_aufguesse'] ?? false);
     $canStatistik = normalizeBool($input['can_statistik'] ?? false);
     $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
+    $canMitarbeiter = normalizeBool($input['can_mitarbeiter'] ?? false);
     $isAdmin = normalizeBool($input['is_admin'] ?? false);
 
     $stmt = $db->prepare(
         "UPDATE mitarbeiter
-         SET name = ?, position = ?, username = ?, password_hash = ?, aktiv = ?, can_aufguesse = ?, can_statistik = ?, can_umfragen = ?, is_admin = ?
+         SET name = ?, position = ?, username = ?, password_hash = ?, aktiv = ?, can_aufguesse = ?, can_statistik = ?, can_umfragen = ?, can_mitarbeiter = ?, is_admin = ?
          WHERE id = ?"
     );
     $stmt->execute([
@@ -176,6 +179,7 @@ function handleUpdateMitarbeiter($db) {
         $canAufguesse,
         $canStatistik,
         $canUmfragen,
+        $canMitarbeiter,
         $isAdmin,
         $mitarbeiterId
     ]);

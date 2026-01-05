@@ -49,7 +49,7 @@ $db = Database::getInstance()->getConnection();
 // Plaene fuer die Uebersicht laden (neueste zuerst)
 $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORDER BY erstellt_am DESC")->fetchAll();
 
-$isAdmin = is_admin_user();
+$canMitarbeiter = has_permission('mitarbeiter');
 $canAufguesse = has_permission('aufguesse');
 $canStatistik = has_permission('statistik');
 $canUmfragen = has_permission('umfragen');
@@ -79,7 +79,7 @@ $canUmfragen = has_permission('umfragen');
         <!-- DASHBOARD-INHALTE -->
         <!-- 3-spaltiges Grid-Layout fuer verschiedene Bereiche -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <?php if ($isAdmin): ?>
+            <?php if ($canMitarbeiter): ?>
                 <div class="bg-white rounded-lg  p-6">
                     <h3 class="text-lg font-semibold mb-2">Mitarbeiter</h3>
                     <p class="text-gray-600">Verwalten Sie Ihre Mitarbeiter</p>
@@ -105,42 +105,49 @@ $canUmfragen = has_permission('umfragen');
         </div>
 
 
-        <div class="bg-white rounded-lg  p-6">
-            <h3 class="text-lg font-semibold mb-2">Aufguesse</h3>
-            <p class="text-gray-600">Planen Sie Ihre Aufguesse</p>
-            <?php if ($canAufguesse): ?>
-                <a href="aufguesse.php" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Verwalten</a>
-            <?php endif; ?>
-
-            <div class="mt-6 border-t border-gray-200 pt-6">
-                <?php if (empty($plaene)): ?>
-                    <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
-                        Noch keine Plaene vorhanden. Erstelle zuerst einen Plan in der Planung.
-                    </div>
-                <?php else: ?>
-                    <div id="plan-list" class="flex flex-wrap gap-4">
-                        <?php foreach ($plaene as $p): ?>
-                            <div class="plan-item flex w-full flex-col gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]" data-plan-id="<?php echo (int)$p['id']; ?>">
-                                <div>
-                                    <div class="text-base font-semibold text-gray-900">
-                                        <?php echo htmlspecialchars($p['name'] ?? ''); ?>
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        <?php echo !empty($p['erstellt_am']) ? htmlspecialchars(date('d.m.Y', strtotime($p['erstellt_am']))) : 'Unbekanntes Datum'; ?>
-                                    </div>
-                                    <div class="text-sm text-gray-600 mt-1 break-words">
-                                        <?php echo htmlspecialchars($p['beschreibung'] ?? 'Keine Beschreibung'); ?>
-                                    </div>
-                                </div>
-                                <button type="button" class="plan-select-btn mt-auto" data-plan-select="<?php echo (int)$p['id']; ?>" aria-pressed="false">
-                                    Plan auswaehlen
-                                </button>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-2">Aufguesse</h3>
+                <p class="text-gray-600">Planen Sie Ihre Aufguesse</p>
+                <?php if ($canAufguesse): ?>
+                    <a href="aufguesse.php" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Verwalten</a>
                 <?php endif; ?>
+
+                <div class="mt-6 border-t border-gray-200 pt-6">
+                    <?php if (empty($plaene)): ?>
+                        <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
+                            Noch keine Plaene vorhanden. Erstelle zuerst einen Plan in der Planung.
+                        </div>
+                    <?php else: ?>
+                        <div id="plan-list" class="flex flex-wrap gap-4">
+                            <?php foreach ($plaene as $p): ?>
+                                <div class="plan-item flex w-full flex-col gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]" data-plan-id="<?php echo (int)$p['id']; ?>">
+                                    <div>
+                                        <div class="text-base font-semibold text-gray-900">
+                                            <?php echo htmlspecialchars($p['name'] ?? ''); ?>
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            <?php echo !empty($p['erstellt_am']) ? htmlspecialchars(date('d.m.Y', strtotime($p['erstellt_am']))) : 'Unbekanntes Datum'; ?>
+                                        </div>
+                                        <div class="text-sm text-gray-600 mt-1 break-words">
+                                            <?php echo htmlspecialchars($p['beschreibung'] ?? 'Keine Beschreibung'); ?>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="plan-select-btn mt-auto" data-plan-select="<?php echo (int)$p['id']; ?>" aria-pressed="false">
+                                        Plan auswaehlen
+                                    </button>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
+            <div class="bg-white rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-2">Bildschirme</h3>
+                <p class="text-gray-600">Verwalten Sie die TV-Bildschirme</p>
+                <a href="bildschirme.php" class="mt-4 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Verwalten</a>
+            </div>
         </div>
     </div>
 

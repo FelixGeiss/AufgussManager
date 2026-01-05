@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Bitte Benutzername und Passwort eingeben.';
     } else {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare('SELECT id, name, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, is_admin FROM mitarbeiter WHERE username = ? LIMIT 1');
+        $stmt = $db->prepare('SELECT id, name, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, is_admin FROM mitarbeiter WHERE username = ? LIMIT 1');
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'aufguesse' => (int)$user['can_aufguesse'] === 1,
                 'statistik' => (int)$user['can_statistik'] === 1,
                 'umfragen' => (int)$user['can_umfragen'] === 1,
+                'mitarbeiter' => (int)$user['can_mitarbeiter'] === 1,
             ];
 
             header('Location: ' . BASE_URL . 'admin/index.php');
