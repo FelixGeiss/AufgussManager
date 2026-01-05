@@ -582,7 +582,7 @@ function renderPlanView(planId, plaene, aufguesse) {
                     <div class="plan-list-cell">Staerke</div>
                     <div class="plan-list-cell">Aufgiesser</div>
                     <div class="plan-list-cell">Sauna</div>
-                    <div class="plan-list-cell">Duftmittel</div>
+                    <div class="plan-list-cell">Duft</div>
                 </div>
                 <div class="plan-list-body">
                     ${rows}
