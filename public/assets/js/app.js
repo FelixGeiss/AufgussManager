@@ -513,6 +513,7 @@ function renderPlanView(planId, plaene, aufguesse) {
     const bannerText = planSettings ? planSettings.bannerText : '';
     const bannerImage = planSettings ? planSettings.bannerImage : '';
     const bannerWidth = planSettings ? planSettings.bannerWidth : 220;
+    const bannerHeight = planSettings ? planSettings.bannerHeight : 160;
     const textColor = planSettings ? planSettings.textColor : '';
     const themeColor = planSettings ? planSettings.themeColor : '';
     const clockBlockHeight = 96;
@@ -531,8 +532,11 @@ function renderPlanView(planId, plaene, aufguesse) {
             : (bannerText ? `<div class="plan-clock-banner-text">${escapeHtml(bannerText)}</div>` : ''))
         : '';
     const clockStackHeight = clockEnabled ? clockBlockHeight : 0;
+    const safeBannerWidth = Number.isFinite(Number(bannerWidth)) ? Math.max(1, Number(bannerWidth)) : 220;
+    const safeBannerHeight = Number.isFinite(Number(bannerHeight)) ? Math.max(1, Number(bannerHeight)) : 160;
+    const bannerAspect = safeBannerWidth / safeBannerHeight;
     const clockVars = (clockEnabled || bannerContent)
-        ? `--plan-clock-width: ${bannerWidth || 220}px; --plan-clock-stack-height: ${clockStackHeight}px;`
+        ? `--plan-clock-width: ${safeBannerWidth}px; --plan-clock-stack-height: ${clockStackHeight}px; --plan-banner-aspect: ${bannerAspect};`
         : '';
     const textVars = textColor ? `--plan-text-color: ${textColor};` : '';
     const accentVars = themeColor ? `--plan-accent-color: ${themeColor};` : '';
