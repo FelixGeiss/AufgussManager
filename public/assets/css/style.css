@@ -585,3 +585,33 @@
     box-shadow: none;
 }
 
+.screen-lock {
+    position: fixed;
+    inset: 0;
+    background: #0f172a;
+    color: #f8fafc;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    text-align: center;
+    padding: 2rem;
+}
+
+.screen-lock__title {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 700;
+}
+
+.screen-lock__subtitle {
+    margin-top: 0.75rem;
+    font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+    color: #cbd5f5;
+}
+
+@media (max-width: 1000px) {
+    .screen-lock {
+        display: flex;
+    }
+}
+

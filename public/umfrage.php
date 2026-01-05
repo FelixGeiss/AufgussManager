@@ -301,6 +301,12 @@ if ($planBackground !== '') {
 }
 ?>
 <body class="bg-gray-100 kiosk-view" style="<?php echo $backgroundStyle; ?>">
+    <div class="screen-lock" aria-hidden="true">
+        <div>
+            <div class="screen-lock__title">Bildschirm zu klein</div>
+            <div class="screen-lock__subtitle">Bitte vergroessern oder ein groesseres Geraet nutzen.</div>
+        </div>
+    </div>
     <?php
     $loggedIn = is_admin_logged_in();
     $isAdmin = is_admin_user();

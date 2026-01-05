@@ -72,6 +72,12 @@ require_once __DIR__ . '/../src/auth.php';
 </head>
 
 <body class="bg-gray-100 kiosk-view">
+    <div class="screen-lock" aria-hidden="true">
+        <div>
+            <div class="screen-lock__title">Bildschirm zu klein</div>
+            <div class="screen-lock__subtitle">Bitte vergroessern oder ein groesseres Geraet nutzen.</div>
+        </div>
+    </div>
     <?php
     $loggedIn = is_admin_logged_in();
     $isAdmin = is_admin_user();
