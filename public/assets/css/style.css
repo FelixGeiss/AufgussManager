@@ -321,7 +321,7 @@
     padding: 0.75rem 1rem;
     background: var(--plan-accent-color, #ffffff);
     border: 0;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 2px solid #e5e7eb;
     border-radius: 0;
     text-align: center;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
@@ -329,11 +329,14 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 2;
 }
 
 .plan-view-with-clock .plan-clock-time {
     font-size: calc(var(--plan-header-height, 96px) * 0.42);
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1;
     color: var(--plan-text-color, #111827);
 }
@@ -356,6 +359,8 @@
     justify-content: center;
     text-align: center;
     color: #111827;
+    position: relative;
+    z-index: 1;
 }
 
 .plan-view-with-clock .plan-clock-banner img {
@@ -421,6 +426,87 @@
     }
 }
 
+.kiosk-view .plan-list-head .plan-list-cell {
+    font-size: clamp(1rem, 1.6vw, 2rem);
+    letter-spacing: 0.12em;
+}
+
+@media (min-width: 2500px) {
+    .kiosk-view .plan-list-head .plan-list-cell {
+        font-size: clamp(1.8rem, 2.1vw, 3.2rem);
+    }
+
+    .kiosk-view .plan-list-cell {
+        font-size: clamp(1.5rem, 1.8vw, 2.8rem);
+        padding: clamp(1.2rem, 1.8vw, 2.6rem) clamp(1.4rem, 2vw, 3rem);
+    }
+
+    .kiosk-view .plan-list-body .plan-list-cell {
+        font-size: clamp(1.2rem, 1.5vw, 2.4rem);
+    }
+
+    .kiosk-view .plan-list-row .plan-list-cell:first-child {
+        font-size: clamp(1.6rem, 2vw, 3rem);
+    }
+
+    .kiosk-view .plan-media-stack img,
+    .kiosk-view .plan-list-row img {
+        width: clamp(72px, 6vw, 160px) !important;
+        height: clamp(72px, 6vw, 160px) !important;
+    }
+
+    .kiosk-view .plan-list-people .h-10,
+    .kiosk-view .plan-list-people .w-10 {
+        width: clamp(72px, 6vw, 160px) !important;
+        height: clamp(72px, 6vw, 160px) !important;
+    }
+
+    .kiosk-view .plan-list-people img {
+        width: clamp(72px, 6vw, 160px) !important;
+        height: clamp(72px, 6vw, 160px) !important;
+    }
+
+    .kiosk-view .plan-list-people .text-sm {
+        font-size: clamp(1.2rem, 1.6vw, 2.4rem);
+    }
+
+    .kiosk-view .plan-list-row .text-sm {
+        font-size: inherit;
+    }
+
+    .plan-temp-badge,
+    .plan-strength-badge {
+        border-width: 2px !important;
+    }
+
+    .kiosk-view .plan-strength-badge {
+        font-size: clamp(1.1rem, 1.5vw, 2rem) !important;
+        padding: 0.45rem 1.1rem !important;
+    }
+
+    .plan-list-row,
+    .plan-list-head,
+    .plan-table-head {
+        border-width: 0 !important;
+        border-bottom-width: 2px !important;
+    }
+
+    .plan-list-row.next-aufguss-row {
+        border-width: 2px !important;
+    }
+
+    .plan-view-with-clock .plan-clock-time {
+        font-size: clamp(2.2rem, 3vw, 4.2rem);
+    }
+
+    .plan-view-with-clock .plan-clock-date {
+        font-size: clamp(1.1rem, 1.6vw, 2rem);
+    }
+
+    .kiosk-view {
+        --plan-header-height: clamp(120px, 8vw, 180px);
+    }
+}
 .plan-table-wrap::-webkit-scrollbar {
     width: 0;
     height: 0;
@@ -497,7 +583,7 @@
 
 .plan-list-row .plan-list-cell:first-child {
     font-size: 1.125rem;
-    font-weight: 400;
+    font-weight: 700;
     color: var(--plan-text-color, #111827);
 }
 
@@ -551,11 +637,6 @@
 .kiosk-view .plan-list-cell {
     font-size: clamp(0.95rem, 1.2vw, 1.4rem);
     padding: clamp(0.75rem, 1vw, 1.5rem) clamp(0.75rem, 1.2vw, 1.5rem);
-}
-
-.kiosk-view .plan-list-head .plan-list-cell {
-    font-size: clamp(1rem, 1.6vw, 2rem);
-    letter-spacing: 0.12em;
 }
 
 .kiosk-view .plan-list-row .plan-list-cell:first-child {
@@ -612,6 +693,53 @@
 @media (max-width: 1000px) {
     .screen-lock {
         display: flex;
+    }
+}
+
+@media (min-width: 2500px) {
+    .kiosk-view .plan-list-head .plan-list-cell {
+        font-size: clamp(1.8rem, 2.1vw, 3.2rem) !important;
+    }
+
+    .kiosk-view .plan-list-cell {
+        font-size: clamp(1.5rem, 1.8vw, 2.8rem) !important;
+        padding: clamp(1.2rem, 1.8vw, 2.6rem) clamp(1.4rem, 2vw, 3rem) !important;
+    }
+
+    .kiosk-view .plan-list-body .plan-list-cell {
+        font-size: clamp(1.2rem, 1.5vw, 2.4rem) !important;
+    }
+
+    .kiosk-view .plan-list-row .plan-list-cell:first-child {
+        font-size: clamp(1.6rem, 2vw, 3rem) !important;
+    }
+
+    .kiosk-view .plan-media-stack img,
+    .kiosk-view .plan-list-row img,
+    .kiosk-view .plan-list-people .h-10,
+    .kiosk-view .plan-list-people .w-10,
+    .kiosk-view .plan-list-people img {
+        width: clamp(72px, 6vw, 160px) !important;
+        height: clamp(72px, 6vw, 160px) !important;
+    }
+
+    .kiosk-view .plan-list-people .text-sm {
+        font-size: clamp(1.2rem, 1.6vw, 2.4rem) !important;
+    }
+
+    .kiosk-view .plan-strength-badge {
+        font-size: clamp(1.1rem, 1.5vw, 2rem) !important;
+        padding: 0.6rem 1.4rem !important;
+    }
+
+    .plan-temp-badge,
+    .plan-strength-badge {
+        border-width: 2px !important;
+    }
+
+    .plan-view-with-clock .plan-clock {
+        border-bottom-width: 2px !important;
+        border-bottom-color: #e5e7eb !important;
     }
 }
 
