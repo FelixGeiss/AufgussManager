@@ -103,7 +103,6 @@ function readScreenConfig($storageFile) {
         'order' => [],
         'display_seconds' => 10,
         'pause_seconds' => 10,
-        'direction' => 'right',
         'rotation_started_at' => null
     ]];
     if (file_exists($storageFile)) {

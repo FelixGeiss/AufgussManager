@@ -224,7 +224,7 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transform: translateX(110%);
+    transform: translate3d(var(--plan-ad-enter-x, 110%), var(--plan-ad-enter-y, 0), 0);
     transition: opacity 300ms ease, transform 300ms ease;
     pointer-events: none;
     background: rgba(255, 255, 255, 0.8);
@@ -240,19 +240,17 @@
 
 .global-ad-wrap {
     z-index: 70;
-    transform: translateX(var(--global-ad-enter, 110%));
 }
 
 .plan-ad-wrap.is-visible {
     opacity: 1;
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
     pointer-events: auto;
 }
 
-.global-ad-wrap.is-exiting {
+.plan-ad-wrap.is-exiting {
     opacity: 0;
-    transform: translateX(var(--global-ad-exit, 110%));
-    pointer-events: none;
+    transform: translate3d(var(--plan-ad-exit-x, 110%), var(--plan-ad-exit-y, 0), 0);
 }
 
 .plan-ad-media {

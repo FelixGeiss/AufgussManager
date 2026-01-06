@@ -97,6 +97,7 @@ let screenBackgroundPath = '';
 let screenGlobalAdPath = '';
 let screenGlobalAdType = '';
 let screenGlobalAdSignature = '';
+let screenAdDirection = 'right';
 let screenConfigUpdatedAt = null;
 let screenPlanLocked = false;
 let screenConfigSyncTimer = null;
@@ -109,12 +110,12 @@ let globalAdConfig = {
     order: [],
     displaySeconds: 10,
     pauseSeconds: 10,
-    direction: 'right',
     rotationStartedAt: null
 };
 let globalAdVisible = false;
 let globalAdCurrentPath = '';
 let globalAdCurrentType = '';
+let planAdExitTimer = null;
 let globalAdExitTimer = null;
 
 function startAufgussApp() {
@@ -197,6 +198,7 @@ function applyScreenConfig(screen, globalAd, serverTime) {
     screenGlobalAdPath = globalAd && globalAd.path ? String(globalAd.path) : '';
     screenGlobalAdType = globalAd && globalAd.type ? String(globalAd.type) : '';
     screenGlobalAdSignature = buildGlobalAdSignature(globalAd);
+    screenAdDirection = screen.ad_direction ? String(screen.ad_direction) : 'right';
     updateGlobalAdConfig(globalAd, serverTime);
 
     if (screenMode === 'image') {
@@ -880,7 +882,6 @@ function buildGlobalAdSignature(globalAd) {
         order,
         globalAd.display_seconds || '',
         globalAd.pause_seconds || '',
-        globalAd.direction || '',
         globalAd.rotation_started_at || ''
     ].join('|');
 }
@@ -899,7 +900,6 @@ function updateGlobalAdConfig(globalAd, serverTime) {
             order: [],
             displaySeconds: 10,
             pauseSeconds: 10,
-            direction: 'right',
             rotationStartedAt: null
         };
         updateGlobalAdOverlay();
@@ -915,7 +915,6 @@ function updateGlobalAdConfig(globalAd, serverTime) {
             : [],
         displaySeconds: Number(globalAd.display_seconds) || 10,
         pauseSeconds: Number(globalAd.pause_seconds) || 10,
-        direction: globalAd.direction === 'left' ? 'left' : 'right',
         rotationStartedAt: globalAd.rotation_started_at ? String(globalAd.rotation_started_at) : null
     };
     updateGlobalAdOverlay();
@@ -1126,7 +1125,7 @@ function showGlobalAd(mediaPath, mediaType) {
         globalAdExitTimer = null;
     }
     wrap.classList.remove('is-exiting');
-    setGlobalAdDirectionVars(wrap);
+    setPlanAdDirectionVars(wrap);
 
     if (mediaPath !== globalAdCurrentPath || mediaType !== globalAdCurrentType) {
         if (mediaType === 'video') {
@@ -1149,7 +1148,7 @@ function hideGlobalAd() {
     if (!wrap || !globalAdVisible) {
         return;
     }
-    setGlobalAdDirectionVars(wrap);
+    setPlanAdDirectionVars(wrap);
     wrap.classList.add('is-exiting');
     if (globalAdExitTimer) {
         clearTimeout(globalAdExitTimer);
@@ -1159,14 +1158,6 @@ function hideGlobalAd() {
         wrap.classList.remove('is-exiting');
         globalAdVisible = false;
     }, 320);
-}
-
-function setGlobalAdDirectionVars(wrap) {
-    const direction = globalAdConfig.direction === 'left' ? 'left' : 'right';
-    const enter = direction === 'right' ? '-110%' : '110%';
-    const exit = direction === 'right' ? '110%' : '-110%';
-    wrap.style.setProperty('--global-ad-enter', enter);
-    wrap.style.setProperty('--global-ad-exit', exit);
 }
 
 function formatClockTime(value) {
@@ -1223,6 +1214,13 @@ function showPlanAd(mediaPath, mediaType, durationMs) {
 
     if (!wrap || !media) return;
 
+    if (planAdExitTimer) {
+        clearTimeout(planAdExitTimer);
+        planAdExitTimer = null;
+    }
+    wrap.classList.remove('is-exiting');
+    setPlanAdDirectionVars(wrap);
+
     const now = Date.now();
     if (lastPlanAdShownAt && (now - lastPlanAdShownAt) < 500) {
         return;
@@ -1275,9 +1273,42 @@ function showPlanAd(mediaPath, mediaType, durationMs) {
 
 function hidePlanAd() {
     const wrap = document.getElementById('plan-ad-wrap');
-    if (wrap) {
-        wrap.classList.remove('is-visible');
+    if (!wrap) return;
+    setPlanAdDirectionVars(wrap);
+    wrap.classList.add('is-exiting');
+    if (planAdExitTimer) {
+        clearTimeout(planAdExitTimer);
     }
+    planAdExitTimer = setTimeout(() => {
+        wrap.classList.remove('is-visible');
+        wrap.classList.remove('is-exiting');
+    }, 320);
+}
+
+function setPlanAdDirectionVars(wrap) {
+    const direction = screenAdDirection || 'right';
+    let enterX = '-110%';
+    let exitX = '110%';
+    let enterY = '0';
+    let exitY = '0';
+    if (direction === 'left') {
+        enterX = '110%';
+        exitX = '-110%';
+    } else if (direction === 'up') {
+        enterX = '0';
+        exitX = '0';
+        enterY = '110%';
+        exitY = '-110%';
+    } else if (direction === 'down') {
+        enterX = '0';
+        exitX = '0';
+        enterY = '-110%';
+        exitY = '110%';
+    }
+    wrap.style.setProperty('--plan-ad-enter-x', enterX);
+    wrap.style.setProperty('--plan-ad-exit-x', exitX);
+    wrap.style.setProperty('--plan-ad-enter-y', enterY);
+    wrap.style.setProperty('--plan-ad-exit-y', exitY);
 }
 
 function clearPlanAdTimers() {

@@ -78,8 +78,7 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         || array_key_exists('global_ad_enabled', $input)
         || array_key_exists('global_ad_order', $input)
         || array_key_exists('global_ad_display_seconds', $input)
-        || array_key_exists('global_ad_pause_seconds', $input)
-        || array_key_exists('global_ad_direction', $input);
+        || array_key_exists('global_ad_pause_seconds', $input);
     $screenId = (int)($input['screen_id'] ?? 0);
     if (!$hasGlobalAd || $screenId > 0) {
         if ($screenId < 1 || $screenId > $screenCount) {
@@ -95,6 +94,7 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
 
     $imagePath = sanitizePath($input['image_path'] ?? null);
     $backgroundPath = sanitizePath($input['background_path'] ?? null);
+    $adDirection = sanitizeDirection($input['ad_direction'] ?? null);
 
     if ($mode === 'image') {
         $planId = null;
@@ -108,6 +108,7 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         $screen['plan_id'] = $planId;
         $screen['image_path'] = $imagePath;
         $screen['background_path'] = $backgroundPath;
+        $screen['ad_direction'] = $adDirection;
         $screen['updated_at'] = date('c');
 
         $config['screens'][$screenId] = $screen;
@@ -127,9 +128,6 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         $pauseSeconds = isset($input['global_ad_pause_seconds'])
             ? max(0, (int)$input['global_ad_pause_seconds'])
             : defaultGlobalAd($screenCount)['pause_seconds'];
-        $direction = $input['global_ad_direction'] ?? defaultGlobalAd($screenCount)['direction'];
-        $direction = $direction === 'left' ? 'left' : 'right';
-
         $config['global_ad'] = array_merge(defaultGlobalAd($screenCount), [
             'path' => $globalAdPath,
             'type' => $globalAdPath ? $globalAdType : null,
@@ -137,7 +135,6 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
             'order' => $order,
             'display_seconds' => $displaySeconds,
             'pause_seconds' => $pauseSeconds,
-            'direction' => $direction,
             'rotation_started_at' => date('c')
         ]);
     }
@@ -188,6 +185,7 @@ function defaultScreen($screenId) {
         'plan_id' => null,
         'image_path' => null,
         'background_path' => null,
+        'ad_direction' => 'right',
         'updated_at' => null
     ];
 }
@@ -204,7 +202,6 @@ function defaultGlobalAd($screenCount = 5) {
         'order' => $order,
         'display_seconds' => 10,
         'pause_seconds' => 10,
-        'direction' => 'right',
         'rotation_started_at' => null
     ];
 }
@@ -229,6 +226,17 @@ function inferAdType($path) {
     }
     $clean = strtolower(pathinfo($path, PATHINFO_EXTENSION));
     return in_array($clean, ['mp4', 'webm', 'ogg'], true) ? 'video' : 'image';
+}
+
+function sanitizeDirection($value) {
+    if (!is_string($value)) {
+        return 'right';
+    }
+    $value = strtolower(trim($value));
+    if (in_array($value, ['left', 'right', 'up', 'down'], true)) {
+        return $value;
+    }
+    return 'right';
 }
 
 function sanitizeScreenOrder($order, $screenCount) {
