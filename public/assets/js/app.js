@@ -94,6 +94,9 @@ let screenId = 0;
 let screenMode = null;
 let screenImagePath = '';
 let screenBackgroundPath = '';
+let screenGlobalAdPath = '';
+let screenGlobalAdType = '';
+let screenGlobalAdSignature = '';
 let screenConfigUpdatedAt = null;
 let screenPlanLocked = false;
 let screenConfigSyncTimer = null;
@@ -122,8 +125,8 @@ function initScreenConfig() {
     }
 
     return fetchScreenConfig()
-        .then(screen => {
-            applyScreenConfig(screen);
+        .then(result => {
+            applyScreenConfig(result ? result.screen : null, result ? result.globalAd : null);
             initScreenConfigSync();
         })
         .catch(error => {
@@ -138,14 +141,16 @@ function initScreenConfigSync() {
     }
     screenConfigSyncTimer = setInterval(() => {
         fetchScreenConfig()
-            .then(screen => {
-                if (!screen || !screen.updated_at) {
+            .then(result => {
+                const screen = result ? result.screen : null;
+                const globalAd = result ? result.globalAd : null;
+                const globalSignature = buildGlobalAdSignature(globalAd);
+                const screenUpdated = !!(screen && screen.updated_at && screen.updated_at !== screenConfigUpdatedAt);
+                const globalUpdated = globalSignature !== screenGlobalAdSignature;
+                if (!screenUpdated && !globalUpdated) {
                     return;
                 }
-                if (screen.updated_at === screenConfigUpdatedAt) {
-                    return;
-                }
-                applyScreenConfig(screen);
+                applyScreenConfig(screen, globalAd);
                 renderFilteredAufguesse();
             })
             .catch(() => {});
@@ -157,17 +162,23 @@ function fetchScreenConfig() {
         .then(response => response.ok ? response.json() : null)
         .then(data => {
             const payload = data && data.data ? data.data : null;
-            return payload && payload.screen ? payload.screen : null;
+            return payload ? {
+                screen: payload.screen || null,
+                globalAd: payload.global_ad || null
+            } : null;
         });
 }
 
-function applyScreenConfig(screen) {
+function applyScreenConfig(screen, globalAd) {
     const wasLocked = screenPlanLocked;
     if (!screen) return;
     screenConfigUpdatedAt = screen.updated_at || null;
     screenMode = screen.mode === 'image' ? 'image' : 'plan';
     screenImagePath = screen.image_path ? String(screen.image_path) : '';
     screenBackgroundPath = screen.background_path ? String(screen.background_path) : '';
+    screenGlobalAdPath = globalAd && globalAd.path ? String(globalAd.path) : '';
+    screenGlobalAdType = globalAd && globalAd.type ? String(globalAd.type) : '';
+    screenGlobalAdSignature = buildGlobalAdSignature(globalAd);
 
     if (screenMode === 'image') {
         screenPlanLocked = true;
@@ -654,8 +665,30 @@ function renderPlanView(planId, plaene, aufguesse) {
     const createdAt = formatPlanDate(plan.erstellt_am);
     const forcedBackgroundImage = screenBackgroundPath ? normalizeScreenAssetPath(screenBackgroundPath) : '';
     const backgroundImage = forcedBackgroundImage || (plan.hintergrund_bild ? `uploads/${plan.hintergrund_bild}` : '');
-    const adMediaPath = plan.werbung_media ? `uploads/${plan.werbung_media}` : '';
-    const adMediaType = plan.werbung_media_typ || '';
+    const globalAdPath = screenGlobalAdPath ? normalizeBannerImagePath(screenGlobalAdPath) : '';
+    const globalAdType = screenGlobalAdType
+        ? screenGlobalAdType
+        : (globalAdPath && isBannerVideoPath(globalAdPath) ? 'video' : 'image');
+    const planAdEnabled = !!plan.werbung_aktiv && !!plan.werbung_media;
+    const adConfig = planAdEnabled
+        ? {
+            enabled: true,
+            intervalMinutes: Number(plan.werbung_interval_minuten) || 10,
+            durationSeconds: Number(plan.werbung_dauer_sekunden) || 10,
+            mediaPath: `uploads/${plan.werbung_media}`,
+            mediaType: plan.werbung_media_typ || ''
+        }
+        : (globalAdPath
+            ? {
+                enabled: true,
+                intervalMinutes: 10,
+                durationSeconds: 10,
+                mediaPath: globalAdPath,
+                mediaType: globalAdType
+            }
+            : { enabled: false, mediaPath: '', mediaType: '' });
+    const adMediaPath = adConfig.mediaPath || '';
+    const adMediaType = adConfig.mediaType || '';
     const planSettings = getNextAufgussSettings(plan.id);
     const clockEnabled = !!(planSettings && planSettings.clockEnabled);
     const bannerEnabled = !!(planSettings && planSettings.bannerEnabled);
@@ -797,7 +830,7 @@ function renderPlanView(planId, plaene, aufguesse) {
                 </div>
             </div>
         `;
-        setupPlanAd(plan, adMediaPath, adMediaType);
+        setupPlanAd(plan.id, adConfig);
         initPlanClock(clockEnabled ? document.getElementById('plan-clock') : null);
         requestAnimationFrame(() => updatePlanClockLayout(container.querySelector('.plan-view-with-clock') || container.firstElementChild));
         updateNextAufgussIndicators();
@@ -824,10 +857,15 @@ function renderPlanView(planId, plaene, aufguesse) {
         </div>
     `;
 
-    setupPlanAd(plan, adMediaPath, adMediaType);
+    setupPlanAd(plan.id, adConfig);
     initPlanClock(clockEnabled ? document.getElementById('plan-clock') : null);
     requestAnimationFrame(() => updatePlanClockLayout(container.querySelector('.plan-view-with-clock')));
     updateNextAufgussIndicators();
+}
+
+function buildGlobalAdSignature(globalAd) {
+    if (!globalAd) return '';
+    return `${globalAd.path || ''}|${globalAd.type || ''}`;
 }
 
 function applyPlanBackground(imagePath) {
@@ -848,10 +886,12 @@ function applyPlanBackground(imagePath) {
     }
 }
 
-function setupPlanAd(plan, adMediaPath, adMediaType) {
-    const enabled = !!plan.werbung_aktiv;
-    const intervalMinutes = Number(plan.werbung_interval_minuten) || 10;
-    const durationSeconds = Number(plan.werbung_dauer_sekunden) || 10;
+function setupPlanAd(planId, adConfig) {
+    const enabled = !!(adConfig && adConfig.enabled);
+    const intervalMinutes = Number(adConfig && adConfig.intervalMinutes) || 10;
+    const durationSeconds = Number(adConfig && adConfig.durationSeconds) || 10;
+    const adMediaPath = adConfig && adConfig.mediaPath ? adConfig.mediaPath : '';
+    const adMediaType = adConfig && adConfig.mediaType ? adConfig.mediaType : '';
     const intervalMs = Math.max(1, intervalMinutes) * 60000;
     const durationMs = durationSeconds * 1000;
 
@@ -864,7 +904,7 @@ function setupPlanAd(plan, adMediaPath, adMediaType) {
         return;
     }
 
-    activeAdPlanId = String(plan.id);
+    activeAdPlanId = String(planId);
     if (adMediaType === 'video') {
         preloadPlanAdVideo(adMediaPath);
     }

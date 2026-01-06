@@ -57,7 +57,8 @@ if (!in_array($file['type'], ALLOWED_IMAGE_TYPES, true)) {
     exit;
 }
 
-$uploadDir = UPLOAD_PATH . 'screens' . DIRECTORY_SEPARATOR;
+$uploadSubDir = $kind === 'background' ? 'plan' : 'screens';
+$uploadDir = UPLOAD_PATH . $uploadSubDir . DIRECTORY_SEPARATOR;
 if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
@@ -72,7 +73,7 @@ if (!move_uploaded_file($file['tmp_name'], $filepath)) {
     exit;
 }
 
-$relativePath = 'screens/' . $filename;
+$relativePath = $uploadSubDir . '/' . $filename;
 
 try {
     $storageDir = __DIR__ . '/../../storage';

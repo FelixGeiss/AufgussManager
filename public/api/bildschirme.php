@@ -47,14 +47,15 @@ try {
 function handleGetScreens($storageFile, $screenCount) {
     $screenId = isset($_GET['screen_id']) ? (int)$_GET['screen_id'] : 0;
     $config = readScreenConfig($storageFile, $screenCount);
+    $globalAd = $config['global_ad'] ?? defaultGlobalAd();
 
     if ($screenId > 0) {
         $screen = $config['screens'][$screenId] ?? defaultScreen($screenId);
-        sendResponse(true, 'Bildschirm geladen', ['screen' => $screen]);
+        sendResponse(true, 'Bildschirm geladen', ['screen' => $screen, 'global_ad' => $globalAd]);
     }
 
     $screens = array_values($config['screens']);
-    sendResponse(true, 'Bildschirme geladen', ['screens' => $screens]);
+    sendResponse(true, 'Bildschirme geladen', ['screens' => $screens, 'global_ad' => $globalAd]);
 }
 
 function handleSaveScreen($storageDir, $storageFile, $screenCount) {
@@ -63,9 +64,12 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         $input = $_POST;
     }
 
+    $hasGlobalAd = array_key_exists('global_ad_path', $input) || array_key_exists('global_ad_type', $input);
     $screenId = (int)($input['screen_id'] ?? 0);
-    if ($screenId < 1 || $screenId > $screenCount) {
-        sendResponse(false, 'Ungueltige Bildschirm-ID', null, 400);
+    if (!$hasGlobalAd || $screenId > 0) {
+        if ($screenId < 1 || $screenId > $screenCount) {
+            sendResponse(false, 'Ungueltige Bildschirm-ID', null, 400);
+        }
     }
 
     $mode = $input['mode'] ?? 'plan';
@@ -82,27 +86,49 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
     }
 
     $config = readScreenConfig($storageFile, $screenCount);
-    $screen = $config['screens'][$screenId] ?? defaultScreen($screenId);
-    $screen['mode'] = $mode;
-    $screen['plan_id'] = $planId;
-    $screen['image_path'] = $imagePath;
-    $screen['background_path'] = $backgroundPath;
-    $screen['updated_at'] = date('c');
+    $screen = null;
+    if ($screenId > 0) {
+        $screen = $config['screens'][$screenId] ?? defaultScreen($screenId);
+        $screen['mode'] = $mode;
+        $screen['plan_id'] = $planId;
+        $screen['image_path'] = $imagePath;
+        $screen['background_path'] = $backgroundPath;
+        $screen['updated_at'] = date('c');
 
-    $config['screens'][$screenId] = $screen;
+        $config['screens'][$screenId] = $screen;
+    }
+
+    if ($hasGlobalAd) {
+        $globalAdPath = sanitizePath($input['global_ad_path'] ?? null);
+        $globalAdType = $input['global_ad_type'] ?? null;
+        if (!$globalAdType || !in_array($globalAdType, ['image', 'video'], true)) {
+            $globalAdType = inferAdType($globalAdPath);
+        }
+        $config['global_ad'] = [
+            'path' => $globalAdPath,
+            'type' => $globalAdPath ? $globalAdType : null
+        ];
+    }
+
     writeScreenConfig($storageDir, $storageFile, $config);
 
-    sendResponse(true, 'Bildschirm gespeichert', ['screen' => $screen]);
+    sendResponse(true, 'Bildschirm gespeichert', [
+        'screen' => $screen,
+        'global_ad' => $config['global_ad'] ?? defaultGlobalAd()
+    ]);
 }
 
 function readScreenConfig($storageFile, $screenCount) {
-    $config = ['screens' => []];
+    $config = ['screens' => [], 'global_ad' => defaultGlobalAd()];
 
     if (file_exists($storageFile)) {
         $raw = file_get_contents($storageFile);
         $data = $raw ? json_decode($raw, true) : null;
         if (is_array($data) && isset($data['screens']) && is_array($data['screens'])) {
             $config['screens'] = $data['screens'];
+        }
+        if (is_array($data) && isset($data['global_ad']) && is_array($data['global_ad'])) {
+            $config['global_ad'] = array_merge(defaultGlobalAd(), $data['global_ad']);
         }
     }
 
@@ -133,6 +159,13 @@ function defaultScreen($screenId) {
     ];
 }
 
+function defaultGlobalAd() {
+    return [
+        'path' => null,
+        'type' => null
+    ];
+}
+
 function sanitizePath($path) {
     if ($path === null) {
         return null;
@@ -145,6 +178,14 @@ function sanitizePath($path) {
         return null;
     }
     return ltrim($path, "/\\");
+}
+
+function inferAdType($path) {
+    if (!$path) {
+        return 'image';
+    }
+    $clean = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    return in_array($clean, ['mp4', 'webm', 'ogg'], true) ? 'video' : 'image';
 }
 
 function sendResponse($success, $message, $data = null, $statusCode = 200) {
