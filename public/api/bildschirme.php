@@ -78,7 +78,8 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         || array_key_exists('global_ad_enabled', $input)
         || array_key_exists('global_ad_order', $input)
         || array_key_exists('global_ad_display_seconds', $input)
-        || array_key_exists('global_ad_pause_seconds', $input);
+        || array_key_exists('global_ad_pause_seconds', $input)
+        || array_key_exists('global_ad_direction', $input);
     $screenId = (int)($input['screen_id'] ?? 0);
     if (!$hasGlobalAd || $screenId > 0) {
         if ($screenId < 1 || $screenId > $screenCount) {
@@ -126,6 +127,8 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         $pauseSeconds = isset($input['global_ad_pause_seconds'])
             ? max(0, (int)$input['global_ad_pause_seconds'])
             : defaultGlobalAd($screenCount)['pause_seconds'];
+        $direction = $input['global_ad_direction'] ?? defaultGlobalAd($screenCount)['direction'];
+        $direction = $direction === 'left' ? 'left' : 'right';
 
         $config['global_ad'] = array_merge(defaultGlobalAd($screenCount), [
             'path' => $globalAdPath,
@@ -134,6 +137,7 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
             'order' => $order,
             'display_seconds' => $displaySeconds,
             'pause_seconds' => $pauseSeconds,
+            'direction' => $direction,
             'rotation_started_at' => date('c')
         ]);
     }
@@ -200,6 +204,7 @@ function defaultGlobalAd($screenCount = 5) {
         'order' => $order,
         'display_seconds' => 10,
         'pause_seconds' => 10,
+        'direction' => 'right',
         'rotation_started_at' => null
     ];
 }

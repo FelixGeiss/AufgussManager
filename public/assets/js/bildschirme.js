@@ -10,7 +10,8 @@ let globalAd = {
     enabled: false,
     order: [],
     displaySeconds: 10,
-    pauseSeconds: 10
+    pauseSeconds: 10,
+    direction: 'right'
 };
 
 function escapeHtml(value) {
@@ -119,7 +120,7 @@ function buildGlobalAdCard() {
     return `
         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-global-ad-card>
             <div class="text-lg font-semibold mb-3">Globale Werbung</div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Aktiv</label>
                     <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
@@ -139,6 +140,13 @@ function buildGlobalAdCard() {
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Pause (Sek.)</label>
                     <input type="number" name="global_ad_pause_seconds" min="0" value="${Number(globalAd.pauseSeconds) || 10}" class="w-full border rounded px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Richtung</label>
+                    <select name="global_ad_direction" class="w-full border rounded px-3 py-2">
+                        <option value="right"${globalAd.direction === 'right' ? ' selected' : ''}>Nach rechts</option>
+                        <option value="left"${globalAd.direction === 'left' ? ' selected' : ''}>Nach links</option>
+                    </select>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -470,7 +478,8 @@ function handleGlobalAdSave() {
         global_ad_enabled: !!globalAd.enabled,
         global_ad_order: Array.isArray(globalAd.order) ? globalAd.order : [],
         global_ad_display_seconds: Number(globalAd.displaySeconds) || 10,
-        global_ad_pause_seconds: Number(globalAd.pauseSeconds) || 10
+        global_ad_pause_seconds: Number(globalAd.pauseSeconds) || 10,
+        global_ad_direction: globalAd.direction === 'left' ? 'left' : 'right'
     };
 
     fetchJson(screensApiUrl, {
@@ -555,6 +564,9 @@ function bindGlobalAdEvents() {
         if (target.name === 'global_ad_pause_seconds') {
             globalAd.pauseSeconds = Number(target.value) || 10;
         }
+        if (target.name === 'global_ad_direction') {
+            globalAd.direction = target.value === 'left' ? 'left' : 'right';
+        }
         if (target.name === 'global_ad_order') {
             globalAd.order = getSelectOrder(target);
             updateSelectedOrderBadges();
@@ -608,7 +620,8 @@ function initScreens() {
                     enabled: !!global.enabled,
                     order,
                     displaySeconds: Number(global.display_seconds) || 10,
-                    pauseSeconds: Number(global.pause_seconds) || 10
+                    pauseSeconds: Number(global.pause_seconds) || 10,
+                    direction: global.direction === 'left' ? 'left' : 'right'
                 };
             }
             renderScreens(plans, screens);

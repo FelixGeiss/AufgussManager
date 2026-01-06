@@ -109,11 +109,13 @@ let globalAdConfig = {
     order: [],
     displaySeconds: 10,
     pauseSeconds: 10,
+    direction: 'right',
     rotationStartedAt: null
 };
 let globalAdVisible = false;
 let globalAdCurrentPath = '';
 let globalAdCurrentType = '';
+let globalAdExitTimer = null;
 
 function startAufgussApp() {
     loadPlans();
@@ -878,6 +880,7 @@ function buildGlobalAdSignature(globalAd) {
         order,
         globalAd.display_seconds || '',
         globalAd.pause_seconds || '',
+        globalAd.direction || '',
         globalAd.rotation_started_at || ''
     ].join('|');
 }
@@ -896,6 +899,7 @@ function updateGlobalAdConfig(globalAd, serverTime) {
             order: [],
             displaySeconds: 10,
             pauseSeconds: 10,
+            direction: 'right',
             rotationStartedAt: null
         };
         updateGlobalAdOverlay();
@@ -911,6 +915,7 @@ function updateGlobalAdConfig(globalAd, serverTime) {
             : [],
         displaySeconds: Number(globalAd.display_seconds) || 10,
         pauseSeconds: Number(globalAd.pause_seconds) || 10,
+        direction: globalAd.direction === 'left' ? 'left' : 'right',
         rotationStartedAt: globalAd.rotation_started_at ? String(globalAd.rotation_started_at) : null
     };
     updateGlobalAdOverlay();
@@ -1116,6 +1121,13 @@ function showGlobalAd(mediaPath, mediaType) {
     const { wrap, media } = ensureGlobalAdElements();
     if (!wrap || !media) return;
 
+    if (globalAdExitTimer) {
+        clearTimeout(globalAdExitTimer);
+        globalAdExitTimer = null;
+    }
+    wrap.classList.remove('is-exiting');
+    setGlobalAdDirectionVars(wrap);
+
     if (mediaPath !== globalAdCurrentPath || mediaType !== globalAdCurrentType) {
         if (mediaType === 'video') {
             media.innerHTML = `<video src="${escapeHtml(mediaPath)}" class="plan-ad-asset" autoplay muted loop playsinline></video>`;
@@ -1134,10 +1146,27 @@ function showGlobalAd(mediaPath, mediaType) {
 
 function hideGlobalAd() {
     const wrap = document.getElementById('global-ad-wrap');
-    if (wrap) {
-        wrap.classList.remove('is-visible');
+    if (!wrap || !globalAdVisible) {
+        return;
     }
-    globalAdVisible = false;
+    setGlobalAdDirectionVars(wrap);
+    wrap.classList.add('is-exiting');
+    if (globalAdExitTimer) {
+        clearTimeout(globalAdExitTimer);
+    }
+    globalAdExitTimer = setTimeout(() => {
+        wrap.classList.remove('is-visible');
+        wrap.classList.remove('is-exiting');
+        globalAdVisible = false;
+    }, 320);
+}
+
+function setGlobalAdDirectionVars(wrap) {
+    const direction = globalAdConfig.direction === 'left' ? 'left' : 'right';
+    const enter = direction === 'right' ? '-110%' : '110%';
+    const exit = direction === 'right' ? '110%' : '-110%';
+    wrap.style.setProperty('--global-ad-enter', enter);
+    wrap.style.setProperty('--global-ad-exit', exit);
 }
 
 function formatClockTime(value) {

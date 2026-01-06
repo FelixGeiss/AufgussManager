@@ -240,12 +240,19 @@
 
 .global-ad-wrap {
     z-index: 70;
+    transform: translateX(var(--global-ad-enter, 110%));
 }
 
 .plan-ad-wrap.is-visible {
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
+}
+
+.global-ad-wrap.is-exiting {
+    opacity: 0;
+    transform: translateX(var(--global-ad-exit, 110%));
+    pointer-events: none;
 }
 
 .plan-ad-media {
