@@ -1931,7 +1931,7 @@ function buildNextAufgussHtml(aufguss) {
         const name = person.name || 'Aufgiesser';
         const img = person.image
             ? `<img src="uploads/${person.image}" alt="${escapeHtml(name)}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
-            : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">Kein Bild</div>`;
+            : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500 font-semibold">Kein Bild</div>`;
         return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${escapeHtml(name)}</div></div>`;
     });
 
@@ -1939,35 +1939,35 @@ function buildNextAufgussHtml(aufguss) {
         ? `<div class="flex flex-col gap-3">${personCards.join('')}</div>`
         : (aufguss.mitarbeiter_bild
             ? `<img src="uploads/${aufguss.mitarbeiter_bild}" alt="Aufgiesser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
-            : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgiesser-Bild</div>`);
+        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgiesser-Bild</div>`);
 
     const saunaBadge = saunaTempText
         ? `<span class="plan-temp-badge absolute -top-2 -right-8 text-sm leading-none px-3 py-1.5 rounded-full border">${escapeHtml(saunaTempText)}&deg;C</span>`
         : '';
     const saunaImg = aufguss.sauna_bild
         ? `<div class="relative">${saunaBadge}<img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>`
-        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
+        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Sauna-Bild</div>`;
 
     return `
         <div class="relative flex flex-col gap-4">
             <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
                 <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
             </div>
-            <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
-                <div class="flex flex-col gap-3">
-                    <div class="flex flex-col gap-1">
-                        <div class="text-3xl font-bold text-gray-900">${escapeHtml(aufgussName)}</div>
-                        <div class="text-lg text-gray-600">${escapeHtml(staerkeText)}</div>
-                        <div class="text-lg text-gray-600">Duftmittel: ${escapeHtml(duftmittel)}</div>
-                        <div class="text-lg text-gray-600">${escapeHtml(saunaTempLine)}</div>
-                    </div>
+            <div class="relative z-10 flex flex-col gap-6 min-h-[70vh]">
+                <div class="flex flex-col gap-2">
+                    <div class="text-3xl font-bold text-gray-900">${escapeHtml(aufgussName)}</div>
+                    <div class="text-lg font-semibold text-gray-900">${escapeHtml(staerkeText)}</div>
+                    <div class="text-lg font-semibold text-gray-900">Duftmittel: ${escapeHtml(duftmittel)}</div>
+                    <div class="text-lg font-semibold text-gray-900">${escapeHtml(saunaTempLine)}</div>
+                </div>
+                <div class="mt-auto grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="flex flex-col gap-2">
                         ${saunaImg}
                         <div class="text-sm font-semibold text-gray-900 text-center">Sauna: ${escapeHtml(saunaName)}</div>
                     </div>
-                </div>
-                <div class="flex flex-col gap-3">
-                    ${mitarbeiterImg}
+                    <div class="flex flex-col gap-3">
+                        ${mitarbeiterImg}
+                    </div>
                 </div>
             </div>
         </div>

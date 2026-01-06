@@ -145,7 +145,7 @@ require_once __DIR__ . '/../src/auth.php';
     <div id="next-aufguss-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4">
             <div class="flex items-center justify-between px-5 py-3 border-b">
-                <h3 class="text-lg font-semibold text-gray-900">Naechster Aufguss</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Nächster Aufguss</h3>
             </div>
             <div id="next-aufguss-body" class="p-5">
                 <div class="text-sm text-gray-500">Laedt...</div>

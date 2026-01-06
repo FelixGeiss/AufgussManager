@@ -1346,7 +1346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
 
                                     <div class="mt-6 border-t border-gray-200 pt-4 space-y-4" data-plan-id="<?php echo $plan['id']; ?>">
-                                        <h4 class="text-base font-semibold text-gray-900 text-center">Naechster Aufguss Popup</h4>
+                                        <h4 class="text-base font-semibold text-gray-900 text-center">Nächster Aufguss Popup</h4>
                                         <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
                                             <input id="next-aufguss-enabled-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="checkbox" class="sr-only peer">
                                             <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
@@ -2313,7 +2313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div id="next-aufguss-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4">
             <div class="flex items-center justify-between px-5 py-3 border-b">
-                <h3 class="text-lg font-semibold text-gray-900">Naechster Aufguss</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Nächster Aufguss</h3>
                 <button type="button" onclick="closeNextAufgussPopup()" class="text-gray-400 hover:text-gray-600">
                     <span class="sr-only">Schliessen</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -3131,7 +3131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const bild = parts[1] ? parts[1].trim() : '';
                 const img = bild
                     ? `<img src="../../uploads/${bild}" alt="${name}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
-                    : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">Kein Bild</div>`;
+                    : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500 font-semibold">Kein Bild</div>`;
                 return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${name}</div></div>`;
             });
 
@@ -3139,35 +3139,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ? `<div class="flex flex-col gap-3">${aufgieserImages.join('')}</div>`
                 : (data.mitarbeiter_bild
                     ? `<img src="../../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
-                    : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgieser-Bild</div>`);
+                    : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgieser-Bild</div>`);
 
             const saunaBadge = saunaTempText
                 ? `<span class="absolute -top-2 -right-4 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${saunaTempText}&deg;C</span>`
                 : '';
             const saunaImg = data.sauna_bild ?
                 `<div class="relative">${saunaBadge}<img src="../../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>` :
-                `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
+                `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Sauna-Bild</div>`;
 
             return `
                 <div class="relative flex flex-col gap-4">
                     <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
                         <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
                     </div>
-                    <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
-                        <div class="flex flex-col gap-3">
-                            <div class="flex flex-col gap-1">
-                                <div class="text-3xl font-bold text-gray-900">${aufgussName}</div>
-                                <div class="text-lg text-gray-600">${staerke}</div>
-                                                                <div class="text-lg text-gray-600">Duftmittel: ${duftmittel}</div>
-                                <div class="text-lg text-gray-600">${saunaTempLine}</div>
-                            </div>
+                    <div class="relative z-10 flex flex-col gap-6 min-h-[70vh]">
+                        <div class="flex flex-col gap-2">
+                            <div class="text-3xl font-bold text-gray-900">${aufgussName}</div>
+                            <div class="text-lg font-semibold text-gray-900">${staerke}</div>
+                            <div class="text-lg font-semibold text-gray-900">Duftmittel: ${duftmittel}</div>
+                            <div class="text-lg font-semibold text-gray-900">${saunaTempLine}</div>
+                        </div>
+                        <div class="mt-auto grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="flex flex-col gap-2">
                                 ${saunaImg}
                                 <div class="text-sm font-semibold text-gray-900 text-center">${saunaName}</div>
                             </div>
-                        </div>
-                        <div class="flex flex-col gap-3">
-                            ${mitarbeiterImg}
+                            <div class="flex flex-col gap-3">
+                                ${mitarbeiterImg}
+                            </div>
                         </div>
                     </div>
                 </div>
