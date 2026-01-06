@@ -151,7 +151,10 @@ function buildGlobalAdCard() {
                         <button type="button" data-action="order-up" class="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50">Hoch</button>
                         <button type="button" data-action="order-down" class="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50">Runter</button>
                     </div>
-                    <div class="text-xs text-gray-500 mt-2">Mehrfachauswahl: Strg/Cmd + Klick.</div>
+                    <div class="mt-2 flex flex-wrap gap-2 text-xs text-gray-600" data-selected-order>
+                        ${renderSelectedOrderBadges(globalAd.order)}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">Mehrfachauswahl: Klick auf Eintraege.</div>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung auswaehlen</label>
@@ -194,6 +197,18 @@ function buildScreenOrderOptions(order) {
         const isSelected = uniqueSelected.includes(value);
         return `<option value="${value}"${isSelected ? ' selected' : ''}>Bildschirm ${value}</option>`;
     }).join('');
+}
+
+function renderSelectedOrderBadges(order) {
+    const list = Array.isArray(order) ? order : [];
+    if (!list.length) {
+        return '<span class="text-xs text-gray-400">Keine Auswahl</span>';
+    }
+    return list
+        .map(value => Number(value))
+        .filter(value => Number.isFinite(value) && value > 0)
+        .map(value => `<span class="inline-flex items-center rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5">Bildschirm ${value}</span>`)
+        .join('');
 }
 
 function buildScreenCard(screenId, screen, plans) {
@@ -297,6 +312,7 @@ function renderGlobalAd() {
     if (!root) return;
     root.innerHTML = buildGlobalAdCard();
     bindGlobalAdEvents();
+    updateSelectedOrderBadges();
 }
 
 function getCardConfig(card) {
@@ -541,10 +557,24 @@ function bindGlobalAdEvents() {
         }
         if (target.name === 'global_ad_order') {
             globalAd.order = getSelectOrder(target);
+            updateSelectedOrderBadges();
         }
         if (target.type === 'file') {
             handleGlobalAdUpload(target);
         }
+    });
+
+    root.addEventListener('mousedown', event => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const option = target.closest('option');
+        if (!option) return;
+        const select = option.closest('select');
+        if (!select || select.name !== 'global_ad_order') return;
+        event.preventDefault();
+        option.selected = !option.selected;
+        globalAd.order = getSelectOrder(select);
+        updateSelectedOrderBadges();
     });
 
     root.addEventListener('click', event => {
@@ -555,6 +585,7 @@ function bindGlobalAdEvents() {
             if (!select) return;
             moveSelectedOptions(select, target.dataset.action === 'order-up' ? -1 : 1);
             globalAd.order = getSelectOrder(select);
+            updateSelectedOrderBadges();
             return;
         }
         if (!target.matches('[data-action="save-global-ad"]')) return;
@@ -601,6 +632,14 @@ function extractGlobalAd(payload) {
         return payload.global_ad;
     }
     return null;
+}
+
+function updateSelectedOrderBadges() {
+    const root = document.getElementById('global-ad-card');
+    if (!root) return;
+    const container = root.querySelector('[data-selected-order]');
+    if (!container) return;
+    container.innerHTML = renderSelectedOrderBadges(globalAd.order);
 }
 
 function getSelectOrder(select) {
