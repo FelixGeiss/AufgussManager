@@ -348,6 +348,7 @@ try {
     $planFilterRatings = $noPlansSelected ? ['sql' => '1=0', 'params' => []] : buildPlanFilter($selectedPlanIds, 'r');
     $ratingStmt = $db->prepare(
         "SELECT r.kriterium AS label,
+                r.aufguss_name_id AS aufguss_name_id,
                 COALESCE(an.name, 'Unbekannter Aufguss') AS aufguss,
                 AVG(r.rating) AS avg_rating,
                 COUNT(*) AS cnt
@@ -361,6 +362,7 @@ try {
     foreach ($ratingStmt->fetchAll() as $row) {
         $ratingItems[] = [
             'label' => $row['label'],
+            'aufguss_name_id' => $row['aufguss_name_id'] !== null ? (int)$row['aufguss_name_id'] : null,
             'aufguss' => $row['aufguss'],
             'value' => round((float)$row['avg_rating'], 2),
             'count' => (int)$row['cnt']
@@ -914,7 +916,7 @@ if (defined('STATISTIK_JSON')) {
                             $badgeClass = 'bg-rose-600';
                         }
                     ?>
-                        <div class="rounded-lg border <?php echo $cardClass; ?> shadow-sm px-5 py-4" data-aufguss="<?php echo htmlspecialchars(strtolower($item['aufguss'] ?? '')); ?>" data-kriterium="<?php echo htmlspecialchars(strtolower($item['label'] ?? '')); ?>" data-avg="<?php echo number_format($avg, 1, '.', ''); ?>">
+                        <div class="rounded-lg border <?php echo $cardClass; ?> shadow-sm px-5 py-4" data-aufguss="<?php echo htmlspecialchars(strtolower($item['aufguss'] ?? '')); ?>" data-aufguss-id="<?php echo htmlspecialchars((string)($item['aufguss_name_id'] ?? '')); ?>" data-kriterium="<?php echo htmlspecialchars(strtolower($item['label'] ?? '')); ?>" data-kriterium-label="<?php echo htmlspecialchars($item['label'] ?? ''); ?>" data-avg="<?php echo number_format($avg, 1, '.', ''); ?>">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <div class="text-xs uppercase tracking-wide text-gray-500">Umfragepunkt</div>
@@ -925,9 +927,14 @@ if (defined('STATISTIK_JSON')) {
                                         <?php echo htmlspecialchars($item['aufguss'] ?? 'Unbekannter Aufguss'); ?>
                                     </div>
                                 </div>
-                                <span class="text-xs text-white px-2 py-1 rounded-full <?php echo $badgeClass; ?>">
-                                    <?php echo number_format($avg, 1, '.', ''); ?> / 5
-                                </span>
+                                <div class="flex flex-col items-end gap-2">
+                                    <span class="text-xs text-white px-2 py-1 rounded-full <?php echo $badgeClass; ?>">
+                                        <?php echo number_format($avg, 1, '.', ''); ?> / 5
+                                    </span>
+                                    <button type="button" class="text-xs font-semibold px-2 py-1 rounded-md border border-rose-200 text-rose-700 bg-white hover:bg-rose-50" data-umfrage-delete>
+                                        Loeschen
+                                    </button>
+                                </div>
                             </div>
                             <div class="mt-4 text-sm text-gray-700">
                                 <div class="flex items-center gap-2 mb-2">
@@ -1470,6 +1477,56 @@ if (defined('STATISTIK_JSON')) {
                     URL.revokeObjectURL(url);
                 });
             }
+
+            const getPlanIdsFromUrl = () => {
+                const params = new URLSearchParams(window.location.search);
+                const raw = params.get('plans');
+                if (!raw || raw === 'all') return null;
+                if (raw === 'none') return [];
+                return raw.split(',').map((value) => value.trim()).filter((value) => value !== '' && /^\d+$/.test(value)).map((value) => Number(value));
+            };
+
+            const handleDelete = async (card) => {
+                const kriterium = card.getAttribute('data-kriterium-label') || '';
+                const aufgussIdRaw = card.getAttribute('data-aufguss-id') || '';
+                const aufgussNameId = aufgussIdRaw !== '' && /^\d+$/.test(aufgussIdRaw) ? Number(aufgussIdRaw) : null;
+                if (!kriterium) return;
+
+                const confirmText = `Umfrage "${kriterium}" wirklich loeschen?`;
+                if (!window.confirm(confirmText)) return;
+
+                const payload = { kriterium, aufguss_name_id: aufgussNameId };
+                const planIds = getPlanIdsFromUrl();
+                if (Array.isArray(planIds) && planIds.length > 0) {
+                    payload.plan_ids = planIds;
+                }
+
+                try {
+                    const response = await fetch('../api/umfrage_bewertungen.php', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json().catch(() => null);
+                    if (!response.ok || !data || data.success !== true) {
+                        const message = data && data.message ? data.message : 'Loeschen fehlgeschlagen.';
+                        alert(message);
+                        return;
+                    }
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Fehler beim Loeschen der Umfrage', error);
+                    alert('Loeschen fehlgeschlagen.');
+                }
+            };
+
+            cards.forEach((card) => {
+                const deleteButton = card.querySelector('[data-umfrage-delete]');
+                if (!deleteButton) return;
+                deleteButton.addEventListener('click', () => {
+                    handleDelete(card);
+                });
+            });
         })();
     </script>
 </body>
