@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/db/connection.php';
-require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/auth.php';
 
 if (is_admin_logged_in()) {
     header('Location: ' . BASE_URL . 'admin/index.php');
@@ -55,8 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Aufgussplan</title>
-    <link rel="stylesheet" href="../dist/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../../dist/style.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-12">

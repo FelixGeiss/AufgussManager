@@ -25,7 +25,7 @@ function has_permission($permission) {
 
 function require_login() {
     if (!is_admin_logged_in()) {
-        header('Location: ' . BASE_URL . 'admin/login.php');
+        header('Location: ' . BASE_URL . 'admin/login/login.php');
         exit;
     }
 }

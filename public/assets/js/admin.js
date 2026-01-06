@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Sicherer Logout mit Bestätigung:
      * - Klick auf Logout-Link abfangen
      * - Bestätigungsdialog anzeigen
-     * - Bei "Ja": Zu logout.php weiterleiten
+     * - Bei "Ja": Zu login/logout.php weiterleiten
      */
     const logoutBtn = document.querySelector('a[href*="logout"]');
     if (logoutBtn) {
@@ -57,7 +57,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Bestätigung vom Benutzer einholen
             if (confirm('Wirklich abmelden?')) {
                 // Zu Logout-Seite weiterleiten (beendet Session)
-                window.location.href = 'logout.php';
+                const path = window.location.pathname || '';
+                const parts = path.split('/admin/');
+                const base = parts.length > 1 ? parts[0] : '';
+                window.location.href = `${base}/admin/login/logout.php`;
             }
         });
     }

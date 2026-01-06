@@ -714,7 +714,11 @@ if (defined('STATISTIK_JSON')) {
     <link rel="stylesheet" href="../../assets/css/admin.css">
 </head>
 <body class="bg-gray-100">
-    <?php include __DIR__ . '/../partials/navbar.php'; ?>
+    <?php
+        $publicBase = '../../';
+        $adminBase = '../';
+        include __DIR__ . '/../partials/navbar.php';
+    ?>
 
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-2xl font-bold mb-6">Statistiken</h2>

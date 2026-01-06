@@ -53,9 +53,9 @@ $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
                 <?php if ($canUmfragen): ?>
                     <a href="<?php echo $adminBase; ?>umfragen.php" class="mr-4 hover:underline">Umfrage erstellen</a>
                 <?php endif; ?>
-                <a href="<?php echo $adminBase; ?>logout.php" class="hover:underline">Logout</a>
+                <a href="<?php echo $adminBase; ?>login/logout.php" class="hover:underline">Logout</a>
             <?php else: ?>
-                <a href="<?php echo $adminBase; ?>login.php" class="hover:underline">Login</a>
+                <a href="<?php echo $adminBase; ?>login/login.php" class="hover:underline">Login</a>
             <?php endif; ?>
         </div>
     </div>
