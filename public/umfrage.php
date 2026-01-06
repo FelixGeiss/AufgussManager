@@ -309,7 +309,8 @@ if ($planBackground !== '') {
     </div>
     <?php
     $publicBase = '';
-    $adminBase = 'admin/';
+    $adminBase = BASE_URL . 'admin/pages/';
+    $adminAuthBase = BASE_URL . 'admin/login/';
     $showPublicLinksWhenLoggedOut = false;
     $navId = 'kiosk-admin-nav';
     $navClass = 'kiosk-admin-nav bg-blue-600 text-white p-4';

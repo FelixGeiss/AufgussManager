@@ -32,14 +32,14 @@ function require_login() {
 
 function require_permission($permission) {
     if (!has_permission($permission)) {
-        header('Location: ' . BASE_URL . 'admin/index.php?denied=1');
+        header('Location: ' . BASE_URL . 'admin/pages/index.php?denied=1');
         exit;
     }
 }
 
 function require_admin() {
     if (!is_admin_user()) {
-        header('Location: ' . BASE_URL . 'admin/index.php?denied=1');
+        header('Location: ' . BASE_URL . 'admin/pages/index.php?denied=1');
         exit;
     }
 }

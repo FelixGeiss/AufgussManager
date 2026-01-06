@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../../src/db/connection.php';
 require_once __DIR__ . '/../../../src/auth.php';
 
 if (is_admin_logged_in()) {
-    header('Location: ' . BASE_URL . 'admin/index.php');
+    header('Location: ' . BASE_URL . 'admin/pages/index.php');
     exit;
 }
 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'bildschirme' => (int)$user['can_bildschirme'] === 1,
             ];
 
-            header('Location: ' . BASE_URL . 'admin/index.php');
+            header('Location: ' . BASE_URL . 'admin/pages/index.php');
             exit;
         }
     }

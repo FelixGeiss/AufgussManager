@@ -21,8 +21,8 @@
 session_start();
 
 // Konfiguration laden (Datenbank, Pfade, Sicherheit)
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/auth.php';
 
 /**
  * SICHERHEIT: LOGIN-PRUEFUNG
@@ -43,7 +43,7 @@ require_login();
  */
 
 // Datenbankverbindung herstellen
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 $db = Database::getInstance()->getConnection();
 
 // Pläene fuer die Uebersicht laden (neueste zuerst)
@@ -59,7 +59,7 @@ $screenAdStatus = [
     'label' => 'Werbung: nicht verfuegbar',
     'screens' => [],
 ];
-$screenConfigFile = __DIR__ . '/../../storage/bildschirme.json';
+$screenConfigFile = __DIR__ . '/../../../storage/bildschirme.json';
 if (is_file($screenConfigFile)) {
     $screenConfigRaw = file_get_contents($screenConfigFile);
     $screenConfig = json_decode($screenConfigRaw, true);
@@ -92,14 +92,14 @@ if (is_file($screenConfigFile)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Aufgussplan</title>
     <!-- Lokale Tailwind CSS -->
-    <link rel="stylesheet" href="../dist/style.css">
+    <link rel="stylesheet" href="../../dist/style.css">
     <!-- Admin-spezifische Styles -->
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
 </head>
 
 <body class="bg-gray-100">
     <!-- NAVIGATION -->
-    <?php include __DIR__ . '/partials/navbar.php'; ?>
+    <?php include __DIR__ . '/../partials/navbar.php'; ?>
 
     <div class="container mx-auto px-4 py-8">
         <!-- SEITENTITEL -->
@@ -198,7 +198,7 @@ if (is_file($screenConfigFile)) {
         </div>
     </div>
 
-    <script src="../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/admin.js'); ?>"></script>
+    <script src="../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin.js'); ?>"></script>
     <script>
         (function() {
             const planButtons = document.querySelectorAll('[data-plan-select]');

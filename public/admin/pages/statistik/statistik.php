@@ -9,9 +9,9 @@
 
 session_start();
 
-require_once __DIR__ . '/../../../src/config/config.php';
-require_once __DIR__ . '/../../../src/auth.php';
-require_once __DIR__ . '/../../../src/db/connection.php';
+require_once __DIR__ . '/../../../../src/config/config.php';
+require_once __DIR__ . '/../../../../src/auth.php';
+require_once __DIR__ . '/../../../../src/db/connection.php';
 
 require_login();
 require_permission('statistik');
@@ -710,14 +710,15 @@ if (defined('STATISTIK_JSON')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistiken - Aufgussplan</title>
-    <link rel="stylesheet" href="../../dist/style.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../../dist/style.css">
+    <link rel="stylesheet" href="../../../assets/css/admin.css">
 </head>
 <body class="bg-gray-100">
     <?php
-        $publicBase = '../../';
-        $adminBase = '../';
-        include __DIR__ . '/../partials/navbar.php';
+        $publicBase = BASE_URL;
+        $adminBase = BASE_URL . 'admin/pages/';
+        $adminAuthBase = BASE_URL . 'admin/login/';
+        include __DIR__ . '/../../partials/navbar.php';
     ?>
 
     <div class="container mx-auto px-4 py-8">
@@ -968,7 +969,7 @@ if (defined('STATISTIK_JSON')) {
     </div>
 
 
-    <script src="../../assets/vendor/apexcharts.min.js"></script>
+    <script src="../../../assets/vendor/apexcharts.min.js"></script>
     <script>
         let chartData = <?php echo json_encode([
             'days' => [
@@ -1506,7 +1507,7 @@ if (defined('STATISTIK_JSON')) {
                 }
 
                 try {
-                    const response = await fetch('../api/umfrage_bewertungen.php', {
+                    const response = await fetch('../../../api/umfrage_bewertungen.php', {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)

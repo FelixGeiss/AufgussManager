@@ -22,8 +22,8 @@
 session_start();
 
 // Konfiguration laden
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/auth.php';
 
 /**
  * SICHERHEIT: LOGIN-PRÜFUNG (auskommentiert für Entwicklung)
@@ -34,10 +34,10 @@ require_login();
 require_permission('aufguesse');
 
 // Datenbankverbindung für PHP-Operationen
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 
 // Aufguss-Model für Plan-Operationen
-require_once __DIR__ . '/../../src/models/aufguss.php';
+require_once __DIR__ . '/../../../src/models/aufguss.php';
 
 $aufgussModel = new Aufguss();
 
@@ -323,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } else {
-        require_once __DIR__ . '/../../src/services/aufgussService.php';
+        require_once __DIR__ . '/../../../src/services/aufgussService.php';
         $service = new AufgussService();
         $result = $service->verarbeiteFormular($_POST, $_FILES);
 
@@ -346,8 +346,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aufgüsse verwalten - Aufgussplan</title>
     <!-- Lokale Tailwind CSS -->
-    <link rel="stylesheet" href="../dist/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../../dist/style.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
     <style>
         .next-aufguss-row {
             background-color: rgba(255, 255, 255, 0.5);
@@ -478,7 +478,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 
-<body class="bg-gray-100">    <?php include __DIR__ . '/partials/navbar.php'; ?>
+<body class="bg-gray-100">    <?php include __DIR__ . '/../partials/navbar.php'; ?>
 
 
 
@@ -601,7 +601,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="relative rounded-lg overflow-hidden">
                             <?php if (!empty($plan['hintergrund_bild'])): ?>
-                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('../uploads/<?php echo htmlspecialchars($plan['hintergrund_bild']); ?>');"></div>
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('../../uploads/<?php echo htmlspecialchars($plan['hintergrund_bild']); ?>');"></div>
                             <?php endif; ?>
                             <div class="relative">
                                 <!-- Aufgüsse für diesen Plan -->
@@ -839,7 +839,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         <?php foreach ($aufgieserPeople as $person): ?>
                                                                             <div class="flex flex-col items-center">
                                                                                 <?php if (!empty($person['bild'])): ?>
-                                                                                    <img src="../uploads/<?php echo htmlspecialchars($person['bild']); ?>"
+                                                                                    <img src="../../uploads/<?php echo htmlspecialchars($person['bild']); ?>"
                                                                                         alt="Aufgiesser-Bild"
                                                                                         class="h-10 w-10 rounded-full object-cover border border-gray-200">
                                                                                 <?php else: ?>
@@ -904,7 +904,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     <div class="relative flex-shrink-0 h-10 w-10">
                                                                         <?php if (!empty($aufguss['sauna_bild'])): ?>
                                                                             <!-- Bild anzeigen wenn vorhanden -->
-                                                                            <img src="../uploads/<?php echo htmlspecialchars($aufguss['sauna_bild']); ?>"
+                                                                            <img src="../../uploads/<?php echo htmlspecialchars($aufguss['sauna_bild']); ?>"
                                                                                 alt="Sauna-Bild"
                                                                                 class="h-10 w-10 rounded-full object-cover border border-gray-200">
                                                                         <?php else: ?>
@@ -1286,7 +1286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">Plan-Hintergrundbild</h3>
                                     <div class="rounded-lg overflow-hidden border border-gray-200 bg-white">
                                         <?php if (!empty($plan['hintergrund_bild'])): ?>
-                                            <img src="../uploads/<?php echo htmlspecialchars($plan['hintergrund_bild']); ?>"
+                                            <img src="../../uploads/<?php echo htmlspecialchars($plan['hintergrund_bild']); ?>"
                                                 alt="Plan Hintergrundbild"
                                                 class="w-full h-48 object-cover">
                                         <?php else: ?>
@@ -1413,9 +1413,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <div id="plan-ad-preview-<?php echo $plan['id']; ?>" class="rounded-lg overflow-hidden border border-gray-200 bg-white">
                                                     <?php if (!empty($plan['werbung_media'])): ?>
                                                         <?php if (($plan['werbung_media_typ'] ?? '') === 'video'): ?>
-                                                            <video src="../uploads/<?php echo htmlspecialchars($plan['werbung_media']); ?>" class="w-full h-48 object-contain" controls loop></video>
+                                                            <video src="../../uploads/<?php echo htmlspecialchars($plan['werbung_media']); ?>" class="w-full h-48 object-contain" controls loop></video>
                                                         <?php else: ?>
-                                                            <img src="../uploads/<?php echo htmlspecialchars($plan['werbung_media']); ?>"
+                                                            <img src="../../uploads/<?php echo htmlspecialchars($plan['werbung_media']); ?>"
                                                                 alt="Werbung"
                                                                 class="w-full h-48 object-contain">
                                                         <?php endif; ?>
@@ -1710,7 +1710,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex-shrink-0 h-8 w-8">
                                                     <?php if (!empty($sauna['bild'])): ?>
-                                                        <img src="../uploads/<?php echo htmlspecialchars($sauna['bild']); ?>"
+                                                        <img src="../../uploads/<?php echo htmlspecialchars($sauna['bild']); ?>"
                                                             alt="Sauna-Bild"
                                                             class="h-8 w-8 rounded-full object-cover border border-gray-200 cursor-pointer hover:border-indigo-400 transition-colors"
                                                             onclick="openImageModal('sauna', <?php echo $sauna['id']; ?>, '<?php echo htmlspecialchars($sauna['name']); ?>')">
@@ -1946,7 +1946,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex-shrink-0 h-8 w-8">
                                                     <?php if (!empty($mitarbeiter_item['bild'])): ?>
-                                                        <img src="../uploads/<?php echo htmlspecialchars($mitarbeiter_item['bild']); ?>"
+                                                        <img src="../../uploads/<?php echo htmlspecialchars($mitarbeiter_item['bild']); ?>"
                                                             alt="Mitarbeiter-Bild"
                                                             class="h-8 w-8 rounded-full object-cover border border-gray-200 cursor-pointer hover:border-indigo-400 transition-colors"
                                                             onclick="openImageModal('mitarbeiter', <?php echo $mitarbeiter_item['id']; ?>, '<?php echo htmlspecialchars($mitarbeiter_item['name']); ?>')">
@@ -2037,7 +2037,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <?php
                                                 $isVideo = stripos($file['typ'], 'video') !== false;
                                                 $fileRelPath = $file['datei'] ?? '';
-                                                $filePath = '../uploads/' . $fileRelPath;
+                                                $filePath = '../../uploads/' . $fileRelPath;
                                                 ?>
                                                 <?php if ($isVideo): ?>
                                                     <video src="<?php echo htmlspecialchars($filePath); ?>" class="h-12 w-20 object-cover rounded border border-gray-200" muted></video>
@@ -2114,7 +2114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <?php
                                                 $isVideo = stripos($file['typ'], 'video') !== false;
-                                                $filePath = '../uploads/' . $file['datei'];
+                                                $filePath = '../../uploads/' . $file['datei'];
                                                 ?>
                                                 <?php if ($isVideo): ?>
                                                     <video src="<?php echo htmlspecialchars($filePath); ?>" class="h-12 w-20 object-cover rounded border border-gray-200" muted></video>
@@ -2327,7 +2327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script src="../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/admin.js'); ?>"></script>
+    <script src="../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin.js'); ?>"></script>
     <script>
         // Tab-Funktionalität für die Datenbank-Übersicht
         function showTab(tabName) {
@@ -2356,7 +2356,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Erstelle ein Formular für den DELETE-Request
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = 'deletes/delete-entry.php'; // Neue PHP-Datei für Lösch-Operationen
+                form.action = '../deletes/delete-entry.php'; // Neue PHP-Datei für Lösch-Operationen
 
                 const typeInput = document.createElement('input');
                 typeInput.type = 'hidden';
@@ -2555,7 +2555,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('updates/update_sauna.php', {
+                const response = await fetch('../updates/update_sauna.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2616,7 +2616,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('updates/update_mitarbeiter.php', {
+                const response = await fetch('../updates/update_mitarbeiter.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2671,7 +2671,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('updates/update_aufguss_name.php', {
+                const response = await fetch('../updates/update_aufguss_name.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2725,7 +2725,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const newValue = input.value;
 
             try {
-                const response = await fetch('updates/update_duftmittel.php', {
+                const response = await fetch('../updates/update_duftmittel.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2788,7 +2788,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('deletes/delete_upload_file.php', {
+                const response = await fetch('../deletes/delete_upload_file.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2815,7 +2815,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                const response = await fetch('deletes/delete_entity_image.php', {
+                const response = await fetch('../deletes/delete_entity_image.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2864,7 +2864,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             submitBtn.textContent = 'Laedt...';
 
             try {
-                const response = await fetch('uploads/upload_entity_image.php', {
+                const response = await fetch('../uploads/upload_entity_image.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -2959,7 +2959,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }, 200);
 
             try {
-                const response = await fetch('uploads/upload_entity_image.php', {
+                const response = await fetch('../uploads/upload_entity_image.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -3130,7 +3130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const name = parts[0] ? parts[0].trim() : 'Aufgieser';
                 const bild = parts[1] ? parts[1].trim() : '';
                 const img = bild
-                    ? `<img src="../uploads/${bild}" alt="${name}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
+                    ? `<img src="../../uploads/${bild}" alt="${name}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
                     : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">Kein Bild</div>`;
                 return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${name}</div></div>`;
             });
@@ -3138,14 +3138,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const mitarbeiterImg = aufgieserImages.length > 0
                 ? `<div class="flex flex-col gap-3">${aufgieserImages.join('')}</div>`
                 : (data.mitarbeiter_bild
-                    ? `<img src="../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
+                    ? `<img src="../../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
                     : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgieser-Bild</div>`);
 
             const saunaBadge = saunaTempText
                 ? `<span class="absolute -top-2 -right-4 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${saunaTempText}&deg;C</span>`
                 : '';
             const saunaImg = data.sauna_bild ?
-                `<div class="relative">${saunaBadge}<img src="../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>` :
+                `<div class="relative">${saunaBadge}<img src="../../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>` :
                 `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
 
             return `
@@ -3366,7 +3366,7 @@ function savePlanSettings(planId, options = {}) {
         }
 
         function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled, bannerEnabled, bannerMode, bannerText, bannerImage, bannerHeight, bannerWidth, themeColor, textColor) {
-            fetch('../api/next_aufguss_settings.php', {
+            fetch('../../api/next_aufguss_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -3389,7 +3389,7 @@ function savePlanSettings(planId, options = {}) {
 
         async function persistBannerSettings(planId) {
             try {
-                const response = await fetch(`../api/next_aufguss_settings.php?plan_id=${encodeURIComponent(planId)}`, {
+                const response = await fetch(`../../api/next_aufguss_settings.php?plan_id=${encodeURIComponent(planId)}`, {
                     headers: { 'Accept': 'application/json' }
                 });
                 const data = await response.json();
@@ -3437,7 +3437,7 @@ function savePlanSettings(planId, options = {}) {
 
         async function persistThemeColorSettings(planId) {
             try {
-                const response = await fetch(`../api/next_aufguss_settings.php?plan_id=${encodeURIComponent(planId)}`, {
+                const response = await fetch(`../../api/next_aufguss_settings.php?plan_id=${encodeURIComponent(planId)}`, {
                     headers: { 'Accept': 'application/json' }
                 });
                 const data = await response.json();
@@ -3651,7 +3651,7 @@ function savePlanSettings(planId, options = {}) {
             }
 
             try {
-                const response = await fetch('updates/update_plan_ad.php', {
+                const response = await fetch('../updates/update_plan_ad.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -3694,7 +3694,7 @@ function savePlanSettings(planId, options = {}) {
             const backgroundPath = select.value;
 
             try {
-                const response = await fetch('updates/update_plan_background.php', {
+                const response = await fetch('../updates/update_plan_background.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -3727,7 +3727,7 @@ function savePlanSettings(planId, options = {}) {
             }
 
             try {
-                const response = await fetch('updates/update_plan_ad_select.php', {
+                const response = await fetch('../updates/update_plan_ad_select.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -3766,7 +3766,7 @@ function savePlanSettings(planId, options = {}) {
             }
 
             try {
-                const response = await fetch('deletes/delete_plan_ad_media.php', {
+                const response = await fetch('../deletes/delete_plan_ad_media.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -3856,7 +3856,7 @@ function savePlanSettings(planId, options = {}) {
             if (media && media.url && media.url.startsWith('blob:')) {
                 URL.revokeObjectURL(media.url);
             }
-            const url = `../uploads/${path}`;
+            const url = `../../uploads/${path}`;
             planAdMedia.set(String(planId), {
                 url,
                 type,
@@ -4269,7 +4269,7 @@ function savePlanSettings(planId, options = {}) {
             const formData = new FormData();
             formData.append('banner', input.files[0]);
             try {
-                const response = await fetch('updates/upload_banner_image.php', {
+                const response = await fetch('../updates/upload_banner_image.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -4293,7 +4293,7 @@ function savePlanSettings(planId, options = {}) {
         function notifyPublicPlanChange(planId) {
             localStorage.setItem('aufgussplanPlanChanged', String(Date.now()));
             if (!planId) return;
-            fetch('../api/selected_plan.php', {
+            fetch('../../api/selected_plan.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plan_id: String(planId) })

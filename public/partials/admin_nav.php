@@ -10,8 +10,9 @@ $canBildschirme = has_permission('bildschirme');
 
 $navId = $navId ?? '';
 $navClass = $navClass ?? 'bg-blue-600 text-white p-4';
-$publicBase = $publicBase ?? '';
-$adminBase = $adminBase ?? 'admin/';
+$publicBase = $publicBase ?? BASE_URL;
+$adminBase = $adminBase ?? (BASE_URL . 'admin/pages/');
+$adminAuthBase = $adminAuthBase ?? (BASE_URL . 'admin/login/');
 $showPublicLinksWhenLoggedOut = $showPublicLinksWhenLoggedOut ?? true;
 
 $navIdAttr = $navId !== ''
@@ -53,9 +54,9 @@ $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
                 <?php if ($canUmfragen): ?>
                     <a href="<?php echo $adminBase; ?>umfragen.php" class="mr-4 hover:underline">Umfrage erstellen</a>
                 <?php endif; ?>
-                <a href="<?php echo $adminBase; ?>login/logout.php" class="hover:underline">Logout</a>
+                <a href="<?php echo $adminAuthBase; ?>logout.php" class="hover:underline">Logout</a>
             <?php else: ?>
-                <a href="<?php echo $adminBase; ?>login/login.php" class="hover:underline">Login</a>
+                <a href="<?php echo $adminAuthBase; ?>login.php" class="hover:underline">Login</a>
             <?php endif; ?>
         </div>
     </div>

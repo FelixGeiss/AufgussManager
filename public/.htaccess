@@ -8,11 +8,17 @@ RewriteRule ^api/(.*)$ api/$1.php [L]
 RewriteRule ^admin/delete-entry\.php$ admin/deletes/delete-entry.php [L]
 RewriteRule ^admin/delete_(.+)\.php$ admin/deletes/delete_$1.php [L]
 RewriteRule ^admin/update_(.+)\.php$ admin/updates/update_$1.php [L]
+RewriteRule ^admin/login\.php$ admin/login/login.php [L]
+RewriteRule ^admin/logout\.php$ admin/login/logout.php [L]
+RewriteRule ^admin/statistik\.php$ admin/pages/statistik/statistik.php [L]
+RewriteRule ^admin/statistik_data\.php$ admin/pages/statistik/statistik_data.php [L]
+RewriteRule ^admin/statistik/umfragen\.php$ admin/pages/statistik/umfragen.php [L]
+RewriteRule ^admin/(index|mitarbeiter|aufguesse|bildschirme|umfragen|next_aufguss|debug_update)\.php$ admin/pages/$1.php [L]
 
 RewriteCond %{REQUEST_URI} ^/admin/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^admin/(.*)$ admin/index.php [L]
+RewriteRule ^admin/(.*)$ admin/pages/index.php [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

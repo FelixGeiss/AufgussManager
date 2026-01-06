@@ -1,4 +1,4 @@
-const apiUrl = '../api/mitarbeiter.php';
+const apiUrl = '../../api/mitarbeiter.php';
 
 // HTML in Text sicher escapen.
 function escapeHtml(value) {

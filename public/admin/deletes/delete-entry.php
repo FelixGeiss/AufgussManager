@@ -22,7 +22,7 @@ require_once __DIR__ . '/../../../src/db/connection.php';
 
 // Nur POST-Requests erlauben
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: aufguesse.php');
+    header('Location: ../pages/aufguesse.php');
     exit;
 }
 
@@ -32,7 +32,7 @@ $id = $_POST['id'] ?? '';
 
 if (empty($type) || empty($id) || !is_numeric($id)) {
     $_SESSION['delete_error'] = 'Ungültige Parameter für Lösch-Operation.';
-    header('Location: aufguesse.php');
+    header('Location: ../pages/aufguesse.php');
     exit;
 }
 
@@ -50,7 +50,7 @@ try {
 
             if ($usage['count'] > 0) {
                 $_SESSION['delete_error'] = 'Aufgussname kann nicht geloescht werden, da er noch in Aufgüssen verwendet wird.';
-                header('Location: aufguesse.php');
+                header('Location: ../pages/aufguesse.php');
                 exit;
             }
 
@@ -68,7 +68,7 @@ try {
 
             if ($usage['count'] > 0) {
                 $_SESSION['delete_error'] = 'Sauna kann nicht gelöscht werden, da sie noch in Aufgüssen verwendet wird.';
-                header('Location: aufguesse.php');
+                header('Location: ../pages/aufguesse.php');
                 exit;
             }
 
@@ -86,7 +86,7 @@ try {
 
             if ($usage['count'] > 0) {
                 $_SESSION['delete_error'] = 'Duftmittel kann nicht gelöscht werden, da es noch in Aufgüssen verwendet wird.';
-                header('Location: aufguesse.php');
+                header('Location: ../pages/aufguesse.php');
                 exit;
             }
 
@@ -110,7 +110,7 @@ try {
 
             if ($usageCount > 0) {
                 $_SESSION['delete_error'] = 'Mitarbeiter kann nicht geloescht werden, da er noch in Aufgüssen verwendet wird.';
-                header('Location: aufguesse.php');
+                header('Location: ../pages/aufguesse.php');
                 exit;
             }
 
@@ -121,7 +121,7 @@ try {
 
         default:
             $_SESSION['delete_error'] = 'Unbekannter Eintragstyp.';
-            header('Location: aufguesse.php');
+            header('Location: ../pages/aufguesse.php');
             exit;
     }
 
@@ -129,7 +129,7 @@ try {
     $_SESSION['delete_error'] = 'Fehler beim Löschen: ' . $e->getMessage();
 }
 
-header('Location: aufguesse.php');
+header('Location: ../pages/aufguesse.php');
 exit;
 
 ?>

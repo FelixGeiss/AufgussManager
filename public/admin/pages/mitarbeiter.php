@@ -12,9 +12,9 @@
 
 session_start();
 
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/auth.php';
-require_once __DIR__ . '/../../src/db/connection.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/auth.php';
+require_once __DIR__ . '/../../../src/db/connection.php';
 
 require_login();
 require_permission('mitarbeiter');
@@ -25,11 +25,11 @@ require_permission('mitarbeiter');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mitarbeiter verwalten - Aufgussplan</title>
-    <link rel="stylesheet" href="../dist/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../../dist/style.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
 </head>
 <body class="bg-gray-100">
-    <?php include __DIR__ . '/partials/navbar.php'; ?>
+    <?php include __DIR__ . '/../partials/navbar.php'; ?>
 
     <div class="container mx-auto px-4 py-8">
         <div class="flex justify-between items-center mb-6">
@@ -159,7 +159,7 @@ require_permission('mitarbeiter');
         </div>
     </div>
 
-    <script src="../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/admin.js'); ?>"></script>
-    <script src="../assets/js/mitarbeiter.js"></script>
+    <script src="../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin.js'); ?>"></script>
+    <script src="../../assets/js/mitarbeiter.js"></script>
 </body>
 </html>
