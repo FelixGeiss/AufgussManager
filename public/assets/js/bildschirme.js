@@ -1,7 +1,7 @@
 const screensApiUrl = '../api/bildschirme.php';
 const plansApiUrl = '../api/plaene.php';
-const uploadUrl = 'upload_screen_media.php';
-const globalAdUploadUrl = 'upload_global_ad.php';
+const uploadUrl = 'uploads/upload_screen_media.php';
+const globalAdUploadUrl = 'uploads/upload_global_ad.php';
 const screenCount = 5;
 const mediaOptions = window.ScreenMediaOptions || { screens: [], backgrounds: [], ads: [] };
 let globalAd = {

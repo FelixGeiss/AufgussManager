@@ -2864,7 +2864,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             submitBtn.textContent = 'Laedt...';
 
             try {
-                const response = await fetch('upload_entity_image.php', {
+                const response = await fetch('uploads/upload_entity_image.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -2959,7 +2959,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }, 200);
 
             try {
-                const response = await fetch('upload_entity_image.php', {
+                const response = await fetch('uploads/upload_entity_image.php', {
                     method: 'POST',
                     body: formData
                 });

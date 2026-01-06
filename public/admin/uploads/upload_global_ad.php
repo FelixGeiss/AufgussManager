@@ -5,8 +5,8 @@
 
 session_start();
 
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/auth.php';
 
 header('Content-Type: application/json');
 
@@ -70,7 +70,7 @@ $relativePath = 'werbung/' . $filename;
 $mediaType = str_starts_with($file['type'], 'video/') ? 'video' : 'image';
 
 try {
-    $storageDir = __DIR__ . '/../../storage';
+    $storageDir = __DIR__ . '/../../../storage';
     $storageFile = $storageDir . '/bildschirme.json';
     $config = readScreenConfig($storageFile);
     $currentGlobal = $config['global_ad'] ?? [];

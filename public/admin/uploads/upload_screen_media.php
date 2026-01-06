@@ -5,8 +5,8 @@
 
 session_start();
 
-require_once __DIR__ . '/../../src/config/config.php';
-require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../../src/config/config.php';
+require_once __DIR__ . '/../../../src/auth.php';
 
 header('Content-Type: application/json');
 
@@ -76,7 +76,7 @@ if (!move_uploaded_file($file['tmp_name'], $filepath)) {
 $relativePath = $uploadSubDir . '/' . $filename;
 
 try {
-    $storageDir = __DIR__ . '/../../storage';
+    $storageDir = __DIR__ . '/../../../storage';
     $storageFile = $storageDir . '/bildschirme.json';
     $config = readScreenConfig($storageFile);
     $screen = $config['screens'][$screenId] ?? defaultScreen($screenId);
