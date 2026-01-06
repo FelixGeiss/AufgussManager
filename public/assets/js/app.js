@@ -266,7 +266,7 @@ function renderScreenImage() {
 
 // Laedt Pläene und aktualisiert die Anzeige.
 function loadPlans() {
-    fetch('api/Pläene.php')
+    fetch('api/plaene.php')
         .then(response => response.json())
         .then(data => {
             const Pläene = extractPläene(data);

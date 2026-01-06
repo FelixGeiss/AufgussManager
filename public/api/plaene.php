@@ -65,7 +65,7 @@ try {
             sendResponse(false, 'HTTP-Methode nicht unterstützt', null, 405);
     }
 } catch (Exception $e) {
-    error_log('API-Fehler in Pläene.php: ' . $e->getMessage());
+    error_log('API-Fehler in plaene.php: ' . $e->getMessage());
     sendResponse(false, 'Interner Serverfehler', null, 500);
 }
 

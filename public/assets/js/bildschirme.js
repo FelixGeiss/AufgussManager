@@ -1,5 +1,5 @@
 const screensApiUrl = '../api/bildschirme.php';
-const plansApiUrl = '../api/Pläene.php';
+const plansApiUrl = '../api/plaene.php';
 const uploadUrl = 'upload_screen_media.php';
 const globalAdUploadUrl = 'upload_global_ad.php';
 const screenCount = 5;
