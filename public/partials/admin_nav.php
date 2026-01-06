@@ -48,7 +48,7 @@ $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
                     <a href="<?php echo $adminBase; ?>aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
                 <?php endif; ?>
                 <?php if ($canStatistik): ?>
-                    <a href="<?php echo $adminBase; ?>statistik.php" class="mr-4 hover:underline">Statistiken</a>
+                    <a href="<?php echo $adminBase; ?>statistik/statistik.php" class="mr-4 hover:underline">Statistiken</a>
                 <?php endif; ?>
                 <?php if ($canUmfragen): ?>
                     <a href="<?php echo $adminBase; ?>umfragen.php" class="mr-4 hover:underline">Umfrage erstellen</a>
