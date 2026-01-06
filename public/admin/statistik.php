@@ -931,7 +931,7 @@ if (defined('STATISTIK_JSON')) {
                                     <span class="text-xs text-white px-2 py-1 rounded-full <?php echo $badgeClass; ?>">
                                         <?php echo number_format($avg, 1, '.', ''); ?> / 5
                                     </span>
-                                    <button type="button" class="text-xs font-semibold px-2 py-1 rounded-md border border-rose-200 text-rose-700 bg-white hover:bg-rose-50" data-umfrage-delete>
+                                    <button type="button" class="admin-btn admin-btn-danger" data-umfrage-delete>
                                         Loeschen
                                     </button>
                                 </div>
