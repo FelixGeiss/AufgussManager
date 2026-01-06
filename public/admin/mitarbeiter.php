@@ -150,7 +150,7 @@ require_permission('mitarbeiter');
         </div>
     </div>
 
-    <script src="../assets/js/admin.js"></script>
+    <script src="../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/admin.js'); ?>"></script>
     <script src="../assets/js/mitarbeiter.js"></script>
 </body>
 </html>

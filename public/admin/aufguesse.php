@@ -2327,8 +2327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script src="../assets/js/admin.js"></script>
-    <script src="../assets/js/admin-functions.js"></script>
+    <script src="../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/admin.js'); ?>"></script>
     <script>
         // Tab-Funktionalität für die Datenbank-Übersicht
         function showTab(tabName) {

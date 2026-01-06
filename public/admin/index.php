@@ -151,8 +151,7 @@ $canUmfragen = has_permission('umfragen');
         </div>
     </div>
 
-    <script src="../assets/js/admin.js"></script>
-    <script src="../assets/js/admin-functions.js"></script>
+    <script src="../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/admin.js'); ?>"></script>
     <script>
         (function() {
             const planButtons = document.querySelectorAll('[data-plan-select]');
