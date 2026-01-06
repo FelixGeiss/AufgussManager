@@ -119,9 +119,9 @@ $canUmfragen = has_permission('umfragen');
                             Noch keine Pläene vorhanden. Erstelle zuerst einen Plan in der Planung.
                         </div>
                     <?php else: ?>
-                        <div id="plan-list" class="flex flex-wrap gap-4">
+                        <div id="plan-list" class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             <?php foreach ($Pläene as $p): ?>
-                                <div class="plan-item flex w-full flex-col gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]" data-plan-id="<?php echo (int)$p['id']; ?>">
+                                <div class="plan-item flex flex-col gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3" data-plan-id="<?php echo (int)$p['id']; ?>">
                                     <div>
                                         <div class="text-base font-semibold text-gray-900">
                                             <?php echo htmlspecialchars($p['name'] ?? ''); ?>
