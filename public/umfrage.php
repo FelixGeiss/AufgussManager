@@ -2,7 +2,7 @@
 /**
  * OEFFENTLICHE UMFRAGEN
  *
- * Anzeige der ausgewaehlten Aufguesse mit Bewertungs-Kriterien und Sterneauswahl.
+ * Anzeige der ausgewaehlten Aufgüsse mit Bewertungs-Kriterien und Sterneauswahl.
  */
 
 session_start();

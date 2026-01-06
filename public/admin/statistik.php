@@ -162,7 +162,7 @@ if ($noPlansSelected) {
     $planFilterStats = buildPlanFilter([], 's');
 }
 
-// Aufguesse pro Tag (letzte 7 Tage)
+// Aufgüsse pro Tag (letzte 7 Tage)
 $byDayRows = $db->prepare(
     "SELECT DATE(datum) AS label, COALESCE(SUM(anzahl), 0) AS cnt
      FROM statistik s
@@ -188,7 +188,7 @@ for ($i = 0; $i < 7; $i++) {
 }
 $byDayItems = buildBarItems($dayLabels, $dayCounts);
 
-// Aufguesse pro Woche (letzte 8 Wochen)
+// Aufgüsse pro Woche (letzte 8 Wochen)
 $byWeekRows = $db->prepare(
     "SELECT YEARWEEK(datum, 3) AS yw, COALESCE(SUM(anzahl), 0) AS cnt
      FROM statistik s
@@ -213,7 +213,7 @@ for ($i = 0; $i < 8; $i++) {
 }
 $byWeekItems = buildBarItems($weekLabels, $weekCounts);
 
-// Aufguesse pro Monat (letzte 12 Monate)
+// Aufgüsse pro Monat (letzte 12 Monate)
 $byMonthRows = $db->prepare(
     "SELECT DATE_FORMAT(datum, '%Y-%m') AS ym, COALESCE(SUM(anzahl), 0) AS cnt
      FROM statistik s
@@ -238,7 +238,7 @@ for ($i = 0; $i < 12; $i++) {
 }
 $byMonthItems = buildBarItems($monthLabels, $monthCounts);
 
-// Aufguesse pro Jahr
+// Aufgüsse pro Jahr
 $byYearRows = $db->prepare(
     "SELECT YEAR(datum) AS y, COALESCE(SUM(anzahl), 0) AS cnt
      FROM statistik s"
@@ -313,7 +313,7 @@ if ($noPlansSelected) {
     $saunaItems = [];
 }
 
-// Aufguesse nach Staerke (wie oft im Plan)
+// Aufgüsse nach Staerke (wie oft im Plan)
 $staerkeStmt = $db->prepare(
     "SELECT a.staerke, COUNT(*) AS cnt
      FROM aufguesse a"
@@ -508,8 +508,8 @@ foreach ($saunaList as $sauna) {
 }
 
 $seriesDays = [
-    ['key' => 'base', 'label' => 'Eingetragene Aufguesse', 'items' => $byDayItems, 'strokeClass' => 'stroke-blue-500'],
-    ['key' => 'aufguss', 'label' => 'Gemachte Aufguesse', 'items' => $aufgussDayItems, 'strokeClass' => 'stroke-orange-500'],
+    ['key' => 'base', 'label' => 'Eingetragene Aufgüsse', 'items' => $byDayItems, 'strokeClass' => 'stroke-blue-500'],
+    ['key' => 'aufguss', 'label' => 'Gemachte Aufgüsse', 'items' => $aufgussDayItems, 'strokeClass' => 'stroke-orange-500'],
 ];
 foreach ($duftmittelList as $duft) {
     $seriesDays[] = [
@@ -537,8 +537,8 @@ for ($level = 1; $level <= 6; $level++) {
 }
 
 $seriesWeeks = [
-    ['key' => 'base', 'label' => 'Eingetragene Aufguesse', 'items' => $byWeekItems, 'strokeClass' => 'stroke-indigo-500'],
-    ['key' => 'aufguss', 'label' => 'Gemachte Aufguesse', 'items' => $aufgussWeekItems, 'strokeClass' => 'stroke-orange-600'],
+    ['key' => 'base', 'label' => 'Eingetragene Aufgüsse', 'items' => $byWeekItems, 'strokeClass' => 'stroke-indigo-500'],
+    ['key' => 'aufguss', 'label' => 'Gemachte Aufgüsse', 'items' => $aufgussWeekItems, 'strokeClass' => 'stroke-orange-600'],
 ];
 foreach ($duftmittelList as $duft) {
     $seriesWeeks[] = [
@@ -566,8 +566,8 @@ for ($level = 1; $level <= 6; $level++) {
 }
 
 $seriesMonths = [
-    ['key' => 'base', 'label' => 'Eingetragene Aufguesse', 'items' => $byMonthItems, 'strokeClass' => 'stroke-teal-500'],
-    ['key' => 'aufguss', 'label' => 'Gemachte Aufguesse', 'items' => $aufgussMonthItems, 'strokeClass' => 'stroke-orange-700'],
+    ['key' => 'base', 'label' => 'Eingetragene Aufgüsse', 'items' => $byMonthItems, 'strokeClass' => 'stroke-teal-500'],
+    ['key' => 'aufguss', 'label' => 'Gemachte Aufgüsse', 'items' => $aufgussMonthItems, 'strokeClass' => 'stroke-orange-700'],
 ];
 foreach ($duftmittelList as $duft) {
     $seriesMonths[] = [
@@ -595,8 +595,8 @@ for ($level = 1; $level <= 6; $level++) {
 }
 
 $seriesYears = [
-    ['key' => 'base', 'label' => 'Eingetragene Aufguesse', 'items' => $byYearItems, 'strokeClass' => 'stroke-emerald-500'],
-    ['key' => 'aufguss', 'label' => 'Gemachte Aufguesse', 'items' => $aufgussYearItems, 'strokeClass' => 'stroke-orange-800'],
+    ['key' => 'base', 'label' => 'Eingetragene Aufgüsse', 'items' => $byYearItems, 'strokeClass' => 'stroke-emerald-500'],
+    ['key' => 'aufguss', 'label' => 'Gemachte Aufgüsse', 'items' => $aufgussYearItems, 'strokeClass' => 'stroke-orange-800'],
 ];
 foreach ($duftmittelList as $duft) {
     $seriesYears[] = [
@@ -746,7 +746,7 @@ if (defined('STATISTIK_JSON')) {
                 <div class="flex flex-wrap items-center gap-4 text-sm text-gray-700">
                     <label class="plan-select-btn legend-filter">
                         <input type="checkbox" class="rounded border-gray-300" data-legend-group="aufguss" checked>
-                        <span>Aufguesse</span>
+                        <span>Aufgüsse</span>
                     </label>
                     <label class="plan-select-btn legend-filter">
                         <input type="checkbox" class="rounded border-gray-300" data-legend-group="duft">
@@ -827,7 +827,7 @@ if (defined('STATISTIK_JSON')) {
         <?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-semibold mb-4">Aufguesse nach Staerke</h3>
+                <h3 class="text-lg font-semibold mb-4">Aufgüsse nach Staerke</h3>
                 <div id="apex-bar-staerke" class="apex-chart apex-chart-bar"></div>
             </div>
             <div class="bg-white rounded-lg shadow-md p-6">
@@ -854,7 +854,7 @@ if (defined('STATISTIK_JSON')) {
                         <div>
                             <label for="umfrage-filter-aufguss" class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Aufguss filtern</label>
                             <select id="umfrage-filter-aufguss" class="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                <option value="">Alle Aufguesse</option>
+                                <option value="">Alle Aufgüsse</option>
                                 <?php foreach ($ratingAufguesse as $aufgussOption) : ?>
                                     <option value="<?php echo htmlspecialchars(strtolower($aufgussOption)); ?>">
                                         <?php echo htmlspecialchars($aufgussOption); ?>

@@ -3,7 +3,7 @@
 /**
  * UMFRAGE - Admin-Seite fuer Umfragen
  *
- * Anzeige der Aufguesse aus einem Plan mit Feldern fuer Bewertungs-Kriterien.
+ * Anzeige der Aufgüsse aus einem Plan mit Feldern fuer Bewertungs-Kriterien.
  */
 
 session_start();
@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
 
         <div class="bg-white rounded-lg p-6">
             <div class="flex flex-col gap-1 mb-4">
-                <h3 class="text-lg font-semibold">Aufguesse im Plan</h3>
+                <h3 class="text-lg font-semibold">Aufgüsse im Plan</h3>
                 <?php if ($selectedPlan): ?>
                     <p class="text-sm text-gray-500">Ausgewaehlt: <?php echo htmlspecialchars($selectedPlan['name'] ?? ''); ?></p>
                 <?php else: ?>
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                 </div>
             <?php elseif (empty($aufguesse)): ?>
                 <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
-                    Dieser Plan enthaelt noch keine Aufguesse.
+                    Dieser Plan enthaelt noch keine Aufgüsse.
                 </div>
             <?php else: ?>
                 <form action="" method="post" class="space-y-6" id="survey-form">
@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                     <?php endif; ?>
 
                     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
-                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Kriterien fuer alle Aufguesse</h4>
+                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Kriterien fuer alle Aufgüsse</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                             <?php foreach ($criteriaDefaults as $key => $value): ?>
                                 <input
@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                     </div>
 
                     <div class="rounded-lg border border-gray-200 bg-white px-4 py-4">
-                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Aufguesse im Plan</h4>
+                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Aufgüsse im Plan</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 text-sm text-gray-700">
                             <?php foreach ($aufguesse as $aufguss): ?>
                                 <div class="rounded-md border border-gray-100 bg-gray-50 px-3 py-2">

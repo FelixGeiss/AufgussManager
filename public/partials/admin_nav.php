@@ -42,7 +42,7 @@ $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
                     </div>
                 </div>
                 <?php if ($canAufguesse): ?>
-                    <a href="<?php echo $adminBase; ?>aufguesse.php" class="mr-4 hover:underline">Aufguesse</a>
+                    <a href="<?php echo $adminBase; ?>aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
                 <?php endif; ?>
                 <?php if ($canStatistik): ?>
                     <a href="<?php echo $adminBase; ?>statistik.php" class="mr-4 hover:underline">Statistiken</a>

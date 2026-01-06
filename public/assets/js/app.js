@@ -6,7 +6,7 @@
  * - Regelmige Aktualisierung (alle 30 Sekunden)
  * - Darstellung der Daten im TV-freundlichen Format
  * - Vollbild-Modus fuer TV-Bildschirme
- * - Timer-Funktionalitt fuer laufende Aufguesse
+ * - Timer-Funktionalitt fuer laufende Aufgüsse
  *
  * Als Anfnger solltest du wissen:
  * - Dies ist modernes ES6+ JavaScript mit Promises und Fetch API
@@ -279,7 +279,7 @@ function loadPlans() {
         });
 }
 
-// Rendert Aufguesse basierend auf Filter.
+// Rendert Aufgüsse basierend auf Filter.
 function renderFilteredAufguesse() {
     if (screenMode === 'image') {
         renderScreenImage();
@@ -290,7 +290,7 @@ function renderFilteredAufguesse() {
 }
 
 
-// Filtert Aufguesse nach Plan.
+// Filtert Aufgüsse nach Plan.
 function filterAufguesseByPlan(aufguesse) {
     if (!Array.isArray(aufguesse) || !selectedPlanId) {
         return aufguesse;
@@ -522,7 +522,7 @@ function ensureSelectedPlan(Pläene) {
     }
 }
 
-// Extrahiert Aufguesse aus API-Payload.
+// Extrahiert Aufgüsse aus API-Payload.
 function extractAufguesse(payload) {
     if (Array.isArray(payload)) {
         return payload;
@@ -702,7 +702,7 @@ function renderPlanView(planId, Pläene, aufguesse) {
         tableHtml = `
             <div class="text-center py-8 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg bg-white/70">
                 <div class="text-4xl mb-2">?</div>
-                <p class="text-lg font-medium">Noch keine Aufguesse in diesem Plan</p>
+                <p class="text-lg font-medium">Noch keine Aufgüsse in diesem Plan</p>
             </div>
         `;
     } else if (hideHeader) {

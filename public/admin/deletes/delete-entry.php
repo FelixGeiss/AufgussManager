@@ -43,13 +43,13 @@ $success = false;
 try {
     switch ($type) {
         case 'aufguss':
-            // Pruefen, ob der Aufgussname in Aufguessen verwendet wird
+            // Pruefen, ob der Aufgussname in Aufgüssen verwendet wird
             $stmt = $db->prepare("SELECT COUNT(*) as count FROM aufguesse WHERE aufguss_name_id = ?");
             $stmt->execute([$id]);
             $usage = $stmt->fetch();
 
             if ($usage['count'] > 0) {
-                $_SESSION['delete_error'] = 'Aufgussname kann nicht geloescht werden, da er noch in Aufguessen verwendet wird.';
+                $_SESSION['delete_error'] = 'Aufgussname kann nicht geloescht werden, da er noch in Aufgüssen verwendet wird.';
                 header('Location: aufguesse.php');
                 exit;
             }
@@ -97,7 +97,7 @@ try {
             break;
 
         case 'mitarbeiter':
-            // Pruefen, ob der Mitarbeiter in Aufguessen oder Aufguss-Aufgiessern verwendet wird
+            // Pruefen, ob der Mitarbeiter in Aufgüssen oder Aufguss-Aufgiessern verwendet wird
             $stmt = $db->prepare("SELECT COUNT(*) as count FROM aufguesse WHERE mitarbeiter_id = ?");
             $stmt->execute([$id]);
             $usage = $stmt->fetch();
@@ -109,7 +109,7 @@ try {
             $usageCount = (int)($usage['count'] ?? 0) + (int)($usageRelations['count'] ?? 0);
 
             if ($usageCount > 0) {
-                $_SESSION['delete_error'] = 'Mitarbeiter kann nicht geloescht werden, da er noch in Aufguessen verwendet wird.';
+                $_SESSION['delete_error'] = 'Mitarbeiter kann nicht geloescht werden, da er noch in Aufgüssen verwendet wird.';
                 header('Location: aufguesse.php');
                 exit;
             }

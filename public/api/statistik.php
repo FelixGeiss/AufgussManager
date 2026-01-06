@@ -1,6 +1,6 @@
 <?php
 /**
- * API: Statistik-Logging fuer abgeschlossene Aufguesse
+ * API: Statistik-Logging fuer abgeschlossene Aufgüsse
  *
  * Erwartet: POST mit JSON {"aufguss_id": 123}
  */

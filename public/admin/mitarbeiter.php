@@ -91,7 +91,7 @@ require_permission('mitarbeiter');
                                     <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
                                 </svg>
                             </span>
-                            Aufguesse
+                            Aufgüsse
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="can_statistik" class="peer sr-only">

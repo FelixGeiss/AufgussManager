@@ -4,7 +4,7 @@
  * ADMIN-DASHBOARD - Hauptseite des Admin-Bereichs
  *
  * Diese Seite ist das Herzstueck der Verwaltung. Hier koennen Administratoren:
- * - Aufguesse planen
+ * - Aufgüsse planen
  * - Uebersicht ueber Bereiche sehen
  * - Zu anderen Verwaltungsseiten navigieren
  *
@@ -107,8 +107,8 @@ $canUmfragen = has_permission('umfragen');
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white rounded-lg p-6">
-                <h3 class="text-lg font-semibold mb-2">Aufguesse</h3>
-                <p class="text-gray-600">Planen Sie Ihre Aufguesse</p>
+                <h3 class="text-lg font-semibold mb-2">Aufgüsse</h3>
+                <p class="text-gray-600">Planen Sie Ihre Aufgüsse</p>
                 <?php if ($canAufguesse): ?>
                     <a href="aufguesse.php" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Verwalten</a>
                 <?php endif; ?>
