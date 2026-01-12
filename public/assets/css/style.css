@@ -553,6 +553,20 @@
     color: var(--plan-text-color, #111827);
 }
 
+.kiosk-view .plan-list-row .plan-list-cell,
+.kiosk-view .plan-list-body .plan-list-cell,
+.kiosk-view .plan-list-row .text-sm,
+.kiosk-view .plan-list-time,
+.kiosk-view .plan-list-people,
+.kiosk-view .plan-list-people .text-sm,
+.kiosk-view .plan-media-stack,
+.kiosk-view .plan-media-stack span,
+.kiosk-view .plan-media-stack .text-sm,
+.kiosk-view .plan-strength-badge,
+.kiosk-view .plan-temp-badge {
+    font-weight: 700 !important;
+}
+
 .kiosk-view .plan-list-cell.text-sm {
     font-size: clamp(0.875rem, 1.1vw, 4.2rem);
 }
