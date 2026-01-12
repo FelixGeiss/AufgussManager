@@ -41,6 +41,7 @@ if (is_file($backupMetaPath)) {
     }
 }
 
+
 try {
     $dbOverview['plaene'] = (int)$db->query("SELECT COUNT(*) FROM plaene")->fetchColumn();
     $dbOverview['aufguesse'] = (int)$db->query("SELECT COUNT(*) FROM aufguesse")->fetchColumn();
@@ -198,6 +199,17 @@ function add_folder_to_zip(ZipArchive $zip, $sourcePath, $zipRoot) {
     }
 }
 
+function create_backup_zip(PDO $db, $destinationPath) {
+    $zip = new ZipArchive();
+    if ($zip->open($destinationPath, ZipArchive::OVERWRITE) !== true) {
+        throw new RuntimeException('Konnte Backup ZIP nicht erstellen.');
+    }
+    $sql = build_sql_backup($db, DB_NAME);
+    $zip->addFromString('database.sql', $sql);
+    add_folder_to_zip($zip, UPLOAD_PATH, 'uploads');
+    $zip->close();
+}
+
 function safe_extract_zip(ZipArchive $zip, $dest) {
     if (!is_dir($dest) && !mkdir($dest, 0775, true)) {
         throw new RuntimeException('Konnte Temp-Ordner nicht erstellen.');
@@ -347,14 +359,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($tmpFile === false) {
                 $errors[] = 'Konnte temporaere Backup-Datei nicht erstellen.';
             } else {
-                $zip = new ZipArchive();
-                if ($zip->open($tmpFile, ZipArchive::OVERWRITE) !== true) {
-                    $errors[] = 'Konnte Backup ZIP nicht erstellen.';
-                } else {
-                    $sql = build_sql_backup($db, DB_NAME);
-                    $zip->addFromString('database.sql', $sql);
-                    add_folder_to_zip($zip, UPLOAD_PATH, 'uploads');
-                    $zip->close();
+                try {
+                    create_backup_zip($db, $tmpFile);
 
                     $metaDir = dirname($backupMetaPath);
                     if (!is_dir($metaDir)) {
@@ -373,6 +379,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     readfile($tmpFile);
                     unlink($tmpFile);
                     exit;
+                } catch (Throwable $e) {
+                    $errors[] = $e->getMessage();
                 }
                 if (is_file($tmpFile)) {
                     unlink($tmpFile);

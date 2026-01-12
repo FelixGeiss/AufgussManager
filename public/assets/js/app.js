@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleFullscreen();
         }
     });
+
 });
 
 let lastAufguesse = [];
