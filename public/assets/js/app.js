@@ -1936,17 +1936,17 @@ function buildNextAufgussHtml(aufguss) {
         return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${escapeHtml(name)}</div></div>`;
     });
 
+    const peopleClass = personCards.length >= 3
+        ? 'flex flex-col gap-3 next-aufguss-people next-aufguss-people--stacked'
+        : 'flex flex-col gap-3 next-aufguss-people';
     const mitarbeiterImg = personCards.length > 0
-        ? `<div class="flex flex-col gap-3">${personCards.join('')}</div>`
+        ? `<div class="${peopleClass}">${personCards.join('')}</div>`
         : (aufguss.mitarbeiter_bild
             ? `<img src="uploads/${aufguss.mitarbeiter_bild}" alt="Aufgiesser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
         : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgiesser-Bild</div>`);
 
-    const saunaBadge = saunaTempText
-        ? `<span class="plan-temp-badge absolute -top-2 -right-8 text-sm leading-none px-3 py-1.5 rounded-full border">${escapeHtml(saunaTempText)}&deg;C</span>`
-        : '';
     const saunaImg = aufguss.sauna_bild
-        ? `<div class="relative">${saunaBadge}<img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>`
+        ? `<div class="relative"><img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>`
         : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Sauna-Bild</div>`;
 
     return `
@@ -2000,8 +2000,8 @@ function showNextAufgussPopup(aufguss, startTs) {
 
     if (nextAufgussHideTimer) {
         clearTimeout(nextAufgussHideTimer);
+        nextAufgussHideTimer = null;
     }
-    nextAufgussHideTimer = setTimeout(hideNextAufgussPopup, 10000);
 }
 
 // Aktualisiert Countdown im Popup.
@@ -2011,6 +2011,9 @@ function updateNextAufgussCountdown() {
     const diffMs = nextAufgussCountdownTarget - Date.now();
     if (diffMs <= 0) {
         countdown.textContent = 'Startet jetzt';
+        if (!nextAufgussHideTimer) {
+            nextAufgussHideTimer = setTimeout(hideNextAufgussPopup, 2000);
+        }
         return;
     }
     const seconds = Math.ceil(diffMs / 1000);

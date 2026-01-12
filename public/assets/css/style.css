@@ -154,7 +154,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.4);
-    z-index: 50;
+    z-index: 10000;
 }
 
 .next-aufguss-overlay.hidden {
@@ -163,54 +163,159 @@
 
 .next-aufguss-card {
     background: rgba(255, 255, 255, 0.92);
-    border-radius: 24px;
-    padding: 2rem 2.5rem;
+    border-radius: clamp(24px, 2vw, 72px);
+    padding: clamp(1.5rem, 2vw, 4rem) clamp(2rem, 2.6vw, 5rem);
     text-align: center;
-    max-width: 720px;
+    max-width: clamp(720px, 40vw, 1400px);
     width: 90%;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    border: clamp(2px, 0.1vw, 6px) solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 clamp(20px, 2vw, 60px) clamp(40px, 3vw, 120px) rgba(0, 0, 0, 0.25);
 }
 
 .next-aufguss-header {
-    font-size: 1.25rem;
+    font-size: clamp(1.25rem, 1.6vw, 3.2rem);
     font-weight: 700;
     color: #1f2937;
-    margin-bottom: 0.75rem;
+    margin-bottom: clamp(0.75rem, 1vw, 2rem);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
 .next-aufguss-title {
-    font-size: 2.5rem;
+    font-size: clamp(2.5rem, 3.2vw, 6rem);
     font-weight: 800;
     color: #111827;
-    margin-bottom: 0.5rem;
+    margin-bottom: clamp(0.5rem, 0.8vw, 1.6rem);
 }
 
 .next-aufguss-time {
-    font-size: 1.5rem;
+    font-size: clamp(1.5rem, 2vw, 4rem);
     font-weight: 600;
     color: #2563eb;
-    margin-bottom: 0.5rem;
+    margin-bottom: clamp(0.5rem, 0.8vw, 1.6rem);
 }
 
 .next-aufguss-sauna {
-    font-size: 1rem;
+    font-size: clamp(1rem, 1.4vw, 3rem);
     font-weight: 600;
     color: #374151;
-    margin-bottom: 1rem;
+    margin-bottom: clamp(1rem, 1.6vw, 3rem);
 }
 
 .next-aufguss-countdown {
-    font-size: 3rem;
+    font-size: clamp(3rem, 3.8vw, 8rem);
     font-weight: 800;
     color: #111827;
     background: rgba(255, 255, 255, 0.8);
-    border: 2px solid rgba(255, 255, 255, 0.8);
+    border: clamp(2px, 0.1vw, 6px) solid rgba(255, 255, 255, 0.8);
     border-radius: 9999px;
-    padding: 0.75rem 2rem;
+    padding: clamp(0.75rem, 1vw, 2rem) clamp(2rem, 2.4vw, 5rem);
     display: inline-block;
+}
+
+#next-aufguss-overlay > div {
+    width: min(92vw, clamp(900px, 70vw, 2600px));
+    max-width: none;
+    margin: 0 auto;
+    max-height: fit-content;
+    border-radius: clamp(20px, 1.5vw, 60px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#next-aufguss-body {
+    overflow: auto;
+}
+
+#next-aufguss-overlay > div > .flex {
+    padding: clamp(1rem, 2vw, 3rem) clamp(1.5rem, 2.5vw, 4rem);
+}
+
+#next-aufguss-overlay > div > .flex h3 {
+    font-size: clamp(1.5rem, 2.2vw, 8rem);
+    line-height: 1.2;
+}
+
+#next-aufguss-body {
+    padding: clamp(1.5rem, 2.5vw, 4rem);
+    overflow: hidden;
+}
+
+#next-aufguss-body .grid > .flex.flex-col.gap-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 16vw, 320px), 1fr));
+    gap: clamp(0.8rem, 1.2vw, 2rem);
+}
+
+#next-aufguss-body .next-aufguss-people--stacked {
+    grid-column: 1 / -1;
+}
+
+#next-aufguss-body .grid > .flex.flex-col.gap-3 img.h-40 {
+    height: auto !important;
+    max-height: clamp(180px, 18vw, 520px) !important;
+    width: 100%;
+    object-fit: contain;
+}
+
+#next-aufguss-body .next-aufguss-people img.h-40 {
+    max-height: clamp(150px, 12vw, 420px) !important;
+}
+
+#next-aufguss-body .next-aufguss-people .h-40:not(img) {
+    min-height: clamp(140px, 11vw, 380px);
+}
+
+#next-aufguss-body .text-8xl {
+    font-size: clamp(4rem, 6vw, 24rem) !important;
+}
+
+#next-aufguss-countdown {
+    padding: clamp(1.2rem, 1.8vw, 3rem) clamp(2.8rem, 3.2vw, 6rem);
+}
+
+#next-aufguss-body .text-3xl {
+    font-size: clamp(1.8rem, 2.6vw, 10.4rem) !important;
+    line-height: 1.15;
+    margin-bottom: clamp(0.4rem, 0.8vw, 1.8rem);
+}
+
+#next-aufguss-body .flex.flex-col.gap-2 {
+    gap: clamp(0.35rem, 0.7vw, 1.4rem);
+}
+
+#next-aufguss-body .text-lg {
+    font-size: clamp(1.1rem, 1.9vw, 7.6rem) !important;
+    line-height: 1.15;
+}
+
+#next-aufguss-body .text-sm {
+    font-size: clamp(0.9rem, 1.6vw, 3rem) !important;
+    line-height: 1.15;
+}
+
+#next-aufguss-body img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+#next-aufguss-body img.h-72,
+#next-aufguss-body img.h-40 {
+    height: auto !important;
+    max-height: clamp(180px, 14vw, 520px) !important;
+    width: 100%;
+    object-fit: contain;
+}
+
+#next-aufguss-body .h-72:not(img),
+#next-aufguss-body .h-40:not(img) {
+    min-height: clamp(160px, 12vw, 440px);
+}
+
+#next-aufguss-body .gap-6 {
+    gap: clamp(1rem, 1.8vw, 3rem) !important;
 }
 
 /* ============================================================================
@@ -434,7 +539,7 @@
     top: 0;
     left: clamp(1rem, 2vw, 5rem);
     right: clamp(1rem, 2vw, 5rem);
-    z-index: 60;
+    z-index: 30;
     height: var(--plan-header-height);
 }
 
@@ -473,7 +578,7 @@
 .plan-table-head th {
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 30;
     background: var(--plan-accent-color, #ffffff);
 }
 
@@ -494,7 +599,7 @@
 .plan-list-head {
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 30;
     background: var(--plan-accent-color, #ffffff);
     border-bottom: 1px solid #e5e7eb;
     border-bottom-width: clamp(1px, 0.05vw, 2px);

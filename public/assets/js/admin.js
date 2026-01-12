@@ -377,7 +377,7 @@ function saveEdit(aufgussId, field) {
         });
 
         // AJAX Request zum Speichern
-        fetch('updates/update_aufguss.php', {
+        fetch('../updates/update_aufguss.php', {
                 method: 'POST',
                 body: formData
             })
@@ -417,7 +417,7 @@ function deletePlan(planId, planName) {
     }
 
     // AJAX Request zum Löschen
-    fetch('deletes/delete_plan.php', {
+    fetch('../deletes/delete_plan.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
