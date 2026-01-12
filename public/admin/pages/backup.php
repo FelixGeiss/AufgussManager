@@ -19,6 +19,7 @@ $dbOverview = [
     'saunen' => 0,
     'duftmittel' => 0,
     'mitarbeiter' => 0,
+    'umfragen' => 0,
     'werbung_medien' => 0,
     'hintergrund_bilder' => 0,
     'uploads_count' => 0,
@@ -47,6 +48,7 @@ try {
     $dbOverview['saunen'] = (int)$db->query("SELECT COUNT(*) FROM saunen")->fetchColumn();
     $dbOverview['duftmittel'] = (int)$db->query("SELECT COUNT(*) FROM duftmittel")->fetchColumn();
     $dbOverview['mitarbeiter'] = (int)$db->query("SELECT COUNT(*) FROM mitarbeiter")->fetchColumn();
+    $dbOverview['umfragen'] = (int)$db->query("SELECT COUNT(*) FROM umfrage_bewertungen")->fetchColumn();
 } catch (Throwable $e) {
     $errors[] = 'Konnte Datenbank-Uebersicht nicht laden: ' . $e->getMessage();
 }
@@ -545,6 +547,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="rounded border border-gray-200 p-4">
                     <div class="text-sm text-gray-500">Mitarbeiter</div>
                     <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['mitarbeiter']; ?></div>
+                </div>
+                <div class="rounded border border-gray-200 p-4">
+                    <div class="text-sm text-gray-500">Umfragen</div>
+                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['umfragen']; ?></div>
                 </div>
                 <div class="rounded border border-gray-200 p-4">
                     <div class="text-sm text-gray-500">Werbung (Bild/Video)</div>
