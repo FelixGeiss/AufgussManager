@@ -531,6 +531,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" name="action" value="backup">
                     <input type="hidden" name="localstorage_json" id="localstorage-json">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Backup herunterladen</button>
+                    <p class="text-xs text-gray-500 mt-3">Bitte fuehren Sie regelmaessig ein Backup durch.</p>
                 </form>
             </div>
 
