@@ -439,7 +439,7 @@
 }
 
 .plan-view-with-clock .plan-list-head {
-    right: calc(var(--plan-clock-display-width, var(--plan-clock-width, 220px)) + var(--plan-clock-gap, 24px));
+    right: calc(var(--plan-clock-display-width, var(--plan-clock-width, 220px)) + var(--plan-clock-gap, 24px) + clamp(1rem, 2vw, 5rem));
     left: clamp(1rem, 2vw, 5rem);
 }
 
@@ -675,8 +675,8 @@
 }
 
 .plan-media-stack .plan-temp-badge {
-    top: 0 !important;
-    right: 0 !important;
+    top: 10px !important;
+    right: -4px !important;
     transform: translate(50%, -50%);
 }
 
