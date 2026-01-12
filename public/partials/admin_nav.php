@@ -23,9 +23,8 @@ $navIdAttr = $navId !== ''
 $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
 ?>
 <nav<?php echo $navIdAttr; ?> class="<?php echo $navClassAttr; ?>">
-    <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
-        <div>
+    <div class="container mx-auto flex items-center justify-center">
+        <div class="flex flex-wrap items-center justify-center gap-4">
             <?php if ($loggedIn || $showPublicLinksWhenLoggedOut): ?>
                 <a href="<?php echo $publicBase; ?>index.php" class="mr-4 hover:underline">Anzeige</a>
                 <a href="<?php echo $publicBase; ?>umfrage.php" class="mr-4 hover:underline">Umfrage anzeigen</a>
@@ -36,7 +35,7 @@ $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
                     <a href="<?php echo $adminBase; ?>mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
                 <?php endif; ?>
                 <?php if ($canBildschirme): ?>
-                    <div class="relative inline-block mr-4 group pt-2 -mt-2">
+                    <div class="relative inline-block group pt-2 -mt-2">
                         <a href="<?php echo $adminBase; ?>bildschirme.php" class="hover:underline">Bildschirme</a>
                         <div class="absolute left-0 top-full w-48 rounded-md bg-white text-gray-800 shadow-lg ring-1 ring-black/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150">
                             <a href="<?php echo $publicBase; ?>bildschirm_1.php" class="block px-4 py-2 hover:bg-gray-100" target="_blank" rel="noopener">Bildschirm 1</a>
