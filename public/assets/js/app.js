@@ -713,7 +713,7 @@ function renderPlanView(planId, Pläene, aufguesse) {
                 <div class="plan-list-head">
                     <div class="plan-list-cell">Zeit</div>
                     <div class="plan-list-cell">Aufguss</div>
-                    <div class="plan-list-cell">Staerke</div>
+                    <div class="plan-list-cell">Stärke</div>
                     <div class="plan-list-cell">Aufgiesser</div>
                     <div class="plan-list-cell">Sauna</div>
                     <div class="plan-list-cell">Duft</div>

@@ -1788,6 +1788,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         class="rounded px-2 py-1 text-sm border border-gray-300" min="0" step="1" placeholder="z.B. 90">
                                                     <div class="flex items-center gap-2 mt-2">
                                                         <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button type="button" onclick="clearSaunaTemperatur(<?php echo $sauna['id']; ?>)" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-300">Leeren</button>
                                                         <button onclick="cancelSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
@@ -2520,6 +2521,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     delete loadingBar.dataset.intervalId;
                 }
             }, 500);
+        }
+
+        function clearSaunaTemperatur(saunaId) {
+            const row = document.querySelector(`[data-sauna-id="${saunaId}"]`);
+            const editMode = row.querySelector('.sauna-temp-cell .edit-mode');
+            const input = editMode.querySelector('input[name="sauna_temperatur"]');
+            if (!input) return;
+            input.value = '';
+            saveSaunaEdit(saunaId, 'temperatur');
         }
 
         // Inline-Editing für Saunen
@@ -4325,4 +4335,5 @@ function savePlanSettings(planId, options = {}) {
 </body>
 
 </html>
+
 
