@@ -714,7 +714,7 @@ function renderPlanView(planId, Pläene, aufguesse) {
                     <div class="plan-list-cell">Zeit</div>
                     <div class="plan-list-cell">Aufguss</div>
                     <div class="plan-list-cell">Stärke</div>
-                    <div class="plan-list-cell">Aufgiesser</div>
+                    <div class="plan-list-cell">Aufgießer</div>
                     <div class="plan-list-cell">Sauna</div>
                     <div class="plan-list-cell">Duft</div>
                 </div>
@@ -732,8 +732,8 @@ function renderPlanView(planId, Pläene, aufguesse) {
                         <tr>
                             <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Zeit</th>
                             <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Aufguss</th>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Staerke</th>
-                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Aufgiesser</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Stärke</th>
+                            <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Aufgießer</th>
                             <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Sauna</th>
                             <th class="px-6 py-4 text-lg font-bold text-black-500 uppercase tracking-wider border-b sticky top-0 z-20 bg-white">Duftmittel</th>
                         </tr>
@@ -1922,7 +1922,7 @@ function getNextAufgussSettings(planId) {
 // Baut HTML fuer Next-Aufguss.
 function buildNextAufgussHtml(aufguss) {
     const aufgussName = aufguss.name || aufguss.aufguss_name || 'Aufguss';
-    const staerkeText = aufguss.staerke ? `Staerke: ${aufguss.staerke}` : 'Staerke: -';
+    const staerkeText = aufguss.staerke ? `Stärke: ${aufguss.staerke}` : 'Stärke: -';
     const saunaName = aufguss.sauna_name || aufguss.sauna || '-';
     const saunaTempText = formatSaunaTempText(aufguss);
     const saunaTempLine = saunaTempText ? `Temperatur: ${saunaTempText}\u00b0C` : 'Temperatur: -';
@@ -1930,7 +1930,7 @@ function buildNextAufgussHtml(aufguss) {
     const people = parseAufgiesserItems(aufguss);
 
     const personCards = people.map(person => {
-        const name = person.name || 'Aufgiesser';
+        const name = person.name || 'Aufgießer';
         const img = person.image
             ? `<img src="uploads/${person.image}" alt="${escapeHtml(name)}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
             : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500 font-semibold">Kein Bild</div>`;
@@ -1943,8 +1943,8 @@ function buildNextAufgussHtml(aufguss) {
     const mitarbeiterImg = personCards.length > 0
         ? `<div class="${peopleClass}">${personCards.join('')}</div>`
         : (aufguss.mitarbeiter_bild
-            ? `<img src="uploads/${aufguss.mitarbeiter_bild}" alt="Aufgiesser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
-        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgiesser-Bild</div>`);
+            ? `<img src="uploads/${aufguss.mitarbeiter_bild}" alt="Aufgießer" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
+        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgießer-Bild</div>`);
 
     const saunaImg = aufguss.sauna_bild
         ? `<div class="relative"><img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>`

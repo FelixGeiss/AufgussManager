@@ -75,7 +75,7 @@ require_once __DIR__ . '/../src/auth.php';
     <div class="screen-lock" aria-hidden="true">
         <div>
             <div class="screen-lock__title">Bildschirm zu klein</div>
-            <div class="screen-lock__subtitle">Bitte vergroessern oder ein groesseres Geraet nutzen.</div>
+            <div class="screen-lock__subtitle">Bitte vergrößern oder ein größeres Gerät nutzen.</div>
         </div>
     </div>
     <?php
@@ -141,14 +141,14 @@ require_once __DIR__ . '/../src/auth.php';
         })();
     </script>
 
-    <!-- NAECHSTER AUFGUSS POPUP -->
+    <!-- NÄCHSTER AUFGUSS POPUP -->
     <div id="next-aufguss-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4">
             <div class="flex items-center justify-between px-5 py-3 border-b">
                 <h3 class="text-lg font-semibold text-gray-900">Nächster Aufguss</h3>
             </div>
             <div id="next-aufguss-body" class="p-5">
-                <div class="text-sm text-gray-500">Laedt...</div>
+                <div class="text-sm text-gray-500">Lädt...</div>
             </div>
         </div>
     </div>

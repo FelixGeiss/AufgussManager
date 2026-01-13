@@ -529,7 +529,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div>
                         <label for="plan-beschreibung" class="block text-sm font-medium text-gray-900 mb-2 text-center">Beschreibung</label>
-                        <textarea id="plan-beschreibung" name="plan_beschreibung" rows="3" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="Kurze Beschreibung fuer den Plan"></textarea>
+                        <textarea id="plan-beschreibung" name="plan_beschreibung" rows="3" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="Kurze Beschreibung für den Plan"></textarea>
                     </div>
                     <div class="flex justify-center">
                         <button type="submit" class="rounded-md bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
@@ -590,7 +590,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <button type="button"
                                         class="plan-select-btn"
                                         data-plan-select="<?php echo (int)$plan['id']; ?>">
-                                        Plan auswaehlen
+                                        Plan auswählen
                                     </button>
                                     <button type="button"
                                         class="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
@@ -751,9 +751,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             </td>
 
                                                             <!-- Stärke -->
-                                                            <td class="px-6 py-4 whitespace-nowrap staerke-cell">
+                                                            <td class="px-6 py-4 whitespace-nowrap stärke-cell">
                                                                 <!-- Anzeige-Modus -->
-                                                                <div class="display-mode cursor-pointer hover:bg-yellow-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'staerke')">
+                                                                <div class="display-mode cursor-pointer hover:bg-yellow-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'stärke')">
                                                                     <?php
                                                                     $stärke = $aufguss['staerke'] ?? 0;
                                                                     $stärkeText = '';
@@ -806,7 +806,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                                 <!-- Bearbeitungs-Modus -->
                                                                 <div class="edit-mode hidden flex flex-col gap-2">
-                                                                    <select name="staerke" class="rounded px-2 py-1 text-sm border border-gray-300">
+                                                                    <select name="stärke" class="rounded px-2 py-1 text-sm border border-gray-300">
                                                                         <option value="">-- Stärke wählen --</option>
                                                                         <option value="1" <?php echo ($stärke == 1) ? 'selected' : ''; ?>>1 - Sehr leicht</option>
                                                                         <option value="2" <?php echo ($stärke == 2) ? 'selected' : ''; ?>>2 Leicht</option>
@@ -816,8 +816,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         <option value="6" <?php echo ($stärke == 6) ? 'selected' : ''; ?>>6 Extrem stark</option>
                                                                     </select>
                                                                     <div class="flex items-center gap-2 mt-2">
-                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'staerke')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
-                                                                        <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'staerke')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
+                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'stärke')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                                        <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'stärke')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -1038,7 +1038,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div id="plan-ad-wrap-<?php echo $plan['id']; ?>" class="plan-ad-wrap hidden rounded-lg border border-gray-200 bg-white/70 p-4">
                                     <div id="plan-ad-media-<?php echo $plan['id']; ?>" class="plan-ad-media text-sm text-gray-500">
-                                        Keine Werbung ausgewaehlt.
+                                        Keine Werbung ausgewählt.
                                     </div>
                                 </div>
                             </div>
@@ -1169,21 +1169,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                     <div class="border-t border-gray-200 pt-4 mt-4">
                                                         <label class="block text-sm font-medium text-gray-900 mb-2 text-center">Mehrere Aufgiesser</label>
-                                                        <label for="mitarbeiter-multi-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Mitarbeiter auswaehlen (Mehrfachauswahl)</label>
+                                                        <label for="mitarbeiter-multi-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Mitarbeiter auswählen (Mehrfachauswahl)</label>
                                                         <select id="mitarbeiter-multi-<?php echo $plan['id']; ?>" name="mitarbeiter_ids[]" multiple class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                             <?php foreach ($mitarbeiter as $m): ?>
                                                                 <option class="text-center" value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['name'] ?? ''); ?></option>
                                                             <?php endforeach; ?>
                                                         </select>
-                                                        <p class="text-xs text-gray-500 mt-2 text-center">Mehrere Namen mit Strg/Cmd auswaehlen.</p>
+                                                        <p class="text-xs text-gray-500 mt-2 text-center">Mehrere Namen mit Strg/Cmd auswählen.</p>
 
                                                     </div>
                                                 </div>
 
                                                 <!-- Stärke des Aufgusses -->
                                                 <div>
-                                                    <label for="staerke-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Stärke des Aufgusses</label>
-                                                    <select id="staerke-<?php echo $plan['id']; ?>" name="staerke" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
+                                                    <label for="stärke-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Stärke des Aufgusses</label>
+                                                    <select id="stärke-<?php echo $plan['id']; ?>" name="stärke" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                         <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Stärke wählen --</option>
                                                         <option class="text-center" value="1">1 - Sehr leicht</option>
                                                         <option class="text-center" value="2">2 Leicht</option>
@@ -1211,7 +1211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         <input id="sauna-bild-<?php echo $plan['id']; ?>" name="sauna_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('sauna', <?php echo $plan['id']; ?>)" />
                                                                         <!-- Dateiname-Anzeige -->
                                                                         <div id="sauna-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
-                                                                            <span>Ausgewaehlte Datei: <span id="sauna-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                                            <span>Ausgewählte Datei: <span id="sauna-filename-text-<?php echo $plan['id']; ?>"></span></span>
                                                                             <button type="button" onclick="removeFile('sauna', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
                                                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -1238,7 +1238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         <input id="mitarbeiter-bild-<?php echo $plan['id']; ?>" name="mitarbeiter_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('mitarbeiter', <?php echo $plan['id']; ?>)" />
                                                                         <!-- Dateiname-Anzeige -->
                                                                         <div id="mitarbeiter-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
-                                                                            <span>Ausgewaehlte Datei: <span id="mitarbeiter-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                                            <span>Ausgewählte Datei: <span id="mitarbeiter-filename-text-<?php echo $plan['id']; ?>"></span></span>
                                                                             <button type="button" onclick="removeFile('mitarbeiter', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
                                                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -1259,7 +1259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                                         <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                                                     </div>
-                                                    <p class="text-sm font-semibold text-gray-900 mt-1 text-center">Laedt...</p>
+                                                    <p class="text-sm font-semibold text-gray-900 mt-1 text-center">Lädt...</p>
                                                 </div>
 
                                                 <!-- Buttons -->
@@ -1271,7 +1271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="mt-6 border-t border-gray-200 pt-4">
                                                 <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Farben</h3>
                                                 <label for="next-aufguss-theme-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
-                                                    Farbe fuer Uhr, Header und Row-Hervorhebung
+                                                    Farbe für Uhr, Header und Row-Hervorhebung
                                                 </label>
                                                 <div class="flex items-center justify-center gap-4">
                                                     <input id="next-aufguss-theme-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
@@ -1279,7 +1279,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </div>
                                                 <div class="mt-4">
                                                     <label for="plan-text-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
-                                                        Textfarbe fuer schwarze Texte (ohne Staerke-Badge)
+                                                        Textfarbe für schwarze Texte (ohne Stärke-Badge)
                                                     </label>
                                                     <div class="flex items-center justify-center gap-4">
                                                         <input id="plan-text-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
@@ -1307,9 +1307,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
 
                                     <div class="space-y-2">
-                                        <label for="plan-background-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandenes Hintergrundbild auswaehlen</label>
+                                        <label for="plan-background-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandenes Hintergrundbild auswählen</label>
                                         <select id="plan-background-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanBackground(<?php echo $plan['id']; ?>)">
-                                            <option value="">-- Hintergrundbild waehlen --</option>
+                                            <option value="">-- Hintergrundbild wählen --</option>
                                             <?php foreach ($hintergrundOptions as $option): ?>
                                                 <option value="<?php echo htmlspecialchars($option['path']); ?>" <?php echo ($plan['hintergrund_bild'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
                                                     <?php echo htmlspecialchars($option['label']); ?>
@@ -1327,7 +1327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Hintergrundbild hochladen</span>
                                                     <input id="plan-bild-<?php echo $plan['id']; ?>" name="plan_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('plan', <?php echo $plan['id']; ?>)" />
                                                     <div id="plan-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
-                                                        <span>Ausgewaehlte Datei: <span id="plan-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                        <span>Ausgewählte Datei: <span id="plan-filename-text-<?php echo $plan['id']; ?>"></span></span>
                                                         <button type="button" onclick="removeFile('plan', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
                                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -1437,9 +1437,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </div>
 
                                                 <div class="space-y-2">
-                                                    <label for="plan-ad-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandene Werbung auswaehlen</label>
+                                                    <label for="plan-ad-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandene Werbung auswählen</label>
                                                     <select id="plan-ad-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanAdMedia(<?php echo $plan['id']; ?>)">
-                                                        <option value="">-- Werbung waehlen --</option>
+                                                        <option value="">-- Werbung wählen --</option>
                                                         <?php foreach ($werbungOptions as $option): ?>
                                                             <option value="<?php echo htmlspecialchars($option['path']); ?>" data-type="<?php echo htmlspecialchars($option['type']); ?>" <?php echo ($plan['werbung_media'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
                                                                 <?php echo htmlspecialchars($option['label']); ?>
@@ -1457,7 +1457,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Werbung hochladen</span>
                                                                 <input id="plan-ad-file-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="file" accept="image/*,video/*" class="sr-only" onchange="updateAdFileName(<?php echo $plan['id']; ?>)" />
                                                                 <div id="plan-ad-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
-                                                                    <span>Ausgewaehlte Datei: <span id="plan-ad-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                                    <span>Ausgewählte Datei: <span id="plan-ad-filename-text-<?php echo $plan['id']; ?>"></span></span>
                                                                     <button type="button" onclick="removeAdFile(<?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
                                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -2184,7 +2184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input id="planBannerEnabled" type="checkbox" class="sr-only">
                 <div>
                     <label for="planBannerText" class="block text-sm font-medium text-gray-700 mb-1">Banner-Text (optional)</label>
-                    <textarea id="planBannerText" rows="5" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Text fuer den Info-Banner" style="width: 220px; box-sizing: border-box;"></textarea>
+                    <textarea id="planBannerText" rows="5" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Text für den Info-Banner" style="width: 220px; box-sizing: border-box;"></textarea>
                 </div>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">Banner-Inhalt</label>
@@ -2209,9 +2209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <input id="planBannerImage" type="hidden">
                 <div>
-                    <label for="planBannerImageSelect" class="block text-sm font-medium text-gray-700 mb-1">Vorhandene Werbung auswaehlen</label>
+                    <label for="planBannerImageSelect" class="block text-sm font-medium text-gray-700 mb-1">Vorhandene Werbung auswählen</label>
                     <select id="planBannerImageSelect" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanBannerImage()">
-                        <option value="">-- Werbung waehlen --</option>
+                        <option value="">-- Werbung wählen --</option>
                         <?php foreach ($werbungOptions as $option): ?>
                             <option value="<?php echo htmlspecialchars($option['path']); ?>">
                                 <?php echo htmlspecialchars($option['label']); ?>
@@ -2229,7 +2229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Banner-Medien hochladen</span>
                                 <input id="planBannerFile" type="file" accept="image/*,video/*" class="sr-only" onchange="updatePlanBannerFileName()" />
                                 <div id="plan-banner-filename" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
-                                    <span>Ausgewaehlte Datei: <span id="plan-banner-filename-text"></span></span>
+                                    <span>Ausgewählte Datei: <span id="plan-banner-filename-text"></span></span>
                                     <button type="button" onclick="removePlanBannerFile()" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -2244,10 +2244,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="button" onclick="uploadPlanBannerImage()" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
                         Hochladen
                     </button>
-                    <p class="text-xs text-gray-500">Hinweis: Fuer volle Seitenhoehe sollte das Bild etwa 1080px hoch sein (Full-HD).</p>
+                    <p class="text-xs text-gray-500">Hinweis: Für volle Seitenhöhe sollte das Bild etwa 1080px hoch sein (Full-HD).</p>
                     <p class="text-xs text-gray-500">Empfohlene Breite: 220px.</p>
                 </div>
-                <p class="text-xs text-gray-500">Der Banner passt seine Hoehe automatisch an den Text an.</p>
+                <p class="text-xs text-gray-500">Der Banner passt seine Höhe automatisch an den Text an.</p>
                 <div class="flex items-center justify-end gap-2 pt-2">
                     <button type="button" onclick="closePlanBannerModal()" class="rounded-md bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200">Abbrechen</button>
                     <button type="button" onclick="savePlanBannerSettings()" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Speichern</button>
@@ -2276,7 +2276,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <!-- Bild hochladen -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-900 mb-2">Neues Bild auswaehlen</label>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Neues Bild auswählen</label>
                         <div class="upload-area mt-2 flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
                             <div class="text-center">
                                 <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
@@ -2284,12 +2284,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </svg>
                                 <div class="mt-2 flex flex-col text-lg text-gray-600">
                                     <label for="modalImageInput" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500">
-                                        <span>Bild auswaehlen</span>
+                                        <span>Bild auswählen</span>
                                         <input id="modalImageInput" name="bild" type="file" accept="image/*" class="sr-only" onchange="updateModalFileName()" />
                                     </label>
                                     <!-- Dateiname-Anzeige -->
                                     <div id="modalFilename" class="mt-2 text-xs text-green-600 font-medium hidden">
-                                        Ausgewaehlte Datei: <span id="modalFilenameText"></span>
+                                        Ausgewählte Datei: <span id="modalFilenameText"></span>
                                         <button type="button" onclick="removeModalFile()" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -2308,7 +2308,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                         </div>
-                        <p class="text-sm font-semibold text-gray-900 mt-1 text-center">Laedt...</p>
+                        <p class="text-sm font-semibold text-gray-900 mt-1 text-center">Lädt...</p>
                     </div>
 
                     <!-- Buttons -->
@@ -2321,7 +2321,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <!-- Naechster Aufguss Popup -->
+    <!-- Nächster Aufguss Popup -->
     <div id="next-aufguss-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4">
             <div class="flex items-center justify-between px-5 py-3 border-b">
@@ -2334,7 +2334,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </div>
             <div id="next-aufguss-body" class="p-5">
-                <div class="text-sm text-gray-500">Laedt...</div>
+                <div class="text-sm text-gray-500">Lädt...</div>
             </div>
         </div>
     </div>

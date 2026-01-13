@@ -304,7 +304,7 @@ if ($planBackground !== '') {
     <div class="screen-lock" aria-hidden="true">
         <div>
             <div class="screen-lock__title">Bildschirm zu klein</div>
-            <div class="screen-lock__subtitle">Bitte vergroessern oder ein groesseres Geraet nutzen.</div>
+            <div class="screen-lock__subtitle">Bitte vergrößern oder ein größeres Gerät nutzen.</div>
         </div>
     </div>
     <?php

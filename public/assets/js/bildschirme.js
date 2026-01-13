@@ -65,10 +65,10 @@ function extractScreens(payload) {
 // Baut Select-Optionen fuer Pläene.
 function buildPlanOptions(plans, selectedId) {
     if (!plans.length) {
-        return '<option value="">Keine Pläene</option>';
+        return '<option value="">Keine Pläne</option>';
     }
     return [
-        '<option value="">Plan waehlen</option>',
+        '<option value="">Plan wählen</option>',
         ...plans.map(plan => {
             const id = String(plan.id);
             const label = escapeHtml(plan.name || `Plan ${id}`);
@@ -125,7 +125,7 @@ function buildMediaPreview(path) {
 
 // Rendert den Block fuer globale Werbung.
 function buildGlobalAdCard() {
-    const options = buildFileOptions(mediaOptions.ads, globalAd.path, '-- Werbung waehlen --');
+    const options = buildFileOptions(mediaOptions.ads, globalAd.path, '-- Werbung wählen --');
     const orderOptions = buildScreenOrderOptions(globalAd.order);
     return `
         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-global-ad-card>
@@ -165,10 +165,10 @@ function buildGlobalAdCard() {
                     <div class="mt-2 flex flex-wrap gap-2 text-xs text-gray-600" data-selected-order>
                         ${renderSelectedOrderBadges(globalAd.order)}
                     </div>
-                    <div class="text-xs text-gray-500 mt-2">Mehrfachauswahl: Klick auf Eintraege.</div>
+                    <div class="text-xs text-gray-500 mt-2">Mehrfachauswahl: Klick auf Einträge.</div>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung auswaehlen</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung auswählen</label>
                     <select name="global_ad_select" class="w-full border rounded px-3 py-2">
                         ${options}
                     </select>
@@ -185,7 +185,7 @@ function buildGlobalAdCard() {
             </div>
             <div class="mt-4 flex items-center gap-3">
                 <button type="button" data-action="save-global-ad" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Speichern</button>
-                <span class="text-xs text-gray-500">Gilt fuer alle Bildschirme.</span>
+                <span class="text-xs text-gray-500">Gilt für alle Bildschirme.</span>
             </div>
         </div>
     `;
@@ -231,8 +231,8 @@ function buildScreenCard(screenId, screen, plans) {
     const imagePath = screen && screen.image_path ? String(screen.image_path) : '';
     const backgroundPath = screen && screen.background_path ? String(screen.background_path) : '';
     const adDirection = screen && screen.ad_direction ? String(screen.ad_direction) : 'right';
-    const imageOptions = buildFileOptions(mediaOptions.screens, imagePath, '-- Bild waehlen --');
-    const backgroundOptions = buildFileOptions(mediaOptions.backgrounds, backgroundPath, '-- Hintergrund waehlen --');
+    const imageOptions = buildFileOptions(mediaOptions.screens, imagePath, '-- Bild wählen --');
+    const backgroundOptions = buildFileOptions(mediaOptions.backgrounds, backgroundPath, '-- Hintergrund wählen --');
 
     return `
         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-screen-card data-screen-id="${screenId}" data-image-path="${escapeHtml(imagePath)}" data-background-path="${escapeHtml(backgroundPath)}">
@@ -286,7 +286,7 @@ function buildScreenCard(screenId, screen, plans) {
             </div>
             <div class="mt-4 flex items-center gap-3">
                 <button type="button" data-action="save" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Speichern</button>
-                <span class="text-xs text-gray-500">Aenderungen am Modus oder Plan bitte speichern.</span>
+                <span class="text-xs text-gray-500">Änderungen am Modus oder Plan bitte speichern.</span>
             </div>
         </div>
     `;
@@ -455,7 +455,7 @@ function handleUpload(card, input) {
                 const options = buildFileOptions(
                     kind === 'background' ? mediaOptions.backgrounds : mediaOptions.screens,
                     path,
-                    kind === 'background' ? '-- Hintergrund waehlen --' : '-- Bild waehlen --'
+                    kind === 'background' ? '-- Hintergrund wählen --' : '-- Bild wählen --'
                 );
                 select.innerHTML = options;
                 select.value = path;

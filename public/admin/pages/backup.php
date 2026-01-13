@@ -409,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         set_time_limit(0);
         $confirm = !empty($_POST['confirm_restore']);
         if (!$confirm) {
-            $errors[] = 'Bitte bestaetigen, dass die aktuelle Datenbank ueberschrieben wird.';
+            $errors[] = 'Bitte bestätigen, dass die aktuelle Datenbank überschrieben wird.';
         }
         if (empty($_FILES['backup_file']) || ($_FILES['backup_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
             $errors[] = 'Bitte eine gueltige .sql- oder .zip-Datei auswaehlen.';
@@ -531,7 +531,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" name="action" value="backup">
                     <input type="hidden" name="localstorage_json" id="localstorage-json">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Backup herunterladen</button>
-                    <p class="text-xs text-gray-500 mt-3">Bitte fuehren Sie regelmaessig ein Backup durch.</p>
+            <p class="text-xs text-gray-500 mt-3">Bitte führen Sie regelmäßig ein Backup durch.</p>
                 </form>
             </div>
 
@@ -550,7 +550,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
                             </svg>
                         </span>
-                        Ich bestaetige, dass die aktuelle Datenbank ueberschrieben wird.
+                        Ich bestätige, dass die aktuelle Datenbank überschrieben wird.
                     </label>
                     <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Backup einspielen</button>
                 </form>
@@ -559,16 +559,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="bg-white rounded-lg shadow-md p-6 mt-6">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold">Datenbank-Uebersicht</h3>
+                <h3 class="text-lg font-semibold">Datenbank-Übersicht</h3>
                 <a href="<?php echo BASE_URL; ?>admin/pages/aufguesse.php" class="text-sm text-indigo-600 hover:text-indigo-800">Zur Detailansicht</a>
             </div>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Plaene</div>
+                    <div class="text-sm text-gray-500">Pläne</div>
                     <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['plaene']; ?></div>
                 </div>
                 <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Aufguesse</div>
+                    <div class="text-sm text-gray-500">Aufgüsse</div>
                     <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['aufguesse']; ?></div>
                 </div>
                 <div class="rounded border border-gray-200 p-4">
@@ -685,7 +685,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     alert('Bitte eine JSON-Datei auswaehlen.');
                     return;
                 }
-                if (!confirm('LocalStorage importieren und vorhandene Werte ueberschreiben?')) {
+                if (!confirm('LocalStorage importieren und vorhandene Werte überschreiben?')) {
                     return;
                 }
                 const reader = new FileReader();

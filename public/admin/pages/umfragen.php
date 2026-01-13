@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
         <h2 class="text-2xl font-bold mb-6">Umfrage erstellen</h2>
 
         <div class="bg-white rounded-lg p-6 mb-6">
-            <h3 class="text-lg font-semibold mb-4">Plan auswaehlen</h3>
+            <h3 class="text-lg font-semibold mb-4">Plan auswählen</h3>
             <?php if (empty($Pläene)): ?>
                 <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
                     Noch keine Pläene vorhanden. Erstelle zuerst einen Plan in der Planung.
@@ -153,15 +153,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
             <div class="flex flex-col gap-1 mb-4">
                 <h3 class="text-lg font-semibold">Aufgüsse im Plan</h3>
                 <?php if ($selectedPlan): ?>
-                    <p class="text-sm text-gray-500">Ausgewaehlt: <?php echo htmlspecialchars($selectedPlan['name'] ?? ''); ?></p>
+                    <p class="text-sm text-gray-500">Ausgewählt: <?php echo htmlspecialchars($selectedPlan['name'] ?? ''); ?></p>
                 <?php else: ?>
-                    <p class="text-sm text-gray-500">Bitte zuerst einen Plan auswaehlen.</p>
+                    <p class="text-sm text-gray-500">Bitte zuerst einen Plan auswählen.</p>
                 <?php endif; ?>
             </div>
 
             <?php if ($planId <= 0): ?>
                 <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
-                    Es ist noch kein Plan ausgewaehlt.
+                    Es ist noch kein Plan ausgewählt.
                 </div>
             <?php elseif (empty($aufguesse)): ?>
                 <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                     <?php endif; ?>
 
                     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
-                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Kriterien fuer alle Aufgüsse</h4>
+                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Kriterien für alle Aufgüsse</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                             <?php foreach ($criteriaDefaults as $key => $value): ?>
                                 <input
@@ -215,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                         <button type="button" id="survey-delete" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                             Umfrage Löschen
                         </button>
-                        <span class="text-sm text-gray-500 self-center">Die Umfrage wird beim ausgewaehlten Plan gespeichert.</span>
+                        <span class="text-sm text-gray-500 self-center">Die Umfrage wird beim ausgewählten Plan gespeichert.</span>
                     </div>
                 </form>
             <?php endif; ?>

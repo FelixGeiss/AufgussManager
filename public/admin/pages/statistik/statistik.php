@@ -762,8 +762,8 @@ if (defined('STATISTIK_JSON')) {
                         <span>Sauna</span>
                     </label>
                     <label class="plan-select-btn legend-filter">
-                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="staerke">
-                        <span>Staerke</span>
+                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="stärke">
+                        <span>Stärke</span>
                     </label>
                 </div>
             </div>
@@ -832,8 +832,8 @@ if (defined('STATISTIK_JSON')) {
         <?php endif; ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-semibold mb-4">Aufgüsse nach Staerke</h3>
-                <div id="apex-bar-staerke" class="apex-chart apex-chart-bar"></div>
+                <h3 class="text-lg font-semibold mb-4">Aufgüsse nach Stärke</h3>
+                <div id="apex-bar-stärke" class="apex-chart apex-chart-bar"></div>
             </div>
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-4">Wie oft welcher Aufguss</h3>

@@ -18,7 +18,7 @@ if ($id <= 0) {
 $sql = "SELECT
             a.id,
             an.name AS name,
-            a.staerke,
+            a.stärke,
             aa_list.aufgieser_namen,
             aa_list.aufgieser_items,
             a.zeit_anfang,
@@ -64,7 +64,7 @@ echo json_encode([
     'data' => [
         'id' => $row['id'],
         'name' => $row['name'],
-        'staerke' => $row['staerke'],
+        'stärke' => $row['stärke'],
         'aufgieser_name' => $aufgieser,
         'aufgieser_items' => $row['aufgieser_items'],
         'sauna_name' => $row['sauna_name'],

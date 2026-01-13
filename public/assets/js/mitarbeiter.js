@@ -209,7 +209,7 @@ async function deleteRow(row) {
         const response = await fetch(`${apiUrl}?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
         const result = await response.json();
         if (result && result.success) {
-            notify('Mitarbeiter geloescht.', 'success');
+            notify('Mitarbeiter gelöscht.', 'success');
             await loadMitarbeiter();
         } else {
             notify(result && result.message ? result.message : 'Löschen fehlgeschlagen.', 'error');
@@ -273,16 +273,16 @@ function setupAddForm() {
             });
             const result = await response.json();
             if (result && result.success) {
-                notify('Mitarbeiter hinzugefuegt.', 'success');
+                notify('Mitarbeiter hinzugefügt.', 'success');
                 form.reset();
                 form.querySelector('input[name="aktiv"]').checked = true;
                 closeAddModal();
                 await loadMitarbeiter();
             } else {
-                notify(result && result.message ? result.message : 'Hinzufuegen fehlgeschlagen.', 'error');
+                notify(result && result.message ? result.message : 'Hinzufügen fehlgeschlagen.', 'error');
             }
         } catch (error) {
-            notify('Netzwerkfehler beim Hinzufuegen.', 'error');
+            notify('Netzwerkfehler beim Hinzufügen.', 'error');
         }
     });
 }

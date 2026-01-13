@@ -107,7 +107,7 @@ if (is_file($screenConfigFile)) {
         <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
 
         <!-- DASHBOARD-INHALTE -->
-        <!-- 3-spaltiges Grid-Layout fuer verschiedene Bereiche -->
+        <!-- 3-spaltiges Grid-Layout für verschiedene Bereiche -->
         <div class="grid gap-6 mb-8 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
             <?php if ($canMitarbeiter): ?>
                 <div class="bg-white rounded-lg  p-6">
@@ -172,7 +172,7 @@ if (is_file($screenConfigFile)) {
                                         </div>
                                     </div>
                                     <button type="button" class="plan-select-btn mt-auto" data-plan-select="<?php echo (int)$p['id']; ?>" aria-pressed="false">
-                                        Plan auswaehlen
+                                        Plan auswählen
                                     </button>
                                 </div>
                             <?php endforeach; ?>
