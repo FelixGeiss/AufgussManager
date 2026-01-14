@@ -125,7 +125,7 @@ if (is_file($screenConfigFile)) {
             <?php if ($canStatistik): ?>
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold mb-2">Statistiken</h3>
-                    <p class="text-gray-600">Uebersicht ueber Aktivitaeten</p>
+                    <p class="text-gray-600">&Uuml;bersicht &uuml;ber Aktivit&auml;ten</p>
                     <a href="statistik/statistik.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                 </div>
             <?php endif; ?>
