@@ -103,6 +103,7 @@ if (!empty($saveError)) {
                         <a href="<?php echo $adminBase; ?>aufguesse.php" class="hover:underline">Plan</a>
                         <div class="absolute left-0 top-full w-40 rounded-md bg-white text-gray-800 shadow-lg ring-1 ring-black/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150">
                             <a href="<?php echo $publicBase; ?>index.php" class="block px-4 py-2 hover:bg-gray-100">Anzeigen</a>
+                            <a href="<?php echo $adminBase; ?>aufguesse.php" class="block px-4 py-2 hover:bg-gray-100">Bearbeiten</a>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -114,6 +115,7 @@ if (!empty($saveError)) {
                         <a href="<?php echo $adminBase; ?>umfragen.php" class="hover:underline">Umfrage</a>
                         <div class="absolute left-0 top-full w-40 rounded-md bg-white text-gray-800 shadow-lg ring-1 ring-black/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150">
                             <a href="<?php echo $publicBase; ?>umfrage.php" class="block px-4 py-2 hover:bg-gray-100">Anzeigen</a>
+                            <a href="<?php echo $adminBase; ?>umfragen.php" class="block px-4 py-2 hover:bg-gray-100">Bearbeiten</a>
                         </div>
                     </div>
                 <?php endif; ?>
