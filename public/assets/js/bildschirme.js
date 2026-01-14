@@ -127,6 +127,7 @@ function buildMediaPreview(path) {
 function buildGlobalAdCard() {
     const options = buildFileOptions(mediaOptions.ads, globalAd.path, '-- Werbung wählen --');
     const orderOptions = buildScreenOrderOptions(globalAd.order);
+    const orderButtons = buildScreenOrderButtons(globalAd.order);
     return `
         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-global-ad-card>
             <div class="text-lg font-semibold mb-3">Globale Werbung</div>
@@ -155,13 +156,12 @@ function buildGlobalAdCard() {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Reihenfolge</label>
-                    <select name="global_ad_order" multiple size="${Math.max(3, screenCount)}" class="w-full border rounded px-3 py-2">
+                    <div class="flex flex-wrap items-center gap-3" style="min-height:46px;" data-order-buttons>
+                        ${orderButtons}
+                    </div>
+                    <select name="global_ad_order" multiple size="${Math.max(3, screenCount)}" class="sr-only" aria-hidden="true" tabindex="-1">
                         ${orderOptions}
                     </select>
-                    <div class="mt-2 flex gap-2">
-                        <button type="button" data-action="order-up" class="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50">Hoch</button>
-                        <button type="button" data-action="order-down" class="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50">Runter</button>
-                    </div>
                     <div class="mt-2 flex flex-wrap gap-2 text-xs text-gray-600" data-selected-order>
                         ${renderSelectedOrderBadges(globalAd.order)}
                     </div>
@@ -211,6 +211,29 @@ function buildScreenOrderOptions(order) {
     }).join('');
 }
 
+
+// Buttons fuer die Bildschirm-Reihenfolge.
+function buildScreenOrderButtons(order) {
+    const selected = Array.isArray(order) ? order.map(value => Number(value)) : [];
+    const uniqueSelected = [];
+    selected.forEach(value => {
+        if (!Number.isFinite(value)) return;
+        if (value < 1 || value > screenCount) return;
+        if (!uniqueSelected.includes(value)) {
+            uniqueSelected.push(value);
+        }
+    });
+    const all = Array.from({ length: screenCount }, (_, i) => i + 1);
+    const remaining = all.filter(value => !uniqueSelected.includes(value));
+    const list = uniqueSelected.concat(remaining);
+    return list.map(value => {
+        const isSelected = uniqueSelected.includes(value);
+        const activeClass = isSelected ? ' is-active' : '';
+        const pressed = isSelected ? 'true' : 'false';
+        return `<button type="button" class="plan-select-btn${activeClass}" data-order-value="${value}" aria-pressed="${pressed}">Bildschirm ${value}</button>`;
+    }).join('');
+}
+
 // Erstellt Badges fuer die ausgewaehlte Reihenfolge.
 function renderSelectedOrderBadges(order) {
     const list = Array.isArray(order) ? order : [];
@@ -255,15 +278,6 @@ function buildScreenCard(screenId, screen, plans) {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung Richtung</label>
-                    <select name="ad_direction" class="w-full border rounded px-3 py-2">
-                        <option value="right"${adDirection === 'right' ? ' selected' : ''}>Von links rein / nach rechts raus</option>
-                        <option value="left"${adDirection === 'left' ? ' selected' : ''}>Von rechts rein / nach links raus</option>
-                        <option value="up"${adDirection === 'up' ? ' selected' : ''}>Von unten rein / nach oben raus</option>
-                        <option value="down"${adDirection === 'down' ? ' selected' : ''}>Von oben rein / nach unten raus</option>
-                    </select>
-                </div>
-                <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Bild (Anzeige)</label>
                     <select name="image_select" class="w-full border rounded px-3 py-2 mb-2">
                         ${imageOptions}
@@ -282,6 +296,15 @@ function buildScreenCard(screenId, screen, plans) {
                     <div class="mt-2" data-preview="background">
                         ${buildPreview(backgroundPath)}
                     </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung Richtung</label>
+                    <select name="ad_direction" class="w-full border rounded px-3 py-2">
+                        <option value="right"${adDirection === 'right' ? ' selected' : ''}>Von links rein / nach rechts raus</option>
+                        <option value="left"${adDirection === 'left' ? ' selected' : ''}>Von rechts rein / nach links raus</option>
+                        <option value="up"${adDirection === 'up' ? ' selected' : ''}>Von unten rein / nach oben raus</option>
+                        <option value="down"${adDirection === 'down' ? ' selected' : ''}>Von oben rein / nach unten raus</option>
+                    </select>
                 </div>
             </div>
             <div class="mt-4 flex items-center gap-3">
@@ -598,6 +621,7 @@ function bindGlobalAdEvents() {
         if (target.name === 'global_ad_order') {
             globalAd.order = getSelectOrder(target);
             updateSelectedOrderBadges();
+            updateOrderButtons(target);
         }
         if (target.type === 'file') {
             handleGlobalAdUpload(target);
@@ -620,12 +644,18 @@ function bindGlobalAdEvents() {
     root.addEventListener('click', event => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
-        if (target.matches('[data-action="order-up"], [data-action="order-down"]')) {
+        if (target.closest('[data-order-buttons]')) {
+            const button = target.closest('button[data-order-value]');
             const select = root.querySelector('[name="global_ad_order"]');
-            if (!select) return;
-            moveSelectedOptions(select, target.dataset.action === 'order-up' ? -1 : 1);
+            if (!button || !select) return;
+            const value = button.getAttribute('data-order-value');
+            if (!value) return;
+            const option = select.querySelector(`option[value="${value}"]`);
+            if (!option) return;
+            option.selected = !option.selected;
             globalAd.order = getSelectOrder(select);
             updateSelectedOrderBadges();
+            updateOrderButtons(select);
             return;
         }
         if (!target.matches('[data-action="save-global-ad"]')) return;
@@ -685,6 +715,24 @@ function updateSelectedOrderBadges() {
     container.innerHTML = renderSelectedOrderBadges(globalAd.order);
 }
 
+// Rendert die Reihenfolge-Buttons aus dem Select.
+function updateOrderButtons(select) {
+    const root = document.getElementById('global-ad-card');
+    if (!root || !select) return;
+    const container = root.querySelector('[data-order-buttons]');
+    if (!container) return;
+    container.innerHTML = Array.from(select.options)
+        .map(option => {
+            const isSelected = option.selected;
+            const activeClass = isSelected ? ' is-active' : '';
+            const pressed = isSelected ? 'true' : 'false';
+            const label = escapeHtml(option.textContent || '');
+            return `<button type="button" class="plan-select-btn${activeClass}" data-order-value="${escapeHtml(option.value)}" aria-pressed="${pressed}">${label}</button>`;
+        })
+        .join('');
+}
+
+
 // Liest die Reihenfolge aus dem Mehrfach-Select.
 function getSelectOrder(select) {
     return Array.from(select.options)
@@ -693,24 +741,3 @@ function getSelectOrder(select) {
         .filter(value => Number.isFinite(value) && value > 0);
 }
 
-// Verschiebt ausgewaehlte Optionen im Select.
-function moveSelectedOptions(select, direction) {
-    const options = Array.from(select.options);
-    if (direction < 0) {
-        for (let i = 1; i < options.length; i++) {
-            const option = options[i];
-            if (option.selected && !options[i - 1].selected) {
-                select.insertBefore(option, options[i - 1]);
-                options.splice(i - 1, 0, options.splice(i, 1)[0]);
-            }
-        }
-    } else if (direction > 0) {
-        for (let i = options.length - 2; i >= 0; i--) {
-            const option = options[i];
-            if (option.selected && !options[i + 1].selected) {
-                select.insertBefore(options[i + 1], option);
-                options.splice(i + 1, 0, options.splice(i, 1)[0]);
-            }
-        }
-    }
-}
