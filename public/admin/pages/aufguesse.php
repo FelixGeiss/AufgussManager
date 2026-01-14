@@ -385,7 +385,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--plan-text-color, #111827);
         }
 
-        .plan-table-scope .plan-table-head th {
+        .plan-table-scope .plan-table-head th,
+        .plan-table-scope .plan-table-scroll td {
             text-align: center;
         }
 
@@ -442,6 +443,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
         }
 
+        .plan-table-scope .plan-table-scroll tbody tr {
+            transition: box-shadow 150ms ease;
+        }
+
+        .plan-table-scope .plan-table-scroll tbody tr:hover {
+            background-color: transparent;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+        }
+
         .plan-table-scope .plan-table-scroll .zeit-cell .display-mode {
             color: var(--plan-text-color, #111827) !important;
             display: flex;
@@ -449,14 +459,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             justify-content: center;
             position: relative;
-            padding-right: 1.25rem;
         }
 
         .plan-table-scope .plan-table-scroll .zeit-cell .display-mode svg {
-            position: absolute;
-            right: 0.35rem;
-            top: 0.35rem;
-            margin-left: 0;
+            left: 50%;
         }
 
         .plan-table-scope .plan-temp-badge {
@@ -480,9 +486,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .plan-table-scope .mitarbeiter-cell .display-mode > .flex {
-            flex-direction: column;
-            flex-wrap: nowrap;
+            flex-direction: row;
+            flex-wrap: wrap;
             align-items: center;
+            gap: 0.75rem;
+        }
+
+        .plan-table-scope .mitarbeiter-cell .display-mode .aufgieser-list.is-multi img,
+        .plan-table-scope .mitarbeiter-cell .display-mode .aufgieser-list.is-multi .h-10.w-10 {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .display-mode {
+            position: relative;
+            padding-bottom: 1.1rem;
+            transition: box-shadow 150ms ease;
+            text-align: center;
+        }
+
+        .display-mode:hover {
+            background-color: rgba(255, 255, 255, 0.35) !important;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+        }
+
+        .display-mode > svg {
+            position: absolute;
+            left: 50%;
+            bottom: 0.15rem;
+            transform: translateX(-50%);
+            margin: 0;
+            color: #000000;
         }
 
     </style>
@@ -845,7 +879,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         $aufgieserPeople[] = ['name' => $fallbackName, 'bild' => $fallbackBild];
                                                                     }
                                                                     ?>
-                                                                    <div class="flex flex-wrap justify-center gap-4 w-full">
+                                                                    <div class="flex flex-wrap justify-center gap-4 w-full aufgieser-list <?php echo count($aufgieserPeople) > 1 ? 'is-multi' : ''; ?>">
                                                                         <?php foreach ($aufgieserPeople as $person): ?>
                                                                             <div class="flex flex-col items-center">
                                                                                 <?php if (!empty($person['bild'])): ?>
