@@ -172,7 +172,9 @@ window.showToast = showToast;
 // Toggle-Funktion für ausklappbare Formulare
 function toggleForm(formId) {
     const form = document.getElementById('form-' + formId);
-    const button = form.previousElementSibling;
+    if (!form) return;
+    const button = document.querySelector(`[data-toggle-form="${formId}"]`) || form.previousElementSibling;
+    if (!button) return;
 
     if (form.classList.contains('hidden')) {
         form.classList.remove('hidden');

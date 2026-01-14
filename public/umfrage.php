@@ -332,7 +332,7 @@ if ($planBackground !== '') {
 
                 <?php if (empty($surveyItems)): ?>
                     <div class="survey-card p-6">
-                        <p class="text-gray-600">Es wurden keine Kriterien uebergeben. Bitte die Umfrage im Admin-Bereich vorbereiten.</p>
+                        <p class="text-gray-600">Es wurden keine Kriterien &uuml;bergeben. Bitte die Umfrage im Admin-Bereich vorbereiten.</p>
                     </div>
                 <?php else: ?>
                     <form action="#" method="post" class="space-y-6">
@@ -374,7 +374,7 @@ if ($planBackground !== '') {
                         <div class="survey-footer rounded-2xl px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                             <span class="text-sm text-gray-600">Bewertungen werden nach dem Absenden gespeichert.</span>
                             <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold">
-                                Bewertung abschliessen
+                                Bewertung abschlie&szlig;en
                             </button>
                         </div>
                     </form>

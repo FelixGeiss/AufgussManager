@@ -446,27 +446,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="flex flex-wrap items-center justify-end gap-2">
+                                
+                                <div class="text-sm text-gray-500">Erstellt am</div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    <?php echo date('d.m.Y', strtotime($plan['erstellt_am'])); ?>
+                                </div>
+                                <div class="mt-2 flex flex-wrap items-center justify-end gap-2">
                                     <button type="button"
                                         class="plan-select-btn"
                                         data-plan-select="<?php echo (int)$plan['id']; ?>"
                                         data-plan-name="<?php echo htmlspecialchars($plan['name'] ?? ''); ?>">
-                                        Plan auswählen
+                                        Plan ausw&auml;hlen
                                     </button>
                                     <button type="button"
                                         class="rounded-md admin-btn-save px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
                                         onclick="saveAllPlanSettings(<?php echo (int)$plan['id']; ?>)">
                                         Speichern
                                     </button>
+                                    <button type="button" onclick="deletePlan(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')"
+                                        class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                                        Plan l&ouml;schen
+                                    </button>
                                 </div>
-                                <div class="text-sm text-gray-500">Erstellt am</div>
-                                <div class="text-sm font-medium text-gray-900">
-                                    <?php echo date('d.m.Y', strtotime($plan['erstellt_am'])); ?>
-                                </div>
-                                <button type="button" onclick="deletePlan(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')"
-                                    class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
-                                    Plan löschen
-                                </button>
                             </div>
                         </div>
 
@@ -901,14 +902,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <!-- Ausklappbares Aufguss-Formular -->
+                        <button type="button" onclick="toggleForm(<?php echo $plan['id']; ?>)" data-toggle-form="<?php echo $plan['id']; ?>" class="mt-6 w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                            Planbearbeitung
+                        </button>
                         <div class="mt-6 border-t border-gray-200 pt-6 mb-6">
-                            <button type="button" onclick="toggleForm(<?php echo $plan['id']; ?>)" class="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                                </svg>
-                                Planbearbeitung
-                            </button>
-
                             <div id="form-<?php echo $plan['id']; ?>" class="hidden mt-6">
                                 <!-- Zweispaltiges Layout für Formular und Hintergrundbild -->
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">

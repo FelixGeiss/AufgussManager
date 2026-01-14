@@ -80,8 +80,6 @@ if (!empty($saveError)) {
                 &larr; Zur&uuml;ck
             </button>
             <?php if ($loggedIn || $showPublicLinksWhenLoggedOut): ?>
-                <a href="<?php echo $publicBase; ?>index.php" class="mr-4 hover:underline">Anzeige</a>
-                <a href="<?php echo $publicBase; ?>umfrage.php" class="mr-4 hover:underline">Umfrage anzeigen</a>
             <?php endif; ?>
             <?php if ($loggedIn): ?>
                 <a href="<?php echo $adminBase; ?>index.php" class="mr-4 hover:underline">Dashboard</a>
@@ -101,7 +99,12 @@ if (!empty($saveError)) {
                     </div>
                 <?php endif; ?>
                 <?php if ($canAufguesse): ?>
-                    <a href="<?php echo $adminBase; ?>aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
+                    <div class="relative inline-block group pt-2 -mt-2">
+                        <a href="<?php echo $adminBase; ?>aufguesse.php" class="hover:underline">Plan</a>
+                        <div class="absolute left-0 top-full w-40 rounded-md bg-white text-gray-800 shadow-lg ring-1 ring-black/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150">
+                            <a href="<?php echo $publicBase; ?>index.php" class="block px-4 py-2 hover:bg-gray-100">Anzeigen</a>
+                        </div>
+                    </div>
                 <?php endif; ?>
                 <?php if ($canStatistik): ?>
                     <a href="<?php echo $adminBase; ?>statistik/statistik.php" class="mr-4 hover:underline">Statistiken</a>
