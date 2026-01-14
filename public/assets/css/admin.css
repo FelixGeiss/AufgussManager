@@ -185,8 +185,24 @@ input[type="radio"] {
     transform: scale(1.35);
 }
 
+/* Legenden-Filter: Text im Button zentrieren, Checkbox links fixieren */
 .legend-filter {
+    position: relative;
     cursor: pointer;
+    padding-left: 2.2rem;
+    padding-right: 2.2rem;
+}
+
+.legend-filter > input[type="checkbox"] {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.legend-filter > span {
+    flex: 1 1 auto;
+    text-align: center;
 }
 
 .legend-filter:has([data-legend-group]:checked) {
