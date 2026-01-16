@@ -51,10 +51,17 @@ try {
         throw new Exception('Datei ist zu groß (max. 10MB)');
     }
 
-    // Dateityp prüfen
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!in_array($file['type'], $allowedTypes)) {
-        throw new Exception('Ungültiger Dateityp (nur JPG, PNG, GIF erlaubt)');
+    // Dateityp pruefen
+    $imageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    $videoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+    $allowedTypes = $entityType === 'plan'
+        ? array_merge($imageTypes, $videoTypes)
+        : $imageTypes;
+    if (!in_array($file['type'], $allowedTypes, true)) {
+        $allowedLabel = $entityType === 'plan'
+            ? 'nur JPG, PNG, GIF, MP4, WEBM, OGG erlaubt'
+            : 'nur JPG, PNG, GIF erlaubt';
+        throw new Exception('Ungueltiger Dateityp (' . $allowedLabel . ')');
     }
 
     // Tabelle und Spalte basierend auf Entity-Type bestimmen

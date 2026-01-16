@@ -487,8 +487,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <div class="relative rounded-lg overflow-hidden">
-                            <?php if (!empty($plan['hintergrund_bild'])): ?>
-                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('../../uploads/<?php echo htmlspecialchars($plan['hintergrund_bild']); ?>');"></div>
+                            <?php
+                            $backgroundPath = $plan['hintergrund_bild'] ?? '';
+                            $backgroundExt = strtolower(pathinfo((string)$backgroundPath, PATHINFO_EXTENSION));
+                            $backgroundIsVideo = $backgroundPath !== '' && in_array($backgroundExt, ['mp4', 'webm', 'ogg'], true);
+                            ?>
+                            <?php if (!empty($backgroundPath)): ?>
+                                <?php if ($backgroundIsVideo): ?>
+                                    <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline>
+                                        <source src="../../uploads/<?php echo htmlspecialchars($backgroundPath); ?>" type="video/<?php echo htmlspecialchars($backgroundExt); ?>">
+                                    </video>
+                                <?php else: ?>
+                                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('../../uploads/<?php echo htmlspecialchars($backgroundPath); ?>');"></div>
+                                <?php endif; ?>
                             <?php endif; ?>
                             <div class="relative">
                                 <!-- Aufgüsse für diesen Plan -->
@@ -1201,8 +1212,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                                                 </svg>
                                                 <div class="mt-2 flex flex-col text-lg text-gray-600">
-                                                    <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Hintergrundbild hochladen</span>
-                                                    <input id="plan-bild-<?php echo $plan['id']; ?>" name="plan_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('plan', <?php echo $plan['id']; ?>)" />
+                                                    <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Hintergrundbild oder Video hochladen</span>
+                                                    <input id="plan-bild-<?php echo $plan['id']; ?>" name="plan_bild" type="file" accept="image/*,video/mp4,video/webm,video/ogg" class="sr-only" onchange="updateFileName('plan', <?php echo $plan['id']; ?>)" />
                                                     <div id="plan-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
                                                         <span>Ausgewählte Datei: <span id="plan-filename-text-<?php echo $plan['id']; ?>"></span></span>
                                                         <button type="button" onclick="removeFile('plan', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
@@ -1213,7 +1224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </div>
                                                     <p class="pl-1 flex">oder ziehen und ablegen</p>
                                                 </div>
-                                                <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
+                                                <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM bis zu 10MB</p>
                                             </div>
                                         </label>
                                         <div class="flex flex-col gap-3 sm:flex-row">

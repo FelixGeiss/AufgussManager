@@ -643,7 +643,7 @@
             const submitBtn = document.getElementById(`plan-upload-btn-${planId}`);
 
             if (!input || !input.files || !input.files[0]) {
-                alert('Bitte waehlen Sie ein Bild aus.');
+                alert('Bitte waehlen Sie eine Datei aus.');
                 return;
             }
 

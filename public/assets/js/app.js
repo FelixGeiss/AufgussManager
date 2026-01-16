@@ -769,7 +769,7 @@ function renderPlanView(planId, Pläene, aufguesse) {
     if (hideHeader) {
         container.innerHTML = `
             <div class="relative rounded-lg overflow-hidden${clockClass} plan-color-scope"${wrapperStyle}>
-                ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
+                ${renderPlanBackground(backgroundImage)}
                 <div class="relative">
                     ${clockHtml}
                     <div class="plan-table-wrap">
@@ -793,7 +793,7 @@ function renderPlanView(planId, Pläene, aufguesse) {
             <div class="relative p-6">
                 ${headerHtml}
                 <div class="relative rounded-lg overflow-hidden${clockClass} plan-color-scope"${wrapperStyle}>
-                    ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
+                    ${renderPlanBackground(backgroundImage)}
                     <div class="relative">
                         ${clockHtml}
                         <div class="plan-table-wrap">
@@ -864,12 +864,64 @@ function updateGlobalAdConfig(globalAd, serverTime) {
     updateGlobalAdOverlay();
 }
 
-// Setzt Hintergrundbild fuer Plan.
-function applyPlanBackground(imagePath) {
+function isVideoPath(path) {
+    return /\.(mp4|webm|ogg)$/i.test(path || '');
+}
+
+function renderPlanBackground(path) {
+    if (!path) return '';
+    if (isVideoPath(path)) {
+        return `<video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline>
+            <source src="${path}">
+        </video>`;
+    }
+    return `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${path}');"></div>`;
+}
+
+// Setzt Hintergrund fuer Plan.
+function applyPlanBackground(path) {
     const body = document.body;
     if (!body) return;
-    if (imagePath) {
-        body.style.backgroundImage = `url('${imagePath}')`;
+
+    const existingVideo = document.getElementById('plan-background-video');
+    const isVideo = isVideoPath(path);
+
+    if (isVideo && path) {
+        if (!existingVideo) {
+            const video = document.createElement('video');
+            video.id = 'plan-background-video';
+            video.autoplay = true;
+            video.loop = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.className = 'plan-background-video';
+            video.style.position = 'fixed';
+            video.style.inset = '0';
+            video.style.width = '100%';
+            video.style.height = '100%';
+            video.style.objectFit = 'cover';
+            video.style.zIndex = '-1';
+            video.style.pointerEvents = 'none';
+            body.prepend(video);
+            video.src = path;
+        } else if (existingVideo.src !== path) {
+            existingVideo.src = path;
+        }
+
+        body.style.backgroundImage = '';
+        body.style.backgroundSize = '';
+        body.style.backgroundPosition = '';
+        body.style.backgroundRepeat = '';
+        body.style.backgroundAttachment = '';
+        return;
+    }
+
+    if (existingVideo) {
+        existingVideo.remove();
+    }
+
+    if (path) {
+        body.style.backgroundImage = `url('${path}')`;
         body.style.backgroundSize = 'cover';
         body.style.backgroundPosition = 'center';
         body.style.backgroundRepeat = 'no-repeat';
