@@ -1,4 +1,4 @@
-# Aufgussplan - Einsteigerfreundliche Anleitung
+# AufgussManager - Einsteigerfreundliche Anleitung
 
 ## Was ist dieses Projekt?
 
@@ -41,7 +41,7 @@ Browser → PHP-Seiten → Services → Models → Datenbank
 ## 📁 Detaillierte Projektstruktur
 
 ```
-aufgussplan/
+AufgussManager/
 ├── 📂 public/               # 🌐 BROWSER-ZUGÄNGLICH (Web-Root)
 │   ├── index.php            # 🏠 Öffentliche Aufgussplan-Anzeige
 │   ├── test_db.php          # 🧪 Datenbank-Verbindung testen
@@ -88,7 +88,7 @@ Bevor du beginnst, stelle sicher, dass du hast:
 cd C:\xampp\htdocs
 
 # Repository klonen (oder ZIP herunterladen und entpacken)
-git clone [repository-url] aufgussplan
+git clone [repository-url] AufgussManager
 
 # Oder: ZIP-Datei herunterladen und nach C:\xampp\htdocs\ entpacken
 ```
@@ -145,7 +145,7 @@ define('DB_USER', 'root');         // XAMPP Standard
 define('DB_PASS', '');             // Leer bei XAMPP
 
 // URL (an deine Installation anpassen)
-define('BASE_URL', 'http://localhost/aufgussplan/');
+define('BASE_URL', 'http://localhost/AufgussManager/');
 ```
 
 #### 3.2 Automatische Pfad-Konfiguration
@@ -161,7 +161,7 @@ define('SRC_PATH', ROOT_PATH . 'src' . DIRECTORY_SEPARATOR);
 #### 4.1 Node.js Dependencies
 ```bash
 # Im Projekt-Verzeichnis:
-cd C:\xampp\htdocs\aufgussplan
+cd C:\xampp\htdocs\AufgussManager
 
 # Dependencies installieren
 npm install
@@ -190,13 +190,13 @@ npm run build
 Falls du nicht den ganzen htdocs verwenden willst:
 1. **httpd.conf** öffnen
 2. `DocumentRoot "C:/xampp/htdocs"` ändern zu:
-   `DocumentRoot "C:/xampp/htdocs/aufgussplan/public"`
+   `DocumentRoot "C:/xampp/htdocs/AufgussManager/public"`
 3. `DirectoryIndex index.php` hinzufügen
 
 ### Schritt 6: Installation testen
 
 #### 6.1 Datenbankverbindung prüfen
-Öffne im Browser: http://localhost/aufgussplan/test_db.php
+Öffne im Browser: http://localhost/AufgussManager/test_db.php
 
 **Erwartete Ausgabe:**
 - ✅ Verbindung erfolgreich hergestellt
@@ -204,8 +204,8 @@ Falls du nicht den ganzen htdocs verwenden willst:
 - ✅ Tabellen existieren (oder Anleitung zum Erstellen)
 
 #### 6.2 Anwendung testen
-- **Öffentlicher Bereich**: http://localhost/aufgussplan/
-- **Admin-Bereich**: http://localhost/aufgussplan/admin/
+- **Öffentlicher Bereich**: http://localhost/AufgussManager/
+- **Admin-Bereich**: http://localhost/AufgussManager/admin/
 
 ### Häufige Probleme und Lösungen
 
@@ -239,7 +239,7 @@ Falls du nicht den ganzen htdocs verwenden willst:
 
 #### URL aufrufen
 ```
-http://localhost/aufgussplan/
+http://localhost/AufgussManager/
 ```
 
 #### Was du siehst:
@@ -268,7 +268,7 @@ function loadAufgussplan() {
 
 #### URL aufrufen
 ```
-http://localhost/aufgussplan/admin/
+http://localhost/AufgussManager/admin/
 ```
 
 #### Verfügbare Funktionen:
@@ -305,7 +305,7 @@ http://localhost/aufgussplan/admin/
 ### 🔄 Arbeitsablauf verstehen
 
 #### Beispiel: Neuen Aufguss planen
-1. **Admin öffnet** http://localhost/aufgussplan/admin/
+1. **Admin öffnet** http://localhost/AufgussManager/admin/
 2. **Formular ausfüllen:**
    - Aufguss: "Wellness-Aufguss"
    - Duftmittel: "Eukalyptus-Minze" (neu - wird automatisch erstellt)
@@ -571,7 +571,7 @@ echo '</pre>';
 
 #### Datenbankverbindung testen
 ```
-http://localhost/aufgussplan/test_db.php
+http://localhost/AufgussManager/test_db.php
 ```
 
 #### Funktionale Tests
