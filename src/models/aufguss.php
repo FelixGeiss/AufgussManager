@@ -626,7 +626,7 @@ class Aufguss {
                        aa_list.aufgieser_items,
                        m.name as mitarbeiter_name, m.bild as mitarbeiter_bild,
                        s.name as sauna_name, s.bild as sauna_bild, s.temperatur as sauna_temperatur,
-                       d.name as duftmittel_name,
+                       d.name as duftmittel_name, d.bild as duftmittel_bild,
                        p.name as plan_name
                 FROM aufguesse a
                 LEFT JOIN (
@@ -750,7 +750,7 @@ class Aufguss {
                        aa_list.aufgieser_items,
                        m.name as mitarbeiter_name, m.bild as mitarbeiter_bild,
                        s.name as sauna_name, s.bild as sauna_bild, s.temperatur as sauna_temperatur,
-                       d.name as duftmittel_name,
+                       d.name as duftmittel_name, d.bild as duftmittel_bild,
                        p.name as plan_name
                 FROM aufguesse a
                 LEFT JOIN (

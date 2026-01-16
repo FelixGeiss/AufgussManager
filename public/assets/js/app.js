@@ -78,6 +78,8 @@ let planAdStartTimeout = null;
 let planAdAnchorTimeMs = 0;
 let videoAutoplayUnlocked = false;
 let planAdPreloadVideo = null;
+const placeholderMitarbeiter = 'assets/placeholders/Platzhalter_Mitarbeiter.png';
+const placeholderSauna = 'assets/placeholders/Platzhalter_Sauna.png';
 let planAdOffscreenContainer = null;
 let planClockTimer = null;
 let aufgussById = new Map();
@@ -1351,7 +1353,7 @@ function renderPlanRow(aufguss) {
     const staerke = formatStaerke(aufguss.staerke);
     const aufgiesserHtml = formatAufgiesserHtml(aufguss);
     const saunaHtml = formatSaunaHtml(aufguss);
-    const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
+    const duftmittelHtml = formatDuftmittelHtml(aufguss);
     const startTs = getAufgussStartTimestamp(aufguss);
 
     return `
@@ -1365,7 +1367,7 @@ function renderPlanRow(aufguss) {
             </td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${aufgiesserHtml}</td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${saunaHtml}</td>
-            <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${escapeHtml(duftmittel)}</td>
+            <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${duftmittelHtml}</td>
         </tr>
     `;
 }
@@ -1377,7 +1379,7 @@ function renderPlanRowDiv(aufguss) {
     const staerke = formatStaerke(aufguss.staerke);
     const aufgiesserHtml = formatAufgiesserHtml(aufguss);
     const saunaHtml = formatSaunaHtmlStacked(aufguss);
-    const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
+    const duftmittelHtml = formatDuftmittelHtml(aufguss, true);
     const startTs = getAufgussStartTimestamp(aufguss);
     const timeHtml = timeParts.end
         ? `<div class="plan-list-time"><span>${escapeHtml(timeParts.start)}</span><span>${escapeHtml(timeParts.end)}</span></div>`
@@ -1394,7 +1396,7 @@ function renderPlanRowDiv(aufguss) {
             </div>
             <div class="plan-list-cell text-sm text-gray-900"><div class="plan-list-people">${aufgiesserHtml}</div></div>
             <div class="plan-list-cell text-sm text-gray-900">${saunaHtml}</div>
-            <div class="plan-list-cell text-sm text-gray-900">${escapeHtml(duftmittel)}</div>
+            <div class="plan-list-cell text-sm text-gray-900">${duftmittelHtml}</div>
         </div>
     `;
 }
@@ -1417,18 +1419,20 @@ function formatSaunaHtmlStacked(aufguss) {
     const name = aufguss.sauna_name || aufguss.sauna || '-';
     const image = aufguss.sauna_bild || '';
     const tempBadge = formatSaunaTempBadge(aufguss);
+    const tempText = formatSaunaTempText(aufguss);
+    const tempSuffix = '';
     if (!image) {
-        const tempText = formatSaunaTempText(aufguss);
-        const tempSuffix = tempText ? ` <span class="text-xs text-gray-500">(${escapeHtml(tempText)}&deg;C)</span>` : '';
         return `<div class="plan-media-stack"><span>${escapeHtml(name)}${tempSuffix}</span></div>`;
     }
+    const imagePath = `uploads/${image}`;
+    const imgTag = buildImageTag(imagePath, placeholderSauna, name, 'h-12 w-12 rounded-full object-cover border border-gray-200');
     return `
         <div class="plan-media-stack">
             <div class="relative">
-                <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-12 w-12 rounded-full object-cover border border-gray-200">
+                ${imgTag}
                 ${tempBadge}
             </div>
-            <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}</span>
+            <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}${tempSuffix}</span>
         </div>
     `;
 }
@@ -1525,20 +1529,18 @@ function formatAufgiesserHtml(aufguss) {
 
     const cards = people.map(person => {
         const name = person.name || 'Unbekannt';
-        if (person.image) {
+        if (!person.image) {
             return `
                 <div class="flex flex-col items-center">
-                    <img src="uploads/${person.image}" alt="${escapeHtml(name)}" class="h-10 w-10 rounded-full object-cover border border-gray-200">
                     <div class="mt-2 text-sm font-bold text-gray-900 text-center">${escapeHtml(name)}</div>
                 </div>
             `;
         }
-        const initial = name.trim() ? name.trim().charAt(0).toUpperCase() : '?';
+        const imagePath = `uploads/${person.image}`;
+        const imgTag = buildImageTag(imagePath, placeholderMitarbeiter, name, 'h-10 w-10 rounded-full object-cover border border-gray-200');
         return `
             <div class="flex flex-col items-center">
-                <div class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span class="text-gray-700 font-semibold text-sm">${escapeHtml(initial)}</span>
-                </div>
+                ${imgTag}
                 <div class="mt-2 text-sm font-bold text-gray-900 text-center">${escapeHtml(name)}</div>
             </div>
         `;
@@ -1580,16 +1582,43 @@ function formatSaunaHtml(aufguss) {
     const name = aufguss.sauna_name || aufguss.sauna || '-';
     const image = aufguss.sauna_bild || '';
     const tempBadge = formatSaunaTempBadge(aufguss);
+    const tempText = formatSaunaTempText(aufguss);
+    const tempSuffix = '';
     if (!image) {
-        const tempText = formatSaunaTempText(aufguss);
-        return tempText ? `${escapeHtml(name)} <span class="text-xs text-gray-500">(${escapeHtml(tempText)}&deg;C)</span>` : escapeHtml(name);
+        return tempText ? `${escapeHtml(name)}${tempSuffix}` : escapeHtml(name);
     }
+    const imagePath = `uploads/${image}`;
+    const imgTag = buildImageTag(imagePath, placeholderSauna, name, 'h-10 w-10 rounded-full object-cover border border-gray-200');
     return `
         <div class="flex items-center gap-3">
             <div class="relative">
-                <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-10 w-10 rounded-full object-cover border border-gray-200">
+                ${imgTag}
                 ${tempBadge}
             </div>
+            <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}${tempSuffix}</span>
+        </div>
+    `;
+}
+
+// Baut Duftmittel-HTML (optional mit Bild).
+function formatDuftmittelHtml(aufguss, stacked = false) {
+    const name = aufguss.duftmittel_name || aufguss.duftmittel || '-';
+    const image = aufguss.duftmittel_bild || '';
+    if (!image) {
+        return escapeHtml(name);
+    }
+    const imgTag = `<img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-10 w-10 rounded-full object-cover border border-gray-200" onerror="this.onerror=null;this.remove();">`;
+    if (stacked) {
+        return `
+            <div class="plan-media-stack">
+                <div class="relative">${imgTag}</div>
+                <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}</span>
+            </div>
+        `;
+    }
+    return `
+        <div class="flex items-center gap-3">
+            ${imgTag}
             <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}</span>
         </div>
     `;
@@ -1630,6 +1659,12 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/\"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+function buildImageTag(src, fallbackSrc, alt, className) {
+    const safeAlt = escapeHtml(alt || '');
+    const safeSrc = src || fallbackSrc;
+    return `<img src="${safeSrc}" alt="${safeAlt}" class="${className}" onerror="this.onerror=null;this.src='${fallbackSrc}'">`;
 }
 
 /**
@@ -1983,9 +2018,15 @@ function buildNextAufgussHtml(aufguss) {
 
     const personCards = people.map(person => {
         const name = person.name || 'Aufgießer';
-        const img = person.image
-            ? `<img src="uploads/${person.image}" alt="${escapeHtml(name)}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
-            : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500 font-semibold">Kein Bild</div>`;
+        if (!person.image) {
+            return `<div class="flex flex-col gap-2 text-center"><div class="text-sm font-semibold text-gray-900">${escapeHtml(name)}</div></div>`;
+        }
+        const img = buildImageTag(
+            `uploads/${person.image}`,
+            placeholderMitarbeiter,
+            name,
+            'w-full h-40 object-contain rounded-lg bg-gray-100'
+        );
         return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${escapeHtml(name)}</div></div>`;
     });
 
@@ -1995,12 +2036,22 @@ function buildNextAufgussHtml(aufguss) {
     const mitarbeiterImg = personCards.length > 0
         ? `<div class="${peopleClass}">${personCards.join('')}</div>`
         : (aufguss.mitarbeiter_bild
-            ? `<img src="uploads/${aufguss.mitarbeiter_bild}" alt="Aufgießer" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
-        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgießer-Bild</div>`);
+            ? buildImageTag(
+                `uploads/${aufguss.mitarbeiter_bild}`,
+                placeholderMitarbeiter,
+                'Aufgießer',
+                'w-full h-72 object-contain rounded-lg bg-gray-100'
+            )
+            : `<div class="text-sm font-semibold text-gray-900 text-center">${escapeHtml(formatAufgiesser(aufguss))}</div>`);
 
     const saunaImg = aufguss.sauna_bild
-        ? `<div class="relative"><img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>`
-        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Sauna-Bild</div>`;
+        ? buildImageTag(
+            `uploads/${aufguss.sauna_bild}`,
+            placeholderSauna,
+            saunaName,
+            'w-full h-72 object-contain rounded-lg bg-gray-100'
+        )
+        : `<div class="text-sm font-semibold text-gray-900 text-center">${escapeHtml(saunaName)}</div>`;
 
     return `
         <div class="relative flex flex-col gap-4">

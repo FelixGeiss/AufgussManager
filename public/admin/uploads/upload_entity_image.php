@@ -31,7 +31,7 @@ try {
     $entityId = (int)($_POST['entity_id'] ?? 0);
 
     // Validierung
-    if (!in_array($entityType, ['sauna', 'mitarbeiter', 'plan'])) {
+    if (!in_array($entityType, ['sauna', 'mitarbeiter', 'plan', 'duftmittel'])) {
         throw new Exception('Invalid entity type');
     }
 
@@ -80,6 +80,11 @@ try {
             $table = 'plaene';
             $column = 'hintergrund_bild';
             $uploadSubDir = 'plan';
+            break;
+        case 'duftmittel':
+            $table = 'duftmittel';
+            $column = 'bild';
+            $uploadSubDir = 'duftmittel';
             break;
         default:
             throw new Exception('Invalid entity type');

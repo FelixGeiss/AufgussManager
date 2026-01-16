@@ -65,7 +65,7 @@ try {
     $dbOverview['umfragen'] = (int)$db->query("SELECT COUNT(*) FROM umfrage_bewertungen")->fetchColumn();
     $aufguss_optionen = $db->query("SELECT id, name, beschreibung FROM aufguss_namen ORDER BY name")->fetchAll();
     $saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
-    $duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
+$duftmittel = $db->query("SELECT id, name, beschreibung, bild FROM duftmittel ORDER BY name")->fetchAll();
     $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
     $umfrage_bewertungen = $db->query(
         "SELECT r.id,

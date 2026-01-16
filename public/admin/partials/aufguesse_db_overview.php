@@ -60,6 +60,9 @@
                                         ID
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Bild
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
                                         Name
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
@@ -73,7 +76,7 @@
                             <tbody class="bg-transparent divide-y divide-gray-200">
                                 <?php if (empty($aufguss_optionen)): ?>
                                     <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                                             Keine Aufgüsse in der Datenbank gefunden.
                                         </td>
                                     </tr>
@@ -201,15 +204,15 @@
                                                 <div class="relative inline-flex flex-col items-center group cursor-pointer image-edit-hover"
                                                     onclick="openImageModal('sauna', <?php echo $sauna['id']; ?>, '<?php echo htmlspecialchars($sauna['name']); ?>')">
                                                     <div class="flex-shrink-0 h-8 w-8">
-                                                        <?php if (!empty($sauna['bild'])): ?>
-                                                            <img src="../../uploads/<?php echo htmlspecialchars($sauna['bild']); ?>"
-                                                                alt="Sauna-Bild"
-                                                                class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors">
-                                                        <?php else: ?>
-                                                            <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center hover:bg-green-200 transition-colors">
-    <span class="text-green-600 text-sm">&#127968;</span>
-</div>
-                                                        <?php endif; ?>
+                                                        <?php
+                                                        $saunaBild = !empty($sauna['bild'])
+                                                            ? '../../uploads/' . htmlspecialchars($sauna['bild'])
+                                                            : '../../assets/placeholders/Platzhalter_Sauna.png';
+                                                        ?>
+                                                        <img src="<?php echo $saunaBild; ?>"
+                                                            alt="Sauna-Bild"
+                                                            class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors"
+                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Sauna.png';">
                                                     </div>
                                                     <svg class="mt-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -350,6 +353,27 @@
                                                 <?php echo htmlspecialchars($dm['id']); ?>
                                             </td>
 
+                                            <!-- Bild -->
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="relative inline-flex flex-col items-center group cursor-pointer image-edit-hover"
+                                                    onclick="openImageModal('duftmittel', <?php echo $dm['id']; ?>, '<?php echo htmlspecialchars($dm['name'] ?? ''); ?>')">
+                                                    <div class="flex-shrink-0 h-8 w-8">
+                                                        <?php
+                                                        $duftBild = !empty($dm['bild'])
+                                                            ? '../../uploads/' . htmlspecialchars($dm['bild'])
+                                                            : '../../assets/placeholders/Platzhalter_Duft.svg';
+                                                        ?>
+                                                        <img src="<?php echo $duftBild; ?>"
+                                                            alt="Duftmittel-Bild"
+                                                            class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors"
+                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Duft.svg';">
+                                                    </div>
+                                                    <svg class="mt-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
+                                                </div>
+                                            </td>
+
                                             <!-- Name (editierbar) -->
                                             <td class="px-6 py-4 whitespace-nowrap duftmittel-name-cell">
                                                 <div class="display-mode text-sm font-medium text-gray-900 cursor-pointer hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleDuftmittelEdit(<?php echo $dm['id']; ?>, 'name')">
@@ -444,17 +468,15 @@
                                                 <div class="relative inline-flex flex-col items-center group cursor-pointer image-edit-hover"
                                                     onclick="openImageModal('mitarbeiter', <?php echo $mitarbeiter_item['id']; ?>, '<?php echo htmlspecialchars($mitarbeiter_item['name']); ?>')">
                                                     <div class="flex-shrink-0 h-8 w-8">
-                                                        <?php if (!empty($mitarbeiter_item['bild'])): ?>
-                                                            <img src="../../uploads/<?php echo htmlspecialchars($mitarbeiter_item['bild']); ?>"
-                                                                alt="Mitarbeiter-Bild"
-                                                                class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors">
-                                                        <?php else: ?>
-                                                            <div class="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center hover:bg-gray-400 transition-colors">
-                                                                <span class="text-gray-700 font-semibold text-sm">
-                                                                    <?php echo strtoupper(substr($mitarbeiter_item['name'], 0, 1)); ?>
-                                                                </span>
-                                                            </div>
-                                                        <?php endif; ?>
+                                                        <?php
+                                                        $mitarbeiterBild = !empty($mitarbeiter_item['bild'])
+                                                            ? '../../uploads/' . htmlspecialchars($mitarbeiter_item['bild'])
+                                                            : '../../assets/placeholders/Platzhalter_Mitarbeiter.png';
+                                                        ?>
+                                                        <img src="<?php echo $mitarbeiterBild; ?>"
+                                                            alt="Mitarbeiter-Bild"
+                                                            class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors"
+                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Mitarbeiter.png';">
                                                     </div>
                                                     <svg class="mt-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />

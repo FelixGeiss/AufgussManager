@@ -1,6 +1,15 @@
 // Admin-Aufguesse: ausgelagerte Logik fuer public/admin/pages/aufguesse.php
 // Alle Kommentare bewusst auf Deutsch (ASCII) gehalten.
 
+
+const placeholderMitarbeiter = '../../assets/placeholders/Platzhalter_Mitarbeiter.png';
+const placeholderSauna = '../../assets/placeholders/Platzhalter_Sauna.png';
+
+function buildImageTag(src, fallbackSrc, alt, className) {
+    const safeAlt = String(alt || '');
+    const safeSrc = src || fallbackSrc;
+    return `<img src="${safeSrc}" alt="${safeAlt}" class="${className}" onerror="this.onerror=null;this.src='${fallbackSrc}'">`;
+}
 // Dateiname-Feedback für Bild-Uploads
         // Funktion: updateFileName
         function updateFileName(type, planId) {
@@ -570,6 +579,12 @@
             document.getElementById('modalEntityId').value = entityId;
             document.getElementById('imageModal').classList.remove('hidden');
 
+            const placeholders = document.querySelectorAll('[data-modal-placeholder]');
+            placeholders.forEach((img) => {
+                const match = img.getAttribute('data-modal-placeholder') === entityType;
+                img.classList.toggle('hidden', !match);
+            });
+
             // Reset form
             document.getElementById('imageUploadForm').reset();
             document.getElementById('modalFilename').classList.add('hidden');
@@ -938,21 +953,30 @@
             const aufgieserImages = aufgieserItems.map(parts => {
                 const name = parts[0] ? parts[0].trim() : 'Aufgieser';
                 const bild = parts[1] ? parts[1].trim() : '';
-                const img = bild
-                    ? `<img src="../../uploads/${bild}" alt="${name}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
-                    : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500 font-semibold">Kein Bild</div>`;
+                const img = buildImageTag(
+                    bild ? `../../uploads/${bild}` : '',
+                    placeholderMitarbeiter,
+                    name,
+                    'w-full h-40 object-contain rounded-lg bg-gray-100'
+                );
                 return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${name}</div></div>`;
             });
 
             const mitarbeiterImg = aufgieserImages.length > 0
                 ? `<div class="flex flex-col gap-3">${aufgieserImages.join('')}</div>`
-                : (data.mitarbeiter_bild
-                    ? `<img src="../../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
-                    : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgieser-Bild</div>`);
+                : buildImageTag(
+                    data.mitarbeiter_bild ? `../../uploads/${data.mitarbeiter_bild}` : '',
+                    placeholderMitarbeiter,
+                    'Aufgieser',
+                    'w-full h-72 object-contain rounded-lg bg-gray-100'
+                );
 
-            const saunaImg = data.sauna_bild ?
-                `<div><img src="../../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>` :
-                `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Sauna-Bild</div>`;
+            const saunaImg = buildImageTag(
+                data.sauna_bild ? `../../uploads/${data.sauna_bild}` : '',
+                placeholderSauna,
+                saunaName,
+                'w-full h-72 object-contain rounded-lg bg-gray-100'
+            );
 
             return `
                 <div class="relative flex flex-col gap-4">

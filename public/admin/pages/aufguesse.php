@@ -46,7 +46,7 @@ $Pläene = $aufgussModel->getAllPlans();
 // Daten für Formular-Select-Felder laden
 $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
 $saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
-$duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
+$duftmittel = $db->query("SELECT id, name, beschreibung, bild FROM duftmittel ORDER BY name")->fetchAll();
 $aufguss_optionen = $db->query("SELECT id, name, beschreibung FROM aufguss_namen ORDER BY name")->fetchAll();
 $umfrage_bewertungen = $db->query(
     "SELECT r.id,
@@ -736,17 +736,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     <div class="flex flex-wrap justify-center gap-4 w-full aufgieser-list <?php echo count($aufgieserPeople) > 1 ? 'is-multi' : ''; ?>">
                                                                         <?php foreach ($aufgieserPeople as $person): ?>
                                                                             <div class="flex flex-col items-center">
-                                                                                <?php if (!empty($person['bild'])): ?>
-                                                                                    <img src="../../uploads/<?php echo htmlspecialchars($person['bild']); ?>"
-                                                                                        alt="Aufgiesser-Bild"
-                                                                                        class="h-10 w-10 rounded-full object-cover border border-gray-200">
-                                                                                <?php else: ?>
-                                                                                    <div class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center">
-                                                                                        <span class="text-gray-700 font-semibold text-sm">
-                                                                                            <?php echo strtoupper(substr($person['name'], 0, 1)); ?>
-                                                                                        </span>
-                                                                                    </div>
-                                                                                <?php endif; ?>
+                                                                                <?php
+                                                                                $mitarbeiterBild = !empty($person['bild'])
+                                                                                    ? '../../uploads/' . htmlspecialchars($person['bild'])
+                                                                                    : '../../assets/placeholders/Platzhalter_Mitarbeiter.svg';
+                                                                                ?>
+                                                                                <img src="<?php echo $mitarbeiterBild; ?>"
+                                                                                    alt="Aufgiesser-Bild"
+                                                                                    class="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                                                                    onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Mitarbeiter.svg';">
                                                                                 <div class="mt-2 text-sm font-medium text-gray-900 text-center">
                                                                                     <?php echo htmlspecialchars($person['name']); ?>
                                                                                 </div>
@@ -795,22 +793,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <!-- Anzeige-Modus -->
                                                                 <div class="display-mode flex flex-col items-center cursor-pointer hover:bg-green-50 transition-colors duration-150 rounded px-2 py-2 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'sauna')">
                                                                     <div class="relative flex-shrink-0 h-10 w-10">
-                                                                        <?php if (!empty($aufguss['sauna_bild'])): ?>
-                                                                            <!-- Bild anzeigen wenn vorhanden -->
-                                                                            <img src="../../uploads/<?php echo htmlspecialchars($aufguss['sauna_bild']); ?>"
-                                                                                alt="Sauna-Bild"
-                                                                                class="h-10 w-10 rounded-full object-cover border border-gray-200">
-                                                                        <?php else: ?>
-                                                                            <!-- Icon anzeigen wenn kein Bild vorhanden -->
-                                                                            <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
-                                                                                <span class="text-green-600 text-sm">🏠</span>
-                                                                            </div>
-                                                                        <?php endif; ?>
-                                                                        <?php if ($aufguss['sauna_temperatur'] !== null && $aufguss['sauna_temperatur'] !== ''): ?>
-                                                                            <span class="plan-temp-badge plan-temp-badge-admin absolute -top-1 -right-6 text-[10px] leading-none px-2 py-0.5 rounded-full">
-                                                                                <?php echo (int)$aufguss['sauna_temperatur']; ?>&deg;C
-                                                                            </span>
-                                                                        <?php endif; ?>
+                                                                        <?php
+                                                                        $saunaBild = !empty($aufguss['sauna_bild'])
+                                                                            ? '../../uploads/' . htmlspecialchars($aufguss['sauna_bild'])
+                                                                            : '../../assets/placeholders/Platzhalter_Sauna.svg';
+                                                                        ?>
+                                                                        <img src="<?php echo $saunaBild; ?>"
+                                                                            alt="Sauna-Bild"
+                                                                            class="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Sauna.svg';">
                                                                     </div>
                                                                     <div class="mt-2 text-sm font-medium text-gray-900">
                                                                         <?php echo htmlspecialchars($aufguss['sauna_name'] ?? 'Keine'); ?>
@@ -852,10 +843,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <td class="px-6 py-4 whitespace-nowrap duftmittel-cell text-center">
                                                                 <!-- Anzeige-Modus -->
                                                                 <div class="display-mode flex flex-col items-center cursor-pointer hover:bg-purple-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-2 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'duftmittel')">
+                                                                    <?php
+                                                                    $duftBild = '../../assets/placeholders/Platzhalter_Duft.svg';
+                                                                    if (!empty($aufguss['duftmittel_id'])) {
+                                                                        foreach ($duftmittel as $dm) {
+                                                                            if ((int)$dm['id'] === (int)$aufguss['duftmittel_id'] && !empty($dm['bild'])) {
+                                                                                $duftBild = '../../uploads/' . htmlspecialchars($dm['bild']);
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    ?>
                                                                     <div class="flex-shrink-0 h-10 w-10">
-                                                                        <div class="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                                                            <span class="text-purple-600 text-sm">🌸</span>
-                                                                        </div>
+                                                                        <img src="<?php echo $duftBild; ?>"
+                                                                            alt="Duftmittel-Bild"
+                                                                            class="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Duft.svg';">
                                                                     </div>
                                                                     <div class="mt-2 text-sm font-medium text-gray-900">
                                                                         <?php echo htmlspecialchars($aufguss['duftmittel_name'] ?? 'Keines'); ?>
@@ -1091,9 +1094,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <label for="sauna-bild-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2">Bild der Sauna</label>
                                                             <label for="sauna-bild-<?php echo $plan['id']; ?>" class="upload-area mt-2 flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
                                                                 <div class="text-center pointer-events-none">
-                                                                    <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
-                                                                        <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
-                                                                    </svg>
+                                                                    <img src="../../assets/placeholders/Platzhalter_Sauna.svg" alt="Sauna Platzhalter" class="mx-auto h-10 w-10 rounded-full object-cover border border-gray-200">
                                                                     <div class="mt-2 flex flex-col text-lg text-gray-600">
                                                                         <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Sauna-Bild hochladen</span>
                                                                         <input id="sauna-bild-<?php echo $plan['id']; ?>" name="sauna_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('sauna', <?php echo $plan['id']; ?>)" />
@@ -1118,9 +1119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <label for="mitarbeiter-bild-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2">Bild des Mitarbeiters</label>
                                                             <label for="mitarbeiter-bild-<?php echo $plan['id']; ?>" class="upload-area mt-2 flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
                                                                 <div class="text-center pointer-events-none">
-                                                                    <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
-                                                                        <path d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" fill-rule="evenodd" />
-                                                                    </svg>
+                                                                    <img src="../../assets/placeholders/Platzhalter_Mitarbeiter.svg" alt="Mitarbeiter Platzhalter" class="mx-auto h-10 w-10 rounded-full object-cover border border-gray-200">
                                                                     <div class="mt-2 flex flex-col text-lg text-gray-600">
                                                                         <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Mitarbeiter-Bild hochladen</span>
                                                                         <input id="mitarbeiter-bild-<?php echo $plan['id']; ?>" name="mitarbeiter_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('mitarbeiter', <?php echo $plan['id']; ?>)" />
@@ -1128,6 +1127,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         <div id="mitarbeiter-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
                                                                             <span>Ausgewählte Datei: <span id="mitarbeiter-filename-text-<?php echo $plan['id']; ?>"></span></span>
                                                                             <button type="button" onclick="removeFile('mitarbeiter', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
+                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                                </svg>
+                                                                            </button>
+                                                                        </div>
+                                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                    </div>
+                                                                    <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
+                                                                </div>
+                                                            </label>
+                                                        </div>
+
+                                                        <!-- Bild des Duftmittels -->
+                                                        <div>
+                                                            <label for="duftmittel-bild-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2">Bild des Duftmittels</label>
+                                                            <label for="duftmittel-bild-<?php echo $plan['id']; ?>" class="upload-area mt-2 flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
+                                                                <div class="text-center pointer-events-none">
+                                                                    <img src="../../assets/placeholders/Platzhalter_Duft.svg" alt="Duftmittel Platzhalter" class="mx-auto h-10 w-10 rounded-full object-cover border border-gray-200">
+                                                                    <div class="mt-2 flex flex-col text-lg text-gray-600">
+                                                                        <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Duftmittel-Bild hochladen</span>
+                                                                        <input id="duftmittel-bild-<?php echo $plan['id']; ?>" name="duftmittel_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('duftmittel', <?php echo $plan['id']; ?>)" />
+                                                                        <!-- Dateiname-Anzeige -->
+                                                                        <div id="duftmittel-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
+                                                                            <span>Ausgew&auml;hlte Datei: <span id="duftmittel-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                                            <button type="button" onclick="removeFile('duftmittel', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
                                                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                                                 </svg>
@@ -1531,9 +1555,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label class="block text-sm font-medium text-gray-900 mb-2">Neues Bild auswählen</label>
                         <div class="upload-area mt-2 flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
                             <div class="text-center">
-                                <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
-                                    <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
-                                </svg>
+                                <img src="../../assets/placeholders/Platzhalter_Mitarbeiter.svg" alt="Mitarbeiter Platzhalter" class="mx-auto h-10 w-10 rounded-full object-cover border border-gray-200" data-modal-placeholder="mitarbeiter">
+                                <img src="../../assets/placeholders/Platzhalter_Sauna.svg" alt="Sauna Platzhalter" class="mx-auto h-10 w-10 rounded-full object-cover border border-gray-200 hidden" data-modal-placeholder="sauna">
+                                <img src="../../assets/placeholders/Platzhalter_Duft.svg" alt="Duftmittel Platzhalter" class="mx-auto h-10 w-10 rounded-full object-cover border border-gray-200 hidden" data-modal-placeholder="duftmittel">
                                 <div class="mt-2 flex flex-col text-lg text-gray-600">
                                     <label for="modalImageInput" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500">
                                         <span>Bild auswählen</span>
