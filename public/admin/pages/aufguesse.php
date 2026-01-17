@@ -969,30 +969,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </div>
                                                 </div>
 
-                                                <!-- Zeitbereich auswählen -->
-                                                <div class="text-center">
-                                                    <label class="block text-sm font-medium text-gray-900 mb-2">Zeitbereich des Aufgusses</label>
-                                                    <div class="flex justify-center items-center gap-4">
-                                                        <div class="flex flex-col items-center">
-                                                            <label for="zeit_anfang-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900 mb-1">Anfang</label>
-                                                            <input type="time" id="zeit_anfang-<?php echo $plan['id']; ?>" name="zeit_anfang"
-                                                                class="rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid w-32"
-                                                                style="border-color: var(--border-color)">
-                                                        </div>
-                                                        <div class="flex items-center justify-center text-gray-400 self-stretch w-8">
-                                                            <span class="text-sm">bis</span>
-                                                        </div>
-                                                        <div class="flex flex-col items-center">
-                                                            <label for="zeit_ende-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900 mb-1">Ende</label>
-                                                            <input type="time" id="zeit_ende-<?php echo $plan['id']; ?>" name="zeit_ende"
-                                                                class="rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid w-32"
-                                                                style="border-color: var(--border-color)">
-                                                        </div>
-                                                    </div>
-                                                    <!-- Für Abwärtskompatibilität: verstecktes zeit-Feld -->
-                                                    <input type="hidden" id="zeit-<?php echo $plan['id']; ?>" name="zeit" value="">
-                                                </div>
-
                                                 <!-- Verwendete Duftmittel -->
                                                 <div>
                                                     <label for="duftmittel-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Verwendete Duftmittel</label>
@@ -1064,6 +1040,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <option class="text-center" value="6">6 Extrem stark</option>
                                                     </select>
                                                 </div>
+                                                <div class="text-center mt-4">
+                                                    <label class="block text-sm font-medium text-gray-900 mb-2">Zeitbereich des Aufgusses</label>
+                                                    <div class="flex justify-center items-center gap-4">
+                                                        <div class="flex flex-col items-center">
+                                                            <label for="zeit_anfang-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900 mb-1">Anfang</label>
+                                                            <input type="time" id="zeit_anfang-<?php echo $plan['id']; ?>" name="zeit_anfang"
+                                                                class="rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid w-32"
+                                                                style="border-color: var(--border-color)">
+                                                        </div>
+                                                        <div class="flex items-center justify-center text-gray-400 self-stretch w-8">
+                                                            <span class="text-sm">bis</span>
+                                                        </div>
+                                                        <div class="flex flex-col items-center">
+                                                            <label for="zeit_ende-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900 mb-1">Ende</label>
+                                                            <input type="time" id="zeit_ende-<?php echo $plan['id']; ?>" name="zeit_ende"
+                                                                class="rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid w-32"
+                                                                style="border-color: var(--border-color)">
+                                                        </div>
+                                                    </div>
+                                                    <!-- Für Abwärtskompatibilität: verstecktes zeit-Feld -->
+                                                    <input type="hidden" id="zeit-<?php echo $plan['id']; ?>" name="zeit" value="">
+                                                </div>
+                                                <div class="border-t border-gray-200 my-4"></div>
 
                                                 <!-- Bilder hochladen -->
                                                 <div>
