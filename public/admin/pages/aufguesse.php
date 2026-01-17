@@ -473,15 +473,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         data-plan-name="<?php echo htmlspecialchars($plan['name'] ?? ''); ?>">
                                         Ausw&auml;hlen
                                     </button>
-                                    <button type="button"
-                                        class="rounded-md admin-btn-save px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
-                                        onclick="saveAllPlanSettings(<?php echo (int)$plan['id']; ?>)">
-                                        Speichern
-                                    </button>
-                                    <button type="button" onclick="deletePlan(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')"
-                                        class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
-                                        L&ouml;schen
-                                    </button>
+                                    <div class="flex items-stretch gap-2">
+                                        <button type="button"
+                                            class="flex-1 rounded-md admin-btn-save px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
+                                            onclick="saveAllPlanSettings(<?php echo (int)$plan['id']; ?>)">
+                                            Speichern
+                                        </button>
+                                        <button type="button" onclick="deletePlan(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')"
+                                            class="flex-1 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                                            L&ouml;schen
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

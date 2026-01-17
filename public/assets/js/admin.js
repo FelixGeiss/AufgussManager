@@ -375,6 +375,7 @@ function saveEdit(aufgussId, field) {
     const editMode = cell.querySelector('.edit-mode');
 
     if (editMode) {
+        const normalizedField = field === 'stärke' ? 'staerke' : field;
         // Zeit-Validierung (ohne Speichern zu blockieren)
         if (field === 'zeit') {
             const zeitAnfang = editMode.querySelector('input[name="zeit_anfang"]');
@@ -396,7 +397,7 @@ function saveEdit(aufgussId, field) {
 
         const formData = new FormData();
         formData.append('aufguss_id', aufgussId);
-        formData.append('field', field);
+        formData.append('field', normalizedField);
 
         // Sammle alle Input-Werte (auch leere Werte fuer NULL-Updates)
         const inputs = editMode.querySelectorAll('input, select');
@@ -419,7 +420,8 @@ function saveEdit(aufgussId, field) {
             }
 
             // Immer den Wert senden, auch wenn er leer ist
-            formData.append(input.name, input.value ? input.value.trim() : '');
+            const inputName = input.name === 'stärke' ? 'staerke' : input.name;
+            formData.append(inputName, input.value ? input.value.trim() : '');
         });
 
         // Debug: Zeige gesendete Daten
