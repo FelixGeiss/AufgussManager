@@ -980,7 +980,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 class="rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid w-32"
                                                                 style="border-color: var(--border-color)">
                                                         </div>
-                                                        <div class="flex items-center text-gray-400">
+                                                        <div class="flex items-center justify-center text-gray-400 self-stretch w-8">
                                                             <span class="text-sm">bis</span>
                                                         </div>
                                                         <div class="flex flex-col items-center">
@@ -1001,7 +1001,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                     <!-- Select für vorhandene Duftmittel -->
                                                     <div class="mt-3">
-                                                        <label for="duftmittel-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Oder vorhandene Duftmittel auswählen:</label>
+                                                        <label for="duftmittel-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center"></label>
                                                         <select id="duftmittel-select-<?php echo $plan['id']; ?>" name="duftmittel_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                             <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Duftmittel auswählen --</option>
                                                             <?php foreach ($duftmittel as $d): ?>
@@ -1020,7 +1020,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                     <!-- Select für Sauna (Datenbank) -->
                                                     <div class="mt-3">
-                                                        <label for="sauna-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Oder vorhandene Sauna auswählen:</label>
+                                                        <label for="sauna-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center"></label>
                                                         <select id="sauna-select-<?php echo $plan['id']; ?>" name="sauna_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                             <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Sauna auswählen --</option>
                                                             <?php foreach ($saunen as $s): ?>
