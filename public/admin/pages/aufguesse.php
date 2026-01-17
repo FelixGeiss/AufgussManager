@@ -808,7 +808,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         $saunaTempValue = $aufguss['sauna_temperatur'] ?? null;
                                                                         if ($saunaTempValue !== null && $saunaTempValue !== ''):
                                                                         ?>
-                                                                            <span class="absolute -top-1 -right-1 inline-flex rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-gray-700 border border-gray-200">
+                                                                            <span class="sauna-temp-badge absolute inline-flex rounded-full px-2 py-0.5 text-xs font-semibold" style="top:-4px; right:-30px;">
                                                                                 <?php echo htmlspecialchars($saunaTempValue); ?>&deg;C
                                                                             </span>
                                                                         <?php endif; ?>

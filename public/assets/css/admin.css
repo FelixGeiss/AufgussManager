@@ -626,6 +626,13 @@ textarea.border-green-500 {
     text-align: center;
 }
 
+.plan-table-scope .sauna-cell .sauna-temp-badge {
+    background-color: var(--plan-accent-color, #ffffff);
+    color: var(--plan-text-color, #111827);
+    border: 1px solid currentColor;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+}
+
 /* Animationen fuer Tabellen-/Werbeumschaltung */
 .plan-table-wrap {
     transition: opacity 300ms ease, transform 300ms ease;
