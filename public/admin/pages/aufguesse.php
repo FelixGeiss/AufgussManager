@@ -1094,7 +1094,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                                 </svg>
                                                                             </button>
                                                                         </div>
-                                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                        <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                                                                     </div>
                                                                     <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                                                 </div>
@@ -1119,7 +1119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                                 </svg>
                                                                             </button>
                                                                         </div>
-                                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                        <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                                                                     </div>
                                                                     <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                                                 </div>
@@ -1144,7 +1144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                                 </svg>
                                                                             </button>
                                                                         </div>
-                                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                        <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                                                                     </div>
                                                                     <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                                                 </div>
@@ -1169,7 +1169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                                 </svg>
                                                                             </button>
                                                                         </div>
-                                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                        <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                                                                     </div>
                                                                     <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                                                 </div>
@@ -1241,7 +1241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 </svg>
                                                             </button>
                                                         </div>
-                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                        <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                                                     </div>
                                                     <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM bis zu 10MB</p>
                                                 </div>
@@ -1401,7 +1401,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             </svg>
                                                                         </button>
                                                                     </div>
-                                                                    <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                    <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                                                                 </div>
                                                                 <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM, OGG bis zu 50MB</p>
                                                             </div>
@@ -1546,7 +1546,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </svg>
                                     </button>
                                 </div>
-                                <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                             </div>
                             <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WebM, OGG bis zu 10MB</p>
                         </div>
@@ -1606,7 +1606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </svg>
                                         </button>
                                     </div>
-                                    <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                    <p class="pl-1 flex justify-center text-center">oder ziehen und ablegen</p>
                                 </div>
                                 <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                             </div>
