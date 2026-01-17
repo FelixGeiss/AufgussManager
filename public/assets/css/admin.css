@@ -772,13 +772,25 @@ textarea.border-green-500 {
 .multi-select-trigger {
     width: 100%;
     text-align: center;
-    border: 1px solid #d1d5db;
+    border: 2px solid var(--border-color, #111827);
     background-color: #ffffff;
     border-radius: 0.375rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
+    padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
     color: #111827;
+    position: relative;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4 4-4' stroke='%23111827' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
 }
+
+.multi-select-trigger:focus-visible {
+    outline: 2px solid #4f46e5;
+    outline-offset: -2px;
+}
+
 
 .multi-select-panel {
     position: absolute;
@@ -787,7 +799,7 @@ textarea.border-green-500 {
     top: 100%;
     z-index: 200;
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
+    border: 2px solid var(--border-color, #d1d5db);
     border-radius: 0.5rem;
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
     padding: 0.5rem;
@@ -799,9 +811,13 @@ textarea.border-green-500 {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
     cursor: pointer;
+}
+
+.multi-select-option + .multi-select-option {
+    margin-top: 0.25rem;
 }
 
 .multi-select-option:hover {

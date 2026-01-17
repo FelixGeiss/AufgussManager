@@ -1043,21 +1043,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                     <!-- Select für Mitarbeiter (Datenbank) -->
                                                     <div class="mt-3">
-                                                        <label for="mitarbeiter-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Oder vorhandenen Mitarbeiter auswählen:</label>
-                                                        <select id="mitarbeiter-select-<?php echo $plan['id']; ?>" name="mitarbeiter_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
-                                                            <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Mitarbeiter auswählen --</option>
-                                                            <?php foreach ($mitarbeiter as $m): ?>
-                                                                <option class="text-center" value="<?php echo $m['id']; ?>">
-                                                                    <?php echo htmlspecialchars($m['name'] ?? ''); ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="border-t border-gray-200 pt-4 mt-4">
-                                                        <label class="block text-sm font-medium text-gray-900 mb-2 text-center">Mehrere Aufgiesser</label>
-                                                        <label for="mitarbeiter-multi-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Mitarbeiter auswählen (Mehrfachauswahl)</label>
-                                                        <div class="multi-select" data-placeholder="Mehrere Mitarbeiter wählen">
+                                                        <label class="block text-sm font-medium text-gray-900 mb-2 text-center">Mitarbeiter auswählen</label>
+                                                                                                                <div class="multi-select" data-placeholder="Mehrere Mitarbeiter wählen">
                                                             <button type="button" class="multi-select-trigger">Mehrere Mitarbeiter wählen</button>
                                                             <div class="multi-select-panel hidden">
                                                                 <?php foreach ($mitarbeiter as $m): ?>
@@ -1068,9 +1055,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <?php endforeach; ?>
                                                             </div>
                                                         </div>
-                                                        <p class="text-xs text-gray-500 mt-2 text-center">Mehrere Namen mit Strg/Cmd auswählen.</p>
-
-                                                    </div>
+                                                                                                            </div>
                                                 </div>
 
                                                 <!-- Stärke des Aufgusses -->
