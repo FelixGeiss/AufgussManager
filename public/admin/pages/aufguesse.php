@@ -804,6 +804,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             alt="Sauna-Bild"
                                                                             class="h-10 w-10 rounded-full object-cover border border-gray-200"
                                                                             onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Sauna.svg';">
+                                                                        <?php
+                                                                        $saunaTempValue = $aufguss['sauna_temperatur'] ?? null;
+                                                                        if ($saunaTempValue !== null && $saunaTempValue !== ''):
+                                                                        ?>
+                                                                            <span class="absolute -top-1 -right-1 inline-flex rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-gray-700 border border-gray-200">
+                                                                                <?php echo htmlspecialchars($saunaTempValue); ?>&deg;C
+                                                                            </span>
+                                                                        <?php endif; ?>
                                                                     </div>
                                                                     <div class="mt-2 text-sm font-medium text-gray-900">
                                                                         <?php echo htmlspecialchars($aufguss['sauna_name'] ?? 'Keine'); ?>
