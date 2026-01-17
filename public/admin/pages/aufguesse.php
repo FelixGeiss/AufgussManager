@@ -622,7 +622,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     </div>
 
                                                                     <div>
-                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Vorhandenen Aufguss wählen:</label>
                                                                         <select name="select_aufguss_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'aufguss')">
                                                                             <option value="">-- Aufguss wählen --</option>
@@ -769,10 +768,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                                     
                                                                     <div class="border-t border-gray-200 pt-2">
-                                                                        
-                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Mitarbeiter waehlen:</label>
                                                                         <div class="multi-select" data-placeholder="Mehrere Mitarbeiter wählen">
-                                                            <button type="button" class="multi-select-trigger">Wähle einen oder mehrere</button>
+                                                                            <button type="button" class="multi-select-trigger">Wähle einen oder mehrere</button>
                                                                             <div class="multi-select-panel hidden">
                                                                                 <?php foreach ($mitarbeiter as $m): ?>
                                                                                     <label class="multi-select-option">
@@ -831,7 +828,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     </div>
 
                                                                     <div>
-                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Sauna wählen:</label>
                                                                         <select name="sauna_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'sauna')">
                                                                             <option value="">-- Sauna wählen --</option>
@@ -888,7 +884,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     </div>
 
                                                                     <div>
-                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Duftmittel wählen:</label>
                                                                         <select name="duftmittel_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'duftmittel')">
                                                                             <option value="">-- Duftmittel wählen --</option>
