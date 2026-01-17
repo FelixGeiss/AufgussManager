@@ -1305,13 +1305,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <span>Popup aktivieren</span>
                                         </label>
                                         <div id="next-aufguss-settings-fields-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" class="space-y-4">
-                                            <div>
+                                            <div class="flex flex-col gap-3 md:flex-row md:items-end">
+                                                <div class="flex-1">
                                                 <label for="next-aufguss-lead-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Sekunden vorher anzeigen</label>
                                                 <input id="next-aufguss-lead-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="number" min="1" max="3600" step="1" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" value="5">
+                                                </div>
+                                                <button id="next-aufguss-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewNextAufgussPopup(<?php echo $plan['id']; ?>)" class="w-full md:w-auto rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    Vorschau anzeigen
+                                                </button>
                                             </div>
-                                            <button id="next-aufguss-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewNextAufgussPopup(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                                                Vorschau anzeigen
-                                            </button>
                                         </div>
                                         <div class="mt-4 border-t border-gray-200 pt-4 space-y-3">
                                             <h5 class="text-sm font-semibold text-gray-900">Anzeige-Optionen</h5>
