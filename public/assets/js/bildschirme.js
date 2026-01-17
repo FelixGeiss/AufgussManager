@@ -131,8 +131,8 @@ function buildGlobalAdCard() {
     return `
         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-global-ad-card>
             <div class="text-lg font-semibold mb-3">Globale Werbung</div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
+            <div class="mb-4">
+                <div class="flex flex-col h-full">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Aktiv</label>
                     <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                         <input type="checkbox" name="global_ad_enabled" class="sr-only peer" ${globalAd.enabled ? 'checked' : ''}>
@@ -144,17 +144,9 @@ function buildGlobalAdCard() {
                         <span>Werbung einblenden</span>
                     </label>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Anzeigedauer (Sek.)</label>
-                    <input type="number" name="global_ad_display_seconds" min="1" value="${Number(globalAd.displaySeconds) || 10}" class="w-full border rounded px-3 py-2">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pause (Sek.)</label>
-                    <input type="number" name="global_ad_pause_seconds" min="0" value="${Number(globalAd.pauseSeconds) || 10}" class="w-full border rounded px-3 py-2">
-                </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
+                <div class="flex flex-col justify-between h-full">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Reihenfolge</label>
                     <div class="flex flex-wrap items-center gap-3" style="min-height:46px;" data-order-buttons>
                         ${orderButtons}
@@ -165,10 +157,29 @@ function buildGlobalAdCard() {
                     <div class="mt-2 flex flex-wrap gap-2 text-xs text-gray-600" data-selected-order>
                         ${renderSelectedOrderBadges(globalAd.order)}
                     </div>
-                    <div class="text-xs text-gray-500 mt-2">Mehrfachauswahl: Klick auf Einträge.</div>
+                    <div class="text-xs text-gray-500 mt-2">Mehrfachauswahl: Klick auf Eintr&auml;ge.</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung hochladen</label>
+                            <input type="file" name="global_ad_upload" data-kind="global-ad" class="w-full text-sm" accept="image/*,video/*">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-3">
+                        <button type="button" data-action="save-global-ad" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Speichern</button>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung auswählen</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Anzeigedauer (Sek.)</label>
+                            <input type="number" name="global_ad_display_seconds" min="1" value="${Number(globalAd.displaySeconds) || 10}" class="w-full border rounded px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Pause (Sek.)</label>
+                            <input type="number" name="global_ad_pause_seconds" min="0" value="${Number(globalAd.pauseSeconds) || 10}" class="w-full border rounded px-3 py-2">
+                        </div>
+                    </div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung ausw&auml;hlen</label>
                     <select name="global_ad_select" class="w-full border rounded px-3 py-2">
                         ${options}
                     </select>
@@ -177,18 +188,7 @@ function buildGlobalAdCard() {
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung hochladen</label>
-                    <input type="file" name="global_ad_upload" data-kind="global-ad" class="w-full text-sm" accept="image/*,video/*">
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-3">
-                <button type="button" data-action="save-global-ad" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Speichern</button>
-                <span class="text-xs text-gray-500">Gilt für alle Bildschirme.</span>
-            </div>
-        </div>
-    `;
+        </div>`;
 }
 
 // Baut Optionen fuer die Bildschirm-Reihenfolge.
@@ -748,4 +748,6 @@ function getSelectOrder(select) {
         .map(option => Number(option.value))
         .filter(value => Number.isFinite(value) && value > 0);
 }
+
+
 
