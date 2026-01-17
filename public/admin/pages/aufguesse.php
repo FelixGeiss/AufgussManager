@@ -1014,11 +1014,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <!-- Sauna -->
                                                 <div>
                                                     <label for="sauna-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Sauna</label>
-                                                    <input type="text" id="sauna-<?php echo $plan['id']; ?>" name="sauna" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Finnische Sauna" />
-
-                                                    <!-- Select für Sauna (Datenbank) -->
-                                                    <div class="mt-3">
-                                                        <label for="sauna-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center"></label>
+                                                    <div class="flex flex-col gap-3 md:flex-row">
+                                                        <input type="text" id="sauna-<?php echo $plan['id']; ?>" name="sauna" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Finnische Sauna" />
                                                         <select id="sauna-select-<?php echo $plan['id']; ?>" name="sauna_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                             <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Sauna auswählen --</option>
                                                             <?php foreach ($saunen as $s): ?>
