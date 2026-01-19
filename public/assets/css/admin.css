@@ -650,6 +650,32 @@ textarea.border-green-500 {
     color: var(--plan-text-color, #111827);
 }
 
+/* Next-Aufguss Popup Theme */
+#next-aufguss-card {
+    background: var(--next-aufguss-theme-color, #ffffff);
+    color: var(--next-aufguss-text-color, #111827);
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.4),
+        0 18px 44px rgba(0, 0, 0, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+}
+
+#next-aufguss-countdown {
+    color: #000000 !important;
+}
+
+#next-aufguss-body img {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+#next-aufguss-overlay .text-gray-900,
+#next-aufguss-overlay .text-gray-800,
+#next-aufguss-overlay .text-gray-700,
+#next-aufguss-overlay .text-gray-600,
+#next-aufguss-overlay .text-gray-500,
+#next-aufguss-overlay .text-gray-400 {
+    color: var(--next-aufguss-text-color, #111827);
+}
+
 .plan-clock-admin {
     background-color: var(--plan-accent-color, #ffffff);
 }

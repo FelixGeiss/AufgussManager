@@ -958,7 +958,7 @@ function buildImageTag(src, fallbackSrc, alt, className) {
                     bild ? `../../uploads/${bild}` : '',
                     placeholderMitarbeiter,
                     name,
-                    'w-full h-40 object-contain rounded-lg bg-gray-100'
+                    'w-full h-40 object-contain rounded-lg bg-white/80'
                 );
                 return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${name}</div></div>`;
             });
@@ -969,14 +969,14 @@ function buildImageTag(src, fallbackSrc, alt, className) {
                     data.mitarbeiter_bild ? `../../uploads/${data.mitarbeiter_bild}` : '',
                     placeholderMitarbeiter,
                     'Aufgieser',
-                    'w-full h-72 object-contain rounded-lg bg-gray-100'
+                    'w-full h-72 object-contain rounded-lg bg-white/80'
                 );
 
             const saunaImg = buildImageTag(
                 data.sauna_bild ? `../../uploads/${data.sauna_bild}` : '',
                 placeholderSauna,
                 saunaName,
-                'w-full h-72 object-contain rounded-lg bg-gray-100'
+                'w-full h-72 object-contain rounded-lg bg-white/80'
             );
 
             return `
@@ -985,8 +985,8 @@ function buildImageTag(src, fallbackSrc, alt, className) {
                         <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
                     </div>
                     <div class="relative z-10 flex flex-col gap-6 min-h-[70vh]">
-                        <div class="flex flex-col gap-2">
-                            <div class="text-3xl font-bold text-gray-900">${aufgussName}</div>
+                        <div class="flex flex-col gap-2 text-center">
+                            <div class="text-3xl font-bold text-gray-900 font-display">${aufgussName}</div>
                             <div class="text-lg font-semibold text-gray-900">${staerke}</div>
                             <div class="text-lg font-semibold text-gray-900">Duftmittel: ${duftmittel}</div>
                             <div class="text-lg font-semibold text-gray-900">${saunaTempLine}</div>
@@ -1003,6 +1003,18 @@ function buildImageTag(src, fallbackSrc, alt, className) {
                     </div>
                 </div>
             `;
+        }
+
+        // Funktion: applyNextAufgussTheme
+        function applyNextAufgussTheme(settings) {
+            const card = document.getElementById('next-aufguss-card');
+            if (!card || !settings) return;
+            if (settings.themeColor) {
+                card.style.setProperty('--next-aufguss-theme-color', settings.themeColor);
+            }
+            if (settings.textColor) {
+                card.style.setProperty('--next-aufguss-text-color', settings.textColor);
+            }
         }
 
         // Funktion: getPlanSettings
@@ -1417,6 +1429,7 @@ function savePlanSettings(planId, options = {}) {
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
             body.innerHTML = '<div class="text-sm text-gray-500">Laedt...</div>';
+            applyNextAufgussTheme(nextAufgussSettings.get(String(planId)) || getPlanSettings(planId));
 
             if (previewData) {
                 body.innerHTML = buildNextAufgussHtml(previewData);

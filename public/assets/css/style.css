@@ -163,14 +163,17 @@
 }
 
 .next-aufguss-card {
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--next-aufguss-theme-color, rgba(255, 255, 255, 0.92));
+    color: var(--next-aufguss-text-color, #111827);
     border-radius: clamp(24px, 2vw, 72px);
     padding: clamp(1.5rem, 2vw, 4rem) clamp(2rem, 2.6vw, 5rem);
     text-align: center;
     max-width: clamp(720px, 40vw, 1400px);
     width: 90%;
     border: clamp(2px, 0.1vw, 6px) solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 clamp(20px, 2vw, 60px) clamp(40px, 3vw, 120px) rgba(0, 0, 0, 0.25);
+    box-shadow: 0 clamp(26px, 2.8vw, 90px) clamp(50px, 3.6vw, 160px) rgba(0, 0, 0, 0.38),
+        0 18px 44px rgba(0, 0, 0, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.35) inset;
 }
 
 .next-aufguss-header {
@@ -243,6 +246,15 @@
     overflow: hidden;
 }
 
+#next-aufguss-overlay .text-gray-900,
+#next-aufguss-overlay .text-gray-800,
+#next-aufguss-overlay .text-gray-700,
+#next-aufguss-overlay .text-gray-600,
+#next-aufguss-overlay .text-gray-500,
+#next-aufguss-overlay .text-gray-400 {
+    color: var(--next-aufguss-text-color, #111827);
+}
+
 #next-aufguss-body .grid > .flex.flex-col.gap-3 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 16vw, 320px), 1fr));
@@ -273,6 +285,7 @@
 }
 
 #next-aufguss-countdown {
+    color: #000000 !important;
     padding: clamp(1.2rem, 1.8vw, 3rem) clamp(2.8rem, 3.2vw, 6rem);
 }
 
@@ -300,6 +313,7 @@
     width: 100%;
     height: auto;
     object-fit: contain;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 #next-aufguss-body img.h-72,
@@ -317,6 +331,71 @@
 
 #next-aufguss-body .gap-6 {
     gap: clamp(1rem, 1.8vw, 3rem) !important;
+}
+
+/* Admin-Style fuer Public Popup (gleiche Optik wie Vorschau) */
+#next-aufguss-overlay.next-aufguss-admin-style > div {
+    width: 100%;
+    max-width: 48rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    border-radius: 0.75rem;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style > div > .flex {
+    padding: 0.75rem 1.25rem;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style > div > .flex h3 {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body {
+    padding: 1.25rem;
+    overflow: auto;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-8xl {
+    font-size: 6rem !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-countdown {
+    padding: 1rem 2.5rem;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-3xl {
+    font-size: 1.875rem !important;
+    line-height: 2.25rem !important;
+    margin-bottom: 0 !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .flex.flex-col.gap-2 {
+    gap: 0.5rem;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-lg {
+    font-size: 1.125rem !important;
+    line-height: 1.75rem !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body img.h-72 {
+    height: 18rem !important;
+    max-height: none !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body img.h-40 {
+    height: 10rem !important;
+    max-height: none !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .gap-6 {
+    gap: 1.5rem !important;
 }
 
 /* ============================================================================

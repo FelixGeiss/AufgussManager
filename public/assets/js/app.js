@@ -2048,7 +2048,7 @@ function buildNextAufgussHtml(aufguss) {
             `uploads/${person.image}`,
             placeholderMitarbeiter,
             name,
-            'w-full h-40 object-contain rounded-lg bg-gray-100'
+            'w-full h-40 object-contain rounded-lg bg-white/80'
         );
         return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${escapeHtml(name)}</div></div>`;
     });
@@ -2063,7 +2063,7 @@ function buildNextAufgussHtml(aufguss) {
                 `uploads/${aufguss.mitarbeiter_bild}`,
                 placeholderMitarbeiter,
                 'Aufgießer',
-                'w-full h-72 object-contain rounded-lg bg-gray-100'
+                'w-full h-72 object-contain rounded-lg bg-white/80'
             )
             : `<div class="text-sm font-semibold text-gray-900 text-center">${escapeHtml(formatAufgiesser(aufguss))}</div>`);
 
@@ -2072,7 +2072,7 @@ function buildNextAufgussHtml(aufguss) {
             `uploads/${aufguss.sauna_bild}`,
             placeholderSauna,
             saunaName,
-            'w-full h-72 object-contain rounded-lg bg-gray-100'
+            'w-full h-72 object-contain rounded-lg bg-white/80'
         )
         : `<div class="text-sm font-semibold text-gray-900 text-center">${escapeHtml(saunaName)}</div>`;
 
@@ -2082,8 +2082,8 @@ function buildNextAufgussHtml(aufguss) {
                 <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
             </div>
             <div class="relative z-10 flex flex-col gap-6 min-h-[70vh]">
-                <div class="flex flex-col gap-2">
-                    <div class="text-3xl font-bold text-gray-900">${escapeHtml(aufgussName)}</div>
+                <div class="flex flex-col gap-2 text-center">
+                    <div class="text-3xl font-bold text-gray-900 font-display">${escapeHtml(aufgussName)}</div>
                     <div class="text-lg font-semibold text-gray-900">${escapeHtml(staerkeText)}</div>
                     <div class="text-lg font-semibold text-gray-900">Duftmittel: ${escapeHtml(duftmittel)}</div>
                     <div class="text-lg font-semibold text-gray-900">${escapeHtml(saunaTempLine)}</div>
@@ -2102,6 +2102,18 @@ function buildNextAufgussHtml(aufguss) {
     `;
 }
 
+// Setzt Theme-Farben fuer das Next-Aufguss-Popup.
+function applyNextAufgussTheme(settings) {
+    const card = document.getElementById('next-aufguss-card');
+    if (!card || !settings) return;
+    if (settings.themeColor) {
+        card.style.setProperty('--next-aufguss-theme-color', settings.themeColor);
+    }
+    if (settings.textColor) {
+        card.style.setProperty('--next-aufguss-text-color', settings.textColor);
+    }
+}
+
 // Zeigt Next-Aufguss-Popup.
 function showNextAufgussPopup(aufguss, startTs) {
     if (nextAufgussActive && nextAufgussActivePlanId !== String(selectedPlanId)) {
@@ -2114,6 +2126,7 @@ function showNextAufgussPopup(aufguss, startTs) {
     const overlay = document.getElementById('next-aufguss-overlay');
     const body = document.getElementById('next-aufguss-body');
     if (!overlay || !body) return;
+    applyNextAufgussTheme(getNextAufgussSettings(selectedPlanId));
     body.innerHTML = buildNextAufgussHtml(aufguss);
 
     overlay.classList.remove('hidden');

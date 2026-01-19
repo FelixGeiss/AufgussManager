@@ -147,8 +147,8 @@ require_once __DIR__ . '/../src/auth.php';
     </script>
 
     <!-- NÄCHSTER AUFGUSS POPUP -->
-    <div id="next-aufguss-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4">
+    <div id="next-aufguss-overlay" class="next-aufguss-overlay next-aufguss-admin-style fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
+        <div id="next-aufguss-card" class="next-aufguss-card bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4">
             <div class="flex items-center justify-between px-5 py-3 border-b">
                 <h3 class="text-lg font-semibold text-gray-900">Nächster Aufguss</h3>
             </div>
