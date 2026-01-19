@@ -11,6 +11,35 @@ function buildImageTag(src, fallbackSrc, alt, className) {
     const safeSrc = src || fallbackSrc;
     return `<img src="${safeSrc}" alt="${safeAlt}" class="${className}" onerror="this.onerror=null;this.src='${fallbackSrc}'">`;
 }
+
+// Liefert Staerke-Icons wie in der Tabelle.
+function getStaerkeIconBaseUrl() {
+    return '../../uploads/';
+}
+
+function getStaerkeBadgeCategory(level) {
+    const staerke = Number(level) || 0;
+    if (staerke <= 0) return 0;
+    if (staerke === 1) return 1;
+    if (staerke === 2) return 2;
+    return 3;
+}
+
+function formatStaerke(aufguss) {
+    const level = Number(aufguss?.staerke) || 0;
+    const category = getStaerkeBadgeCategory(level);
+    const iconPath = (aufguss?.staerke_icon || '').trim();
+    let iconHtml = '';
+    if (iconPath && category > 0) {
+        const safePath = String(iconPath).replace(/"/g, '&quot;');
+        const baseUrl = getStaerkeIconBaseUrl();
+        const icons = Array.from({ length: category })
+            .map(() => `<img src="${baseUrl}${safePath}" alt="Staerke-Icon" decoding="async" class="plan-list-staerke-icon">`)
+            .join('');
+        iconHtml = `<div class="plan-list-staerke-icons">${icons}</div>`;
+    }
+    return { iconHtml };
+}
 // Dateiname-Feedback für Bild-Uploads
         // Funktion: updateFileName
         function updateFileName(type, planId) {
@@ -933,7 +962,11 @@ function buildImageTag(src, fallbackSrc, alt, className) {
         // Funktion: buildNextAufgussHtml
         function buildNextAufgussHtml(data) {
             const aufgussName = data.name || 'Aufguss';
-            const staerke = data.staerke ? `Stärke: ${data.staerke}` : 'Stärke: -';
+            const staerkeInfo = formatStaerke(data);
+            const staerkeText = data.staerke ? `Stärke: ${data.staerke}` : 'Stärke: -';
+            const staerkeLine = staerkeInfo.iconHtml
+                ? `<div class="flex items-center justify-center gap-3"><span>Stärke</span><span class="next-aufguss-staerke-icons">${staerkeInfo.iconHtml}</span></div>`
+                : staerkeText;
             const aufgieserRaw = data.aufgieser_name || '-';
             const aufgieserList = aufgieserRaw
                 .split(',')
@@ -945,7 +978,17 @@ function buildImageTag(src, fallbackSrc, alt, className) {
                 ? String(data.sauna_temperatur)
                 : '';
             const saunaTempLine = saunaTempText ? `Temperatur: ${saunaTempText}&deg;C` : 'Temperatur: -';
-            const duftmittel = data.duftmittel_name || 'Duftmittel: -';
+            const duftmittelNameRaw = data.duftmittel_name || '';
+            const duftmittelName = duftmittelNameRaw ? String(duftmittelNameRaw).trim() : '';
+            const duftmittelImage = data.duftmittel_bild ? String(data.duftmittel_bild).trim() : '';
+            let duftmittelLine = '';
+            if (duftmittelImage) {
+                const imgSrc = `../../uploads/${duftmittelImage.replace(/"/g, '&quot;')}`;
+                const label = duftmittelName ? duftmittelName : 'Duftmittel';
+                duftmittelLine = `<div class="flex items-center justify-center gap-3"><span>${label}</span><img src="${imgSrc}" alt="Duftmittel" class="plan-list-staerke-icon" onerror="this.onerror=null;this.remove();"></div>`;
+            } else if (duftmittelName) {
+                duftmittelLine = `Duftmittel: ${duftmittelName}`;
+            }
 
             const aufgieserItems = (data.aufgieser_items || '')
                 .split(';;')
@@ -987,8 +1030,8 @@ function buildImageTag(src, fallbackSrc, alt, className) {
                     <div class="relative z-10 flex flex-col gap-6 min-h-[70vh]">
                         <div class="flex flex-col gap-2 text-center">
                             <div class="text-3xl font-bold text-gray-900 font-display">${aufgussName}</div>
-                            <div class="text-lg font-semibold text-gray-900">${staerke}</div>
-                            <div class="text-lg font-semibold text-gray-900">Duftmittel: ${duftmittel}</div>
+                            <div class="text-lg font-semibold text-gray-900">${staerkeLine}</div>
+                            ${duftmittelLine ? `<div class="text-lg font-semibold text-gray-900">${duftmittelLine}</div>` : ''}
                             <div class="text-lg font-semibold text-gray-900">${saunaTempLine}</div>
                         </div>
                         <div class="mt-auto grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1378,7 +1421,13 @@ function savePlanSettings(planId, options = {}) {
             if (!countdownEl || !nextAufgussCountdownTarget) return;
             const diffMs = nextAufgussCountdownTarget - Date.now();
             const diffSec = Math.max(0, Math.ceil(diffMs / 1000));
-            countdownEl.textContent = `${diffSec}s`;
+            const nextText = diffSec === 0 ? 'Startet jetzt' : `${diffSec}`;
+            if (countdownEl.textContent !== nextText) {
+                countdownEl.textContent = nextText;
+                countdownEl.classList.remove('is-pulsing');
+                void countdownEl.offsetWidth;
+                countdownEl.classList.add('is-pulsing');
+            }
             if (diffMs <= 0 && !nextAufgussIsPreview) {
                 closeNextAufgussPopup();
             }

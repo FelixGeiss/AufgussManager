@@ -663,8 +663,51 @@ textarea.border-green-500 {
     color: #000000 !important;
 }
 
+#next-aufguss-countdown.is-pulsing {
+    animation: next-aufguss-pulse 320ms ease-out;
+}
+
+@keyframes next-aufguss-pulse {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+}
+
 #next-aufguss-body img {
     background-color: rgba(255, 255, 255, 0.8);
+}
+
+.plan-list-staerke-icons {
+    display: flex;
+    gap: 0.35rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: min(100%, 18rem);
+    min-height: 2.75rem;
+    margin: 0 auto;
+    padding: 0.35rem 0;
+}
+
+.plan-list-staerke-icon {
+    width: min(90px, 5rem);
+    height: min(90px, 5rem);
+    border-radius: 9999px;
+    object-fit: contain;
+    flex: 0 1 auto;
+}
+
+#next-aufguss-body .next-aufguss-staerke-icons .plan-list-staerke-icons {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    gap: 0.4rem;
+}
+
+#next-aufguss-body .next-aufguss-staerke-icons .plan-list-staerke-icon {
+    width: min(90px, 3rem);
+    height: min(90px, 3rem);
+    object-fit: cover;
 }
 
 #next-aufguss-overlay .text-gray-900,

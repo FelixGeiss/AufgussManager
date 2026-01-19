@@ -19,6 +19,7 @@ $sql = "SELECT
             a.id,
             an.name AS name,
             a.staerke,
+            a.staerke_icon,
             aa_list.aufgieser_namen,
             aa_list.aufgieser_items,
             a.zeit_anfang,
@@ -27,6 +28,7 @@ $sql = "SELECT
             s.bild AS sauna_bild,
             s.temperatur AS sauna_temperatur,
             d.name AS duftmittel_name,
+            d.bild AS duftmittel_bild,
             m.name AS mitarbeiter_name,
             m.bild AS mitarbeiter_bild
         FROM aufguesse a
@@ -65,12 +67,14 @@ echo json_encode([
         'id' => $row['id'],
         'name' => $row['name'],
         'staerke' => $row['staerke'],
+        'staerke_icon' => $row['staerke_icon'],
         'aufgieser_name' => $aufgieser,
         'aufgieser_items' => $row['aufgieser_items'],
         'sauna_name' => $row['sauna_name'],
         'sauna_bild' => $row['sauna_bild'],
         'sauna_temperatur' => $row['sauna_temperatur'],
         'mitarbeiter_bild' => $row['mitarbeiter_bild'],
-        'duftmittel_name' => $row['duftmittel_name']
+        'duftmittel_name' => $row['duftmittel_name'],
+        'duftmittel_bild' => $row['duftmittel_bild']
     ]
 ]);

@@ -289,6 +289,16 @@
     padding: clamp(1.2rem, 1.8vw, 3rem) clamp(2.8rem, 3.2vw, 6rem);
 }
 
+#next-aufguss-countdown.is-pulsing {
+    animation: next-aufguss-pulse 320ms ease-out;
+}
+
+@keyframes next-aufguss-pulse {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+}
+
 #next-aufguss-body .text-3xl {
     font-size: clamp(1.8rem, 2.6vw, 10.4rem) !important;
     line-height: 1.15;
@@ -314,6 +324,19 @@
     height: auto;
     object-fit: contain;
     background-color: rgba(255, 255, 255, 0.8);
+}
+
+#next-aufguss-body .next-aufguss-staerke-icons .plan-list-staerke-icons {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    gap: 0.4rem;
+}
+
+#next-aufguss-body .next-aufguss-staerke-icons .plan-list-staerke-icon {
+    width: min(90px, 3rem);
+    height: min(90px, 3rem);
+    object-fit: cover;
 }
 
 #next-aufguss-body img.h-72,
