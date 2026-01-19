@@ -96,7 +96,7 @@ if (!empty($saveError)) {
                 <?php if ($canBildschirme): ?>
                     <div class="relative inline-block group pt-2 -mt-2 after:absolute after:left-0 after:top-full after:h-2 after:w-full after:content-['']">
                         <a href="<?php echo $adminBase; ?>bildschirme.php" class="hover:underline">Bildschirme</a>
-                        <div class="absolute left-0 top-full w-48 rounded-md bg-white text-gray-800 shadow-lg ring-1 ring-black/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150">
+                        <div class="absolute left-0 top-full z-50 w-48 rounded-md bg-white text-gray-800 shadow-lg ring-1 ring-black/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150">
                             <a href="<?php echo $publicBase; ?>bildschirm_1.php" class="block px-4 py-2 hover:bg-gray-100" target="_blank" rel="noopener">Bildschirm 1</a>
                             <a href="<?php echo $publicBase; ?>bildschirm_2.php" class="block px-4 py-2 hover:bg-gray-100" target="_blank" rel="noopener">Bildschirm 2</a>
                             <a href="<?php echo $publicBase; ?>bildschirm_3.php" class="block px-4 py-2 hover:bg-gray-100" target="_blank" rel="noopener">Bildschirm 3</a>
