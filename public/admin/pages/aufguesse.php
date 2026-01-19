@@ -459,15 +459,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" name="form_type" value="create_plan">
                     <div class="grid gap-4 md:grid-cols-2">
                         <div class="space-y-2">
-                            <label for="plan-name" class="block text-sm font-medium text-gray-900 text-center md:text-left">Planname</label>
+                            <label for="plan-name" class="block text-sm font-medium text-gray-900 text-center">Planname</label>
                             <input type="text" id="plan-name" name="plan_name" class="block w-full h-12 rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Wellness-Tag, Power-Aufgüsse" required>
                         </div>
                         <div class="space-y-2">
-                            <label for="plan-beschreibung" class="block text-sm font-medium text-gray-900 text-center md:text-left">Beschreibung</label>
+                            <label for="plan-beschreibung" class="block text-sm font-medium text-gray-900 text-center">Beschreibung</label>
                             <textarea id="plan-beschreibung" name="plan_beschreibung" rows="1" class="block w-full h-12 resize-none rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="Kurze Beschreibung für den Plan"></textarea>
                         </div>
                     </div>
-                    <div class="flex justify-center">
+                    <div class="flex justify-end">
                         <button type="submit" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center gap-1">
                             Plan erstellen <span aria-hidden="true">+</span>
                         </button>
