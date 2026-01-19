@@ -454,21 +454,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         <div class="bg-white rounded-lg shadow-md">
-            <div class="p-6">
+            <div class="p-6 relative">
+                <img src="/AufgussManager/branding/logo/Logo.svg" alt="Logo" class="absolute left-6 top-6" style="width: 150px; height: 150px;">
                 <div class="flex items-start gap-4 mb-4">
-                    <img src="/AufgussManager/branding/logo/Logo.svg" alt="Logo" style="width: 150px; height: 150px;">
                     <h2 class="text-2xl font-bold text-gray-900 text-center flex-1">Neuen Plan erstellen</h2>
                 </div>
                 <form method="POST" class="space-y-4">
                     <input type="hidden" name="form_type" value="create_plan">
-                    <div class="grid gap-4 md:grid-cols-2">
+                    <div class="grid gap-4">
                         <div class="space-y-2">
                             <label for="plan-name" class="block text-sm font-medium text-gray-900 text-center">Planname</label>
-                            <input type="text" id="plan-name" name="plan_name" class="block w-full h-12 rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Wellness-Tag, Power-Aufgüsse" required>
+                            <input type="text" id="plan-name" name="plan_name" size="33" class="block w-auto mx-auto h-12 rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Wellness-Tag, Power-Aufgüsse" required>
                         </div>
                         <div class="space-y-2">
                             <label for="plan-beschreibung" class="block text-sm font-medium text-gray-900 text-center">Beschreibung</label>
-                            <textarea id="plan-beschreibung" name="plan_beschreibung" rows="1" class="block w-full h-12 resize-none rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="Kurze Beschreibung für den Plan"></textarea>
+                            <textarea id="plan-beschreibung" name="plan_beschreibung" rows="1" cols="33" class="block w-auto mx-auto min-h-12 resize-none overflow-hidden rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="Kurze Beschreibung für den Plan"></textarea>
                         </div>
                     </div>
                     <div class="flex justify-end">
@@ -477,6 +477,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </button>
                     </div>
                 </form>
+                <script>
+                    (function () {
+                        const textarea = document.getElementById('plan-beschreibung');
+                        if (!textarea) {
+                            return;
+                        }
+                        const resize = () => {
+                            textarea.style.height = 'auto';
+                            textarea.style.height = `${textarea.scrollHeight}px`;
+                        };
+                        textarea.addEventListener('input', resize);
+                        resize();
+                    })();
+                </script>
             </div>
         </div>
 
