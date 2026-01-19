@@ -562,6 +562,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <link rel="icon" href="/AufgussManager/branding/favicon/favicon.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backup & Restore - Aufgussplan</title>
@@ -722,4 +723,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     })();
 </script>
+
 

@@ -29,6 +29,7 @@ require_once __DIR__ . '/../src/auth.php';
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <link rel="icon" href="/AufgussManager/branding/favicon/favicon.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <!-- Viewport für mobile Geräte und TV-Bildschirme -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -158,3 +159,4 @@ require_once __DIR__ . '/../src/auth.php';
     </div>
 </body>
 </html>
+

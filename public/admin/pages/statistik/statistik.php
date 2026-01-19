@@ -715,6 +715,7 @@ if (defined('STATISTIK_JSON')) {
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <link rel="icon" href="/AufgussManager/branding/favicon/favicon.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistiken - Aufgussplan</title>
@@ -1548,4 +1549,5 @@ if (defined('STATISTIK_JSON')) {
     <script src="../../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../../assets/js/admin.js'); ?>"></script>
 </body>
 </html>
+
 

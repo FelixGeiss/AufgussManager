@@ -434,6 +434,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="de">
 
 <head>
+    <link rel="icon" href="/AufgussManager/branding/favicon/favicon.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aufgüsse verwalten - Aufgussplan</title>
@@ -454,7 +455,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Neuen Plan erstellen</h2>
+                <div class="flex items-start gap-4 mb-4">
+                    <img src="/AufgussManager/branding/logo/Logo.svg" alt="Logo" style="width: 150px; height: 150px;">
+                    <h2 class="text-2xl font-bold text-gray-900 text-center flex-1">Neuen Plan erstellen</h2>
+                </div>
                 <form method="POST" class="space-y-4">
                     <input type="hidden" name="form_type" value="create_plan">
                     <div class="grid gap-4 md:grid-cols-2">
@@ -1685,6 +1689,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
+
 
 
 

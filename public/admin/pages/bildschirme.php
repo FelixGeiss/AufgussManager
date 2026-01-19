@@ -47,6 +47,7 @@ $werbungFiles = listUploadFiles('werbung');
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <link rel="icon" href="/AufgussManager/branding/favicon/favicon.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bildschirme verwalten - Aufgussplan</title>
@@ -81,4 +82,5 @@ $werbungFiles = listUploadFiles('werbung');
     <script src="../../assets/js/bildschirme.js"></script>
 </body>
 </html>
+
 
