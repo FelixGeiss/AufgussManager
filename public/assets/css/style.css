@@ -402,68 +402,127 @@
 }
 
 /* Admin-Style fuer Public Popup (gleiche Optik wie Vorschau) */
+#next-aufguss-overlay.next-aufguss-admin-style {
+    --popup-card-max-width: 2600px;
+    --popup-card-radius: clamp(12px, 1.2vw, 48px);
+    --popup-card-pad-x: clamp(1.25rem, 2.2vw, 4.8rem);
+    --popup-card-pad-y: clamp(1rem, 1.8vw, 3.6rem);
+    --popup-header-size: clamp(1rem, 1.6vw, 5.6rem);
+    --popup-title-size: clamp(1.1rem, 1.9vw, 5.2rem);
+    --popup-subtitle-size: clamp(0.95rem, 1.2vw, 4.8rem);
+    --popup-meta-size: clamp(0.875rem, 1.1vw, 4.2rem);
+    --popup-countdown-size: clamp(2.4rem, 3.8vw, 12rem);
+    --popup-countdown-pad-x: clamp(1.6rem, 2.4vw, 4.8rem);
+    --popup-countdown-pad-y: clamp(0.6rem, 1.2vw, 2.2rem);
+    --popup-image-max: clamp(140px, 3.8vw, 300px);
+    --popup-image-max-large: clamp(180px, 4.6vw, 360px);
+    --popup-icon-size: clamp(28px, 2.2vw, 120px);
+    --popup-gap: clamp(0.5rem, 1vw, 2.4rem);
+}
+
+@media (min-width: 3840px) {
+    #next-aufguss-overlay.next-aufguss-admin-style {
+        --popup-card-max-width: 3200px;
+    }
+}
+
+@media (min-width: 7680px) {
+    #next-aufguss-overlay.next-aufguss-admin-style {
+        --popup-card-max-width: 3800px;
+        --popup-image-max: 600px;
+        --popup-image-max-large: 720px;
+        --popup-icon-size: 240px;
+        --popup-header-size: clamp(1.4rem, 2.4vw, 8rem);
+        --popup-title-size: clamp(1.6rem, 3.2vw, 7.6rem);
+        --popup-subtitle-size: clamp(1.25rem, 2.4vw, 6.4rem);
+        --popup-meta-size: clamp(1.05rem, 1.8vw, 5.2rem);
+        --popup-countdown-size: clamp(4rem, 6.6vw, 22rem);
+    }
+}
+
 #next-aufguss-overlay.next-aufguss-admin-style > div {
-    width: 100%;
-    max-width: 48rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
-    border-radius: 0.75rem;
+    width: min(94vw, var(--popup-card-max-width));
+    max-width: none;
+    margin-left: clamp(0.75rem, 2vw, 4rem);
+    margin-right: clamp(0.75rem, 2vw, 4rem);
+    border-radius: var(--popup-card-radius);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style > div > .flex {
-    padding: 0.75rem 1.25rem;
+    padding: var(--popup-card-pad-y) var(--popup-card-pad-x);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style > div > .flex h3 {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
+    font-size: var(--popup-header-size);
+    line-height: 1.15;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body {
-    padding: 1.25rem;
+    padding: clamp(1.25rem, 2.2vw, 4.5rem);
     overflow: auto;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-8xl {
-    font-size: 6rem !important;
+    font-size: var(--popup-countdown-size) !important;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-countdown {
-    padding: 1rem 2.5rem;
+    padding: var(--popup-countdown-pad-y) var(--popup-countdown-pad-x);
+    border-width: clamp(1px, 0.05vw, 5px);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-3xl {
-    font-size: 1.875rem !important;
-    line-height: 2.25rem !important;
-    margin-bottom: 0 !important;
+    font-size: var(--popup-title-size) !important;
+    line-height: 1.1 !important;
+    margin-bottom: clamp(0.25rem, 0.6vw, 1.2rem) !important;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .flex.flex-col.gap-2 {
-    gap: 0.5rem;
+    gap: var(--popup-gap);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-lg {
-    font-size: 1.125rem !important;
-    line-height: 1.75rem !important;
+    font-size: var(--popup-subtitle-size) !important;
+    line-height: 1.2 !important;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .text-sm {
-    font-size: 0.875rem !important;
-    line-height: 1.25rem !important;
+    font-size: var(--popup-meta-size) !important;
+    line-height: 1.2 !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .next-aufguss-info-label {
+    font-size: var(--popup-meta-size);
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .next-aufguss-info-grid {
+    column-gap: clamp(1rem, 1.6vw, 3.6rem);
+    row-gap: clamp(0.8rem, 1.2vw, 2.8rem);
+    margin-top: clamp(0.4rem, 0.9vw, 2rem);
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .plan-list-staerke-icon,
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .next-aufguss-staerke-icons .plan-list-staerke-icon {
+    width: var(--popup-icon-size);
+    height: var(--popup-icon-size);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body img.h-72 {
-    height: 18rem !important;
-    max-height: none !important;
+    height: auto !important;
+    max-height: var(--popup-image-max-large) !important;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body img.h-40 {
-    height: 10rem !important;
-    max-height: none !important;
+    height: auto !important;
+    max-height: var(--popup-image-max) !important;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .gap-6 {
-    gap: 1.5rem !important;
+    gap: clamp(1rem, 1.6vw, 3.2rem) !important;
+}
+
+#next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .relative.z-10.flex.flex-col.gap-6 {
+    gap: clamp(1.4rem, 2.4vw, 5rem) !important;
 }
 
 /* ============================================================================
