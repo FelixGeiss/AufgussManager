@@ -1965,7 +1965,7 @@ function savePlanSettings(planId, options = {}) {
                     enabledInput.addEventListener('change', () => savePlanSettings(planId));
                 }
                 if (leadInput) {
-                    leadInput.addEventListener('change', () => savePlanSettings(planId));
+                    leadInput.addEventListener('change', () => savePlanSettings(planId, { persist: true }));
                 }
                 if (highlightInput) {
                     highlightInput.addEventListener('change', () => savePlanSettings(planId));

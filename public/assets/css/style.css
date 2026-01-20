@@ -423,6 +423,15 @@
 @media (min-width: 3840px) {
     #next-aufguss-overlay.next-aufguss-admin-style {
         --popup-card-max-width: 3200px;
+        --popup-image-max: 600px;
+        --popup-image-max-large: 720px;
+    }
+}
+
+@media (min-width: 2560px) {
+    #next-aufguss-overlay.next-aufguss-admin-style {
+        --popup-image-max: 225px;
+        --popup-image-max-large: 270px;
     }
 }
 

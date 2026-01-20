@@ -2115,7 +2115,7 @@ function buildNextAufgussHtml(aufguss) {
                 <div class="mt-auto grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="flex flex-col gap-2">
                         ${saunaImg}
-                        <div class="text-sm font-semibold text-gray-900 text-center">Sauna: ${escapeHtml(saunaName)}</div>
+                        <div class="text-sm font-semibold text-gray-900 text-center">${escapeHtml(saunaName)}</div>
                     </div>
                     <div class="flex flex-col gap-3">
                         ${mitarbeiterImg}
