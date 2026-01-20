@@ -1354,7 +1354,7 @@ function renderPlanRow(aufguss) {
     const aufgiesserHtml = formatAufgiesserHtml(aufguss);
     const saunaHtml = formatSaunaHtml(aufguss);
     const duftmittelHtml = formatDuftmittelHtml(aufguss);
-    const startTs = getAufgussStartTimestamp(aufguss);
+    const startTs = getDisplayAufgussStartTimestamp(aufguss);
 
     return `
         <tr class="bg-white/35" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
@@ -1378,7 +1378,7 @@ function renderPlanRowDiv(aufguss) {
     const aufgiesserHtml = formatAufgiesserHtml(aufguss);
     const saunaHtml = formatSaunaHtmlStacked(aufguss);
     const duftmittelHtml = formatDuftmittelHtml(aufguss, true);
-    const startTs = getAufgussStartTimestamp(aufguss);
+    const startTs = getDisplayAufgussStartTimestamp(aufguss);
     const timeHtml = timeParts.end
         ? `<div class="plan-list-time"><span>${escapeHtml(timeParts.start)}</span><span>${escapeHtml(timeParts.end)}</span></div>`
         : `<div class="plan-list-time"><span>${escapeHtml(timeParts.start)}</span></div>`;
@@ -1461,6 +1461,9 @@ function getAufgussStartTimestamp(aufguss) {
     let dateValue = aufguss.datum || '';
     const timeValue = aufguss.zeit_anfang || aufguss.zeit || '';
     if (!timeValue) return null;
+    if (dateValue) {
+        dateValue = String(dateValue).split(' ')[0].split('T')[0];
+    }
     const today = new Date();
     const day = String(today.getDate()).padStart(2, '0');
     const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -1470,18 +1473,31 @@ function getAufgussStartTimestamp(aufguss) {
     }
     const normalizedTime = timeValue.length === 5 ? `${timeValue}:00` : timeValue;
     let ts = new Date(`${dateValue}T${normalizedTime}`).getTime();
-    if (!Number.isNaN(ts)) {
-        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-        if (ts < startOfToday) {
-            ts = new Date(`${todayValue}T${normalizedTime}`).getTime();
-        }
-    }
     if (Number.isNaN(ts)) {
         const fallbackDate = todayValue;
         ts = new Date(`${fallbackDate}T${normalizedTime}`).getTime();
     }
     if (Number.isNaN(ts)) return null;
     return ts;
+}
+
+// Start-Zeitstempel fuer Anzeige (immer heute).
+function getDisplayAufgussStartTimestamp(aufguss) {
+    const timeValue = aufguss.zeit_anfang || aufguss.zeit || '';
+    if (!timeValue) return null;
+    return buildAufgussTimestamp('', timeValue);
+}
+
+// End-Zeitstempel fuer Anzeige (immer heute).
+function getDisplayAufgussEndTimestamp(aufguss, startTs) {
+    const baseTs = startTs || getDisplayAufgussStartTimestamp(aufguss);
+    if (!baseTs) return null;
+    if (aufguss.zeit_ende) {
+        const endTs = buildAufgussTimestamp('', aufguss.zeit_ende);
+        if (endTs) return endTs;
+    }
+    const minutes = Number(aufguss.dauer) || 15;
+    return baseTs + (minutes * 60000);
 }
 
 // Formatiert Datum fuer Kopfzeile.
@@ -1880,8 +1896,8 @@ function updateNextAufgussIndicators() {
         if (!aufgussId) return;
         const aufguss = aufgussById.get(String(aufgussId));
         if (!aufguss) return;
-        const startTs = Number(row.getAttribute('data-start-ts') || 0) || getAufgussStartTimestamp(aufguss);
-        const endTs = getAufgussEndTimestamp(aufguss, startTs);
+        const startTs = Number(row.getAttribute('data-start-ts') || 0) || getDisplayAufgussStartTimestamp(aufguss);
+        const endTs = getDisplayAufgussEndTimestamp(aufguss, startTs);
         if (!startTs || !endTs) return;
         if (now >= startTs && now <= endTs) {
             logAufgussCompleted(aufguss);
@@ -1892,11 +1908,11 @@ function updateNextAufgussIndicators() {
     let nextStart = null;
     const dayMs = 24 * 60 * 60 * 1000;
     rows.forEach(row => {
+        const aufgussId = row.getAttribute('data-aufguss-id');
+        const aufguss = aufgussId ? aufgussById.get(String(aufgussId)) : null;
         let startTs = Number(row.getAttribute('data-start-ts') || 0);
-        if (!startTs) {
-            const aufgussId = row.getAttribute('data-aufguss-id');
-            const aufguss = aufgussId ? aufgussById.get(String(aufgussId)) : null;
-            startTs = aufguss ? (getAufgussStartTimestamp(aufguss) || 0) : 0;
+        if (!startTs && aufguss) {
+            startTs = getDisplayAufgussStartTimestamp(aufguss) || 0;
         }
         if (!startTs) return;
         if (startTs <= now) {
