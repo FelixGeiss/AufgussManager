@@ -2033,13 +2033,14 @@ function getNextAufgussSettings(planId) {
 function buildNextAufgussHtml(aufguss) {
     const aufgussName = aufguss.name || aufguss.aufguss_name || 'Aufguss';
     const staerkeInfo = formatStaerke(aufguss);
-    const staerkeText = aufguss.staerke ? `Stärke: ${aufguss.staerke}` : 'Stärke: -';
+    const staerkeValue = aufguss.staerke ? escapeHtml(String(aufguss.staerke)) : '-';
     const staerkeLine = staerkeInfo.iconHtml
-        ? `<div class="flex items-center justify-center gap-3"><span>Stärke</span><span class="next-aufguss-staerke-icons">${staerkeInfo.iconHtml}</span></div>`
-        : escapeHtml(staerkeText);
+        ? `<div class="next-aufguss-info-label">Stärke</div><div class="next-aufguss-staerke-icons">${staerkeInfo.iconHtml}</div>`
+        : `<div class="next-aufguss-info-label">Stärke</div><div>${staerkeValue}</div>`;
     const saunaName = aufguss.sauna_name || aufguss.sauna || '-';
     const saunaTempText = formatSaunaTempText(aufguss);
-    const saunaTempLine = saunaTempText ? `Temperatur: ${saunaTempText}\u00b0C` : 'Temperatur: -';
+    const saunaTempLabel = 'Temperatur';
+    const saunaTempValue = saunaTempText ? `${escapeHtml(String(saunaTempText))}\u00b0C` : '-';
     const duftmittelNameRaw = aufguss.duftmittel_name || aufguss.duftmittel || '';
     const duftmittelName = duftmittelNameRaw ? String(duftmittelNameRaw).trim() : '';
     const duftmittelImage = aufguss.duftmittel_bild ? String(aufguss.duftmittel_bild).trim() : '';
@@ -2047,10 +2048,21 @@ function buildNextAufgussHtml(aufguss) {
     if (duftmittelImage) {
         const imgSrc = `uploads/${escapeHtml(duftmittelImage)}`;
         const label = duftmittelName ? escapeHtml(duftmittelName) : 'Duftmittel';
-        duftmittelLine = `<div class="flex items-center justify-center gap-3"><span>${label}</span><img src="${imgSrc}" alt="Duftmittel" class="plan-list-staerke-icon" onerror="this.onerror=null;this.remove();"></div>`;
+        duftmittelLine = `<div class="next-aufguss-info-label">${label}</div><img src="${imgSrc}" alt="Duftmittel" class="plan-list-staerke-icon" onerror="this.onerror=null;this.remove();">`;
     } else if (duftmittelName) {
-        duftmittelLine = `Duftmittel: ${escapeHtml(duftmittelName)}`;
+        duftmittelLine = `<div class="next-aufguss-info-label">Duftmittel</div><div>${escapeHtml(duftmittelName)}</div>`;
     }
+    const infoGridRows = [];
+    if (staerkeLine) {
+        infoGridRows.push(staerkeLine);
+    }
+    if (duftmittelLine) {
+        infoGridRows.push(duftmittelLine);
+    }
+    infoGridRows.push(`<div class="next-aufguss-info-label">${saunaTempLabel}</div><div>${saunaTempValue}</div>`);
+    const infoGrid = infoGridRows.length > 0
+        ? `<div class="next-aufguss-info-grid">${infoGridRows.join('')}</div>`
+        : '';
     const people = parseAufgiesserItems(aufguss);
 
     const personCards = people.map(person => {
@@ -2098,9 +2110,7 @@ function buildNextAufgussHtml(aufguss) {
             <div class="relative z-10 flex flex-col gap-6 min-h-[70vh]">
                 <div class="flex flex-col gap-2 text-center">
                     <div class="text-3xl font-bold text-gray-900 font-display">${escapeHtml(aufgussName)}</div>
-                    <div class="text-lg font-semibold text-gray-900">${staerkeLine}</div>
-                    ${duftmittelLine ? `<div class="text-lg font-semibold text-gray-900">${duftmittelLine}</div>` : ''}
-                    <div class="text-lg font-semibold text-gray-900">${escapeHtml(saunaTempLine)}</div>
+                    ${infoGrid ? `<div class="text-lg font-semibold text-gray-900">${infoGrid}</div>` : ''}
                 </div>
                 <div class="mt-auto grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="flex flex-col gap-2">
