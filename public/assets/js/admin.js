@@ -571,7 +571,7 @@ function deleteAufguss(aufgussId) {
     }
 
     // Stattdessen: Seite neu laden mit Lösch-Parameter
-    window.location.href = 'deletes/delete_aufguss.php?id=' + encodeURIComponent(aufgussId);
+    window.location.href = '../deletes/delete_aufguss.php?id=' + encodeURIComponent(aufgussId);
 }
 
 // Zeit-Validierung für Formulare
