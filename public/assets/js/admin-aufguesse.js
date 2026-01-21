@@ -2409,7 +2409,17 @@ function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled,
                     const imageInput = document.getElementById('planBannerImage');
                     const imageSelect = document.getElementById('planBannerImageSelect');
                     if (imageInput) imageInput.value = path;
-                    if (imageSelect) imageSelect.value = path;
+                    if (imageSelect) {
+                        const exists = Array.from(imageSelect.options).some(option => option.value === path);
+                        if (!exists) {
+                            const option = document.createElement('option');
+                            option.value = path;
+                            option.textContent = path.split('/').pop() || path;
+                            imageSelect.appendChild(option);
+                        }
+                        imageSelect.value = path;
+                        selectPlanBannerImage();
+                    }
                 }
                 removePlanBannerFile();
             } catch (error) {

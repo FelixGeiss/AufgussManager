@@ -1562,32 +1562,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="hidden" id="planBannerPlanId" value="">
             <div class="space-y-4">
                 <input id="planBannerEnabled" type="checkbox" class="sr-only">
-                <div>
-                    <label for="planBannerText" class="block text-sm font-medium text-gray-700 mb-1">Banner-Text (optional)</label>
-                    <textarea id="planBannerText" rows="5" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Text für den Info-Banner" style="width: 220px; box-sizing: border-box;"></textarea>
+                <div class="flex flex-col gap-4 md:flex-row md:items-start">
+                    <div class="shrink-0">
+                        <label for="planBannerText" class="block text-sm font-medium text-gray-700 mb-1">Banner-Text (optional)</label>
+                        <textarea id="planBannerText" rows="5" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Text fuer den Info-Banner" style="width: 220px; box-sizing: border-box;"></textarea>
+                    </div>
+                    <div class="shrink-0 space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Banner-Inhalt</label>
+                        <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                            <input id="planBannerModeText" type="radio" name="planBannerMode" value="text" class="sr-only peer" checked>
+                            <span class="h-4 w-4 rounded-full border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                            <span>Text anzeigen</span>
+                        </label>
+                        <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                            <input id="planBannerModeImage" type="radio" name="planBannerMode" value="image" class="sr-only peer">
+                            <span class="h-4 w-4 rounded-full border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                            <span>Bild/Video anzeigen</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Banner-Inhalt</label>
-                    <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
-                        <input id="planBannerModeText" type="radio" name="planBannerMode" value="text" class="sr-only peer" checked>
-                        <span class="h-4 w-4 rounded-full border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
-                            <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
-                            </svg>
-                        </span>
-                        <span>Text anzeigen</span>
-                    </label>
-                    <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
-                        <input id="planBannerModeImage" type="radio" name="planBannerMode" value="image" class="sr-only peer">
-                        <span class="h-4 w-4 rounded-full border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
-                            <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
-                            </svg>
-                        </span>
-                        <span>Bild/Video anzeigen</span>
-                    </label>
-                </div>
-                <input id="planBannerImage" type="hidden">
+<input id="planBannerImage" type="hidden">
                 <div>
                     <label for="planBannerImageSelect" class="block text-sm font-medium text-gray-700 mb-1">Vorhandene Werbung auswählen</label>
                     <select id="planBannerImageSelect" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanBannerImage()">
