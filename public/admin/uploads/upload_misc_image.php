@@ -1,4 +1,4 @@
-<?php
+Ôªø<?php
 session_start();
 require_once __DIR__ . '/../../../src/config/config.php';
 header('Content-Type: application/json');
@@ -9,11 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$allowedTypes\ = ['werbung', 'plan', 'staerke', 'screens'];
+$allowedTypes = ['werbung', 'plan', 'staerke', 'screens'];
 try {
     $type = trim((string)($_POST['type'] ?? ''));
     if (!in_array($type, $allowedTypes, true)) {
-        throw new RuntimeException('Ung¸ltiger Upload-Typ.');
+        throw new RuntimeException('Ung√ºltiger Upload-Typ.');
     }
 
     if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
@@ -22,7 +22,7 @@ try {
 
     $file = $_FILES['file'];
     if ($file['size'] > 30 * 1024 * 1024) {
-        throw new RuntimeException('Datei darf maximal 30MB groﬂ sein.');
+        throw new RuntimeException('Datei darf maximal 30MB gro√ü sein.');
     }
 
     $imageTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -30,7 +30,7 @@ try {
     $allowedMimeTypes = $type === 'plan' ? array_merge($imageTypes, $videoTypes) : $imageTypes;
 
     if (!in_array($file['type'], $allowedMimeTypes, true)) {
-        throw new RuntimeException('Ung¸ltiger Dateityp.');
+        throw new RuntimeException('Ung√ºltiger Dateityp.');
     }
 
     $uploadDir = rtrim(UPLOAD_PATH, '/\\') . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR;
