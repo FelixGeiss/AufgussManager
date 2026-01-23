@@ -107,7 +107,15 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
 
     $imagePath = sanitizePath($input['image_path'] ?? null);
     $backgroundPath = sanitizePath($input['background_path'] ?? null);
+    $adEntry = sanitizeSide($input['ad_entry'] ?? null);
+    $adExit = sanitizeSide($input['ad_exit'] ?? null);
     $adDirection = sanitizeDirection($input['ad_direction'] ?? null);
+    if ($adEntry === null) {
+        $adEntry = getEntrySideFromDirection($adDirection);
+    }
+    if ($adExit === null) {
+        $adExit = $adDirection;
+    }
 
     if ($mode === 'image') {
         $planId = null;
@@ -121,7 +129,9 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         $screen['plan_id'] = $planId;
         $screen['image_path'] = $imagePath;
         $screen['background_path'] = $backgroundPath;
-        $screen['ad_direction'] = $adDirection;
+        $screen['ad_entry'] = $adEntry;
+        $screen['ad_exit'] = $adExit;
+        $screen['ad_direction'] = $adExit;
         $screen['updated_at'] = date('c');
 
         $config['screens'][$screenId] = $screen;
@@ -179,7 +189,22 @@ function readScreenConfig($storageFile, $screenCount) {
     for ($i = 1; $i <= $screenCount; $i++) {
         if (!isset($config['screens'][$i])) {
             $config['screens'][$i] = defaultScreen($i);
+            continue;
         }
+        $screen = array_merge(defaultScreen($i), $config['screens'][$i]);
+        $legacyDirection = sanitizeDirection($screen['ad_direction'] ?? null);
+        $entry = sanitizeSide($screen['ad_entry'] ?? null);
+        $exit = sanitizeSide($screen['ad_exit'] ?? null);
+        if ($entry === null) {
+            $entry = getEntrySideFromDirection($legacyDirection);
+        }
+        if ($exit === null) {
+            $exit = $legacyDirection;
+        }
+        $screen['ad_entry'] = $entry;
+        $screen['ad_exit'] = $exit;
+        $screen['ad_direction'] = $exit;
+        $config['screens'][$i] = $screen;
     }
 
     return $config;
@@ -201,6 +226,8 @@ function defaultScreen($screenId) {
         'plan_id' => null,
         'image_path' => null,
         'background_path' => null,
+        'ad_entry' => 'left',
+        'ad_exit' => 'right',
         'ad_direction' => 'right',
         'updated_at' => null
     ];
@@ -249,14 +276,33 @@ function inferAdType($path) {
 
 // Werberichtung auf erlaubte Werte begrenzen.
 function sanitizeDirection($value) {
+    return sanitizeSide($value, 'right');
+}
+
+function sanitizeSide($value, $default = null) {
     if (!is_string($value)) {
-        return 'right';
+        return $default;
     }
     $value = strtolower(trim($value));
     if (in_array($value, ['left', 'right', 'up', 'down'], true)) {
         return $value;
     }
-    return 'right';
+    return $default;
+}
+
+function getEntrySideFromDirection($direction) {
+    switch ($direction) {
+        case 'left':
+            return 'right';
+        case 'right':
+            return 'left';
+        case 'up':
+            return 'down';
+        case 'down':
+            return 'up';
+        default:
+            return 'left';
+    }
 }
 
 // Reihenfolge der Bildschirme bereinigen und validieren.

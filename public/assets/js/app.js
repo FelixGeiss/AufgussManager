@@ -100,7 +100,8 @@ let screenBackgroundPath = '';
 let screenGlobalAdPath = '';
 let screenGlobalAdType = '';
 let screenGlobalAdSignature = '';
-let screenAdDirection = 'right';
+let screenAdEntrySide = 'left';
+let screenAdExitSide = 'right';
 let screenConfigUpdatedAt = null;
 let screenPlanLocked = false;
 let screenConfigSyncTimer = null;
@@ -207,8 +208,18 @@ function applyScreenConfig(screen, globalAd, serverTime) {
     screenGlobalAdPath = globalAd && globalAd.path ? String(globalAd.path) : '';
     screenGlobalAdType = globalAd && globalAd.type ? String(globalAd.type) : '';
     screenGlobalAdSignature = buildGlobalAdSignature(globalAd);
-    screenAdDirection = screen.ad_direction ? String(screen.ad_direction) : 'right';
+    const legacyDirection = normalizeAdSide(screen.ad_direction ? String(screen.ad_direction) : '') || 'right';
+    screenAdEntrySide = normalizeAdSide(screen.ad_entry ? String(screen.ad_entry) : '') || getEntrySideFromDirection(legacyDirection);
+    screenAdExitSide = normalizeAdSide(screen.ad_exit ? String(screen.ad_exit) : '') || legacyDirection;
     updateGlobalAdConfig(globalAd, serverTime);
+    const planWrap = document.getElementById('plan-ad-wrap');
+    if (planWrap) {
+        setPlanAdDirectionVars(planWrap);
+    }
+    const globalWrap = document.getElementById('global-ad-wrap');
+    if (globalWrap) {
+        setPlanAdDirectionVars(globalWrap);
+    }
 
     if (screenMode === 'image') {
         screenPlanLocked = true;
@@ -1308,31 +1319,54 @@ function hidePlanAd() {
     }, 320);
 }
 
+function normalizeAdSide(direction) {
+    const value = String(direction || '').trim().toLowerCase();
+    return ['left', 'right', 'up', 'down'].includes(value) ? value : null;
+}
+
+function getEntrySideFromDirection(direction) {
+    switch (direction) {
+        case 'left':
+            return 'right';
+        case 'right':
+            return 'left';
+        case 'up':
+            return 'down';
+        case 'down':
+            return 'up';
+        default:
+            return 'left';
+    }
+}
+
+function getAdOffset(side, kind) {
+    const normalized = normalizeAdSide(side) || (kind === 'enter' ? 'left' : 'right');
+    const isEnter = kind === 'enter';
+    const offsetX = isEnter ? '-110%' : '110%';
+    const offsetY = isEnter ? '-110%' : '110%';
+    if (normalized === 'left') {
+        return { x: '-110%', y: '0' };
+    }
+    if (normalized === 'right') {
+        return { x: '110%', y: '0' };
+    }
+    if (normalized === 'up') {
+        return { x: '0', y: '-110%' };
+    }
+    if (normalized === 'down') {
+        return { x: '0', y: '110%' };
+    }
+    return { x: offsetX, y: offsetY };
+}
+
 // Setzt CSS-Variablen fuer Richtung.
 function setPlanAdDirectionVars(wrap) {
-    const direction = screenAdDirection || 'right';
-    let enterX = '-110%';
-    let exitX = '110%';
-    let enterY = '0';
-    let exitY = '0';
-    if (direction === 'left') {
-        enterX = '110%';
-        exitX = '-110%';
-    } else if (direction === 'up') {
-        enterX = '0';
-        exitX = '0';
-        enterY = '110%';
-        exitY = '-110%';
-    } else if (direction === 'down') {
-        enterX = '0';
-        exitX = '0';
-        enterY = '-110%';
-        exitY = '110%';
-    }
-    wrap.style.setProperty('--plan-ad-enter-x', enterX);
-    wrap.style.setProperty('--plan-ad-exit-x', exitX);
-    wrap.style.setProperty('--plan-ad-enter-y', enterY);
-    wrap.style.setProperty('--plan-ad-exit-y', exitY);
+    const entry = getAdOffset(screenAdEntrySide, 'enter');
+    const exit = getAdOffset(screenAdExitSide, 'exit');
+    wrap.style.setProperty('--plan-ad-enter-x', entry.x);
+    wrap.style.setProperty('--plan-ad-exit-x', exit.x);
+    wrap.style.setProperty('--plan-ad-enter-y', entry.y);
+    wrap.style.setProperty('--plan-ad-exit-y', exit.y);
 }
 
 // Stoppt Timer der Plan-Werbung.

@@ -247,13 +247,100 @@ function renderSelectedOrderBadges(order) {
         .join('');
 }
 
+function sanitizeOrderList(order) {
+    const list = Array.isArray(order) ? order.map(Number) : [];
+    const clean = [];
+    list.forEach(value => {
+        if (!Number.isFinite(value)) return;
+        if (value < 1 || value > screenCount) return;
+        if (clean.includes(value)) return;
+        clean.push(value);
+    });
+    return clean;
+}
+
+function rebuildGlobalAdOrderSelect(select, order) {
+    if (!select) return;
+    select.innerHTML = buildScreenOrderOptions(order);
+}
+
+const adDirectionValues = ['left', 'right', 'up', 'down'];
+const adSideOptions = [
+    { side: 'left', entryLabel: 'von links', entryArrow: '&rarr;', exitLabel: 'nach links', exitArrow: '&larr;' },
+    { side: 'right', entryLabel: 'von rechts', entryArrow: '&larr;', exitLabel: 'nach rechts', exitArrow: '&rarr;' },
+    { side: 'up', entryLabel: 'von oben', entryArrow: '&darr;', exitLabel: 'nach oben', exitArrow: '&uarr;' },
+    { side: 'down', entryLabel: 'von unten', entryArrow: '&uarr;', exitLabel: 'nach unten', exitArrow: '&darr;' }
+];
+
+function normalizeAdSide(direction) {
+    return adDirectionValues.includes(direction) ? direction : null;
+}
+
+function getEntrySideFromDirection(direction) {
+    switch (direction) {
+        case 'left':
+            return 'right';
+        case 'right':
+            return 'left';
+        case 'up':
+            return 'down';
+        case 'down':
+            return 'up';
+        default:
+            return 'left';
+    }
+}
+
+function buildAdSideButtons(type, selectedSide) {
+    return adSideOptions.map(option => {
+        const isSelected = option.side === selectedSide;
+        const activeClass = isSelected ? ' is-active' : '';
+        const pressed = isSelected ? 'true' : 'false';
+        const label = type === 'entry'
+            ? `${option.entryArrow} ${option.entryLabel}`
+            : `${option.exitArrow} ${option.exitLabel}`;
+        const dataAttr = type === 'entry' ? 'data-ad-entry' : 'data-ad-exit';
+        return `<button type="button" class="plan-select-btn${activeClass}" ${dataAttr}="${option.side}" aria-pressed="${pressed}">${label}</button>`;
+    }).join('');
+}
+
+function updateAdSideButtons(card, type, selectedSide) {
+    const selector = type === 'entry' ? '[data-ad-entry]' : '[data-ad-exit]';
+    const attribute = type === 'entry' ? 'data-ad-entry' : 'data-ad-exit';
+    card.querySelectorAll(selector).forEach(button => {
+        const isActive = button.getAttribute(attribute) === selectedSide;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+}
+
+function setAdEntrySide(card, side) {
+    const normalized = normalizeAdSide(side) || 'left';
+    const input = card.querySelector('[name="ad_entry"]');
+    if (input) {
+        input.value = normalized;
+    }
+    updateAdSideButtons(card, 'entry', normalized);
+}
+
+function setAdExitSide(card, side) {
+    const normalized = normalizeAdSide(side) || 'right';
+    const input = card.querySelector('[name="ad_exit"]');
+    if (input) {
+        input.value = normalized;
+    }
+    updateAdSideButtons(card, 'exit', normalized);
+}
+
 // Rendert eine Bildschirm-Karte.
 function buildScreenCard(screenId, screen, plans) {
     const mode = screen && screen.mode === 'image' ? 'image' : 'plan';
     const planId = screen && screen.plan_id ? String(screen.plan_id) : '';
     const imagePath = screen && screen.image_path ? String(screen.image_path) : '';
     const backgroundPath = screen && screen.background_path ? String(screen.background_path) : '';
-    const adDirection = screen && screen.ad_direction ? String(screen.ad_direction) : 'right';
+    const legacyDirection = normalizeAdSide(screen && screen.ad_direction ? String(screen.ad_direction) : '') || 'right';
+    const entrySide = normalizeAdSide(screen && screen.ad_entry ? String(screen.ad_entry) : '') || getEntrySideFromDirection(legacyDirection);
+    const exitSide = normalizeAdSide(screen && screen.ad_exit ? String(screen.ad_exit) : '') || legacyDirection;
     const imageOptions = buildFileOptions(mediaOptions.screens, imagePath, '-- Bild wählen --');
     const backgroundOptions = buildFileOptions(mediaOptions.backgrounds, backgroundPath, '-- Hintergrund wählen --');
 
@@ -298,18 +385,23 @@ function buildScreenCard(screenId, screen, plans) {
                     </div>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung Richtung</label>
-                    <select name="ad_direction" class="w-full border rounded px-3 py-2">
-                        <option value="right"${adDirection === 'right' ? ' selected' : ''}>Von links rein / nach rechts raus</option>
-                        <option value="left"${adDirection === 'left' ? ' selected' : ''}>Von rechts rein / nach links raus</option>
-                        <option value="up"${adDirection === 'up' ? ' selected' : ''}>Von unten rein / nach oben raus</option>
-                        <option value="down"${adDirection === 'down' ? ' selected' : ''}>Von oben rein / nach unten raus</option>
-                    </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung rein</label>
+                            <div class="grid grid-cols-2 gap-2" data-ad-entry-buttons>
+                                ${buildAdSideButtons('entry', entrySide)}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung raus</label>
+                            <div class="grid grid-cols-2 gap-2" data-ad-exit-buttons>
+                                ${buildAdSideButtons('exit', exitSide)}
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="ad_entry" value="${entrySide}">
+                    <input type="hidden" name="ad_exit" value="${exitSide}">
                 </div>
-            </div>
-            <div class="mt-4 flex items-center gap-3">
-                <button type="button" data-action="save" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Speichern</button>
-                <span class="text-xs text-gray-500">Änderungen am Modus oder Plan bitte speichern.</span>
             </div>
         </div>
     `;
@@ -369,14 +461,16 @@ function renderGlobalAd() {
 function getCardConfig(card) {
     const mode = card.querySelector('[name="mode"]')?.value || 'plan';
     const planId = card.querySelector('[name="plan_id"]')?.value || '';
-    const adDirection = card.querySelector('[name="ad_direction"]')?.value || 'right';
+    const adEntry = card.querySelector('[name="ad_entry"]')?.value || 'left';
+    const adExit = card.querySelector('[name="ad_exit"]')?.value || 'right';
     const imagePath = card.dataset.imagePath || '';
     const backgroundPath = card.dataset.backgroundPath || '';
 
     return {
         mode,
         planId,
-        adDirection,
+        adEntry,
+        adExit,
         imagePath,
         backgroundPath
     };
@@ -408,9 +502,10 @@ function updateGlobalAdType(path) {
 }
 
 // Speichert eine Bildschirm-Konfiguration.
-function handleSave(card) {
+function saveScreenConfig(card, options = {}) {
+    const { silent } = options;
     const screenId = Number(card.dataset.screenId || 0);
-    if (!screenId) return;
+    if (!screenId) return Promise.resolve({ success: false, message: 'Ungueltige Bildschirm-ID' });
 
     const config = getCardConfig(card);
     const payload = {
@@ -419,22 +514,54 @@ function handleSave(card) {
         plan_id: config.mode === 'plan' ? config.planId : null,
         image_path: config.mode === 'image' ? config.imagePath : null,
         background_path: config.backgroundPath || null,
-        ad_direction: config.adDirection
+        ad_entry: config.adEntry,
+        ad_exit: config.adExit
     };
 
-    fetchJson(screensApiUrl, {
+    return fetchJson(screensApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
         .then(result => {
             if (result && result.success) {
-                notify('Bildschirm gespeichert.', 'success');
+                if (!silent) {
+                    notify('Bildschirm gespeichert.', 'success');
+                }
+                return { success: true };
             } else {
-                notify(result && result.message ? result.message : 'Speichern fehlgeschlagen.', 'error');
+                const message = result && result.message ? result.message : 'Speichern fehlgeschlagen.';
+                if (!silent) {
+                    notify(message, 'error');
+                }
+                return { success: false, message };
             }
         })
-        .catch(() => notify('Netzwerkfehler beim Speichern.', 'error'));
+        .catch(() => {
+            const message = 'Netzwerkfehler beim Speichern.';
+            if (!silent) {
+                notify(message, 'error');
+            }
+            return { success: false, message };
+        });
+}
+
+function handleSave(card) {
+    saveScreenConfig(card);
+}
+
+function saveAllScreens() {
+    const root = document.getElementById('screen-list');
+    if (!root) return Promise.resolve({ success: true });
+    const cards = Array.from(root.querySelectorAll('[data-screen-card]'));
+    const requests = cards.map(card => saveScreenConfig(card, { silent: true }));
+    return Promise.all(requests).then(results => {
+        const failures = results.filter(result => !result.success);
+        return {
+            success: failures.length === 0,
+            failures
+        };
+    });
 }
 
 // Verarbeitet Uploads fuer Bild/Hintergrund.
@@ -534,27 +661,35 @@ function handleGlobalAdSave() {
         global_ad_pause_seconds: Number(globalAd.pauseSeconds) || 10
     };
 
-    fetchJson(screensApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-        .then(result => {
-        if (result && result.success && result.data && result.data.global_ad) {
-            const serverAd = result.data.global_ad || {};
-            const order = Array.isArray(serverAd.order) && serverAd.order.length
-                ? serverAd.order
-                : (Array.isArray(globalAd.order) ? globalAd.order : []);
-            globalAd = {
-                path: serverAd.path || globalAd.path || '',
-                type: serverAd.type || globalAd.type || '',
-                enabled: typeof serverAd.enabled === 'boolean' ? serverAd.enabled : !!globalAd.enabled,
-                order,
-                displaySeconds: Number(serverAd.display_seconds ?? globalAd.displaySeconds) || 10,
-                pauseSeconds: Number(serverAd.pause_seconds ?? globalAd.pauseSeconds) || 10
-            };
-            renderGlobalAd();
-            notify('Globale Werbung gespeichert.', 'success');
+    saveAllScreens()
+        .then(screenResult => {
+            return fetchJson(screensApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(result => ({ result, screenResult }));
+        })
+        .then(({ result, screenResult }) => {
+            const screenFailed = screenResult && !screenResult.success;
+            if (result && result.success && result.data && result.data.global_ad) {
+                const serverAd = result.data.global_ad || {};
+                const order = Array.isArray(serverAd.order) && serverAd.order.length
+                    ? serverAd.order
+                    : (Array.isArray(globalAd.order) ? globalAd.order : []);
+                globalAd = {
+                    path: serverAd.path || globalAd.path || '',
+                    type: serverAd.type || globalAd.type || '',
+                    enabled: typeof serverAd.enabled === 'boolean' ? serverAd.enabled : !!globalAd.enabled,
+                    order,
+                    displaySeconds: Number(serverAd.display_seconds ?? globalAd.displaySeconds) || 10,
+                    pauseSeconds: Number(serverAd.pause_seconds ?? globalAd.pauseSeconds) || 10
+                };
+                renderGlobalAd();
+                if (screenFailed) {
+                    notify('Werbung gespeichert, aber einige Bildschirme konnten nicht gespeichert werden.', 'error');
+                } else {
+                    notify('Einstellungen gespeichert.', 'success');
+                }
             } else {
                 notify(result && result.message ? result.message : 'Speichern fehlgeschlagen.', 'error');
             }
@@ -594,10 +729,24 @@ function bindEvents() {
     root.addEventListener('click', event => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
-        if (!target.matches('[data-action="save"]')) return;
-        const card = target.closest('[data-screen-card]');
-        if (!card) return;
-        handleSave(card);
+        const adEntryButton = target.closest('[data-ad-entry]');
+        const adExitButton = target.closest('[data-ad-exit]');
+        if (adEntryButton || adExitButton) {
+            const card = target.closest('[data-screen-card]');
+            if (!card) return;
+            if (adEntryButton) {
+                const side = adEntryButton.getAttribute('data-ad-entry');
+                if (side) {
+                    setAdEntrySide(card, side);
+                }
+            } else if (adExitButton) {
+                const side = adExitButton.getAttribute('data-ad-exit');
+                if (side) {
+                    setAdExitSide(card, side);
+                }
+            }
+            return;
+        }
     });
 }
 
@@ -627,7 +776,7 @@ function bindGlobalAdEvents() {
             globalAd.pauseSeconds = Number(target.value) || 10;
         }
         if (target.name === 'global_ad_order') {
-            globalAd.order = getSelectOrder(target);
+            globalAd.order = sanitizeOrderList(getSelectOrder(target));
             updateSelectedOrderBadges();
             updateOrderButtons(target);
         }
@@ -656,12 +805,17 @@ function bindGlobalAdEvents() {
             const button = target.closest('button[data-order-value]');
             const select = root.querySelector('[name="global_ad_order"]');
             if (!button || !select) return;
-            const value = button.getAttribute('data-order-value');
-            if (!value) return;
-            const option = select.querySelector(`option[value="${value}"]`);
-            if (!option) return;
-            option.selected = !option.selected;
-            globalAd.order = getSelectOrder(select);
+            const value = Number(button.getAttribute('data-order-value'));
+            if (!Number.isFinite(value)) return;
+            const nextOrder = sanitizeOrderList(globalAd.order);
+            const index = nextOrder.indexOf(value);
+            if (index >= 0) {
+                nextOrder.splice(index, 1);
+            } else {
+                nextOrder.push(value);
+            }
+            globalAd.order = nextOrder;
+            rebuildGlobalAdOrderSelect(select, globalAd.order);
             updateSelectedOrderBadges();
             updateOrderButtons(select);
             return;

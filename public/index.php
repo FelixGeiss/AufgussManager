@@ -107,7 +107,7 @@ require_once __DIR__ . '/../src/auth.php';
         window.APP_UPLOADS_URL = '<?php echo rtrim(BASE_URL, '/'); ?>/uploads/';
     </script>
     <!-- Haupt-JavaScript für die öffentliche Anzeige -->
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/app.js?v=<?php echo (int)@filemtime(__DIR__ . '/assets/js/app.js'); ?>"></script>
     <script>
         (function() {
             const hideDelay = 2000;
