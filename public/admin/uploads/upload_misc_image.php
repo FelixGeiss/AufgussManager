@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$allowedTypes = ['werbung', 'plan', 'staerke'];
+$allowedTypes\ = ['werbung', 'plan', 'staerke', 'screens'];
 try {
     $type = trim((string)($_POST['type'] ?? ''));
     if (!in_array($type, $allowedTypes, true)) {

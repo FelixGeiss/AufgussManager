@@ -1,5 +1,7 @@
 <?php
 $staerkeUploadFiles = isset($staerkeUploadFiles) && is_array($staerkeUploadFiles) ? $staerkeUploadFiles : [];
+$screenUploadFiles = isset($screenUploadFiles) && is_array($screenUploadFiles) ? $screenUploadFiles : [];
+$screenTabFiles = isset($screenTabFiles) && is_array($screenTabFiles) ? $screenTabFiles : [];
 ?>
 <div class="bg-white rounded-lg shadow-md mt-8">
             <div class="p-6">
@@ -40,6 +42,9 @@ $staerkeUploadFiles = isset($staerkeUploadFiles) && is_array($staerkeUploadFiles
                             </button>
                             <button onclick="showTab('werbung')" id="tab-werbung" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                                 Werbung (<?php echo count($werbungTabFiles); ?>)
+                            </button>
+                            <button onclick="showTab('bildschirme')" id="tab-bildschirme" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                                Bildschirme (<?php echo count($screenUploadFiles); ?>)
                             </button>
                             <button onclick="showTab('hintergrund')" id="tab-hintergrund" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                                 Hintergrund (<?php echo count($hintergrundTabFiles); ?>)
@@ -618,6 +623,93 @@ $staerkeUploadFiles = isset($staerkeUploadFiles) && is_array($staerkeUploadFiles
                                                     onclick="deleteUploadFile('werbung', <?php echo htmlspecialchars(json_encode($fileRelPath), ENT_QUOTES, 'UTF-8'); ?>)"
                                                     class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
                                                     title="Datei Löschen">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bildschirm Tab -->
+                <div class="tab-upload hidden bg-white/70 border border-gray-200 rounded-lg p-3 mb-4" data-tab="bildschirme">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Neues Bildschirmbild hochladen</h3>
+                    <form id="overview-bildschirme-form" onsubmit="handleOverviewUpload(event, 'screens')" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Datei</label>
+                            <input id="overview-bildschirme-input" type="file" accept="image/*" class="w-full rounded-md pl-0 pr-3 py-2 text-sm text-gray-900">
+                        </div>
+                        <div class="md:col-span-2 flex justify-end">
+                            <button type="submit" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center gap-1">
+                                Hochladen <span aria-hidden="true">+</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div id="content-bildschirme" class="tab-content hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Vorschau
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Datei
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Typ
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Bereich
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Name
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                                        Aktionen
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-transparent divide-y divide-gray-200">
+                                <?php if (empty($screenTabFiles)): ?>
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                            Keine Bildschirmbilder gefunden.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($screenTabFiles as $file): ?>
+                                        <tr class="bg-white/5">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <?php
+                                                $fileRelPath = $file['datei'] ?? '';
+                                                $filePath = '../../uploads/' . $fileRelPath;
+                                                ?>
+                                                <img src="<?php echo htmlspecialchars($filePath); ?>" alt="Datei" class="h-12 w-12 object-cover rounded border border-gray-200">
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars(basename($file['datei'])); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['typ']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['bereich']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['name']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <button type="button"
+                                                    onclick="deleteUploadFile('screens', <?php echo htmlspecialchars(json_encode($fileRelPath), ENT_QUOTES, 'UTF-8'); ?>)"
+                                                    class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
+                                                    title="Datei LÃ¶schen">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>

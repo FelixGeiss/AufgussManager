@@ -1,3 +1,27 @@
+const overviewTabStorageKey = 'dbOverviewActiveTab';
+
+function getStoredOverviewTab() {
+    try {
+        return localStorage.getItem(overviewTabStorageKey);
+    } catch (error) {
+        return null;
+    }
+}
+
+function setStoredOverviewTab(tabName) {
+    try {
+        localStorage.setItem(overviewTabStorageKey, tabName);
+    } catch (error) {
+        // Ignore storage failures.
+    }
+}
+
+function getCurrentOverviewTab() {
+    const activeButton = document.querySelector('.tab-button.border-indigo-500');
+    if (!activeButton || !activeButton.id) return null;
+    return activeButton.id.replace(/^tab-/, '');
+}
+
 // Datenbank-Uebersicht: Tabs und Loeschen
 function showTab(tabName) {
     // Verstecke alle Tab-Inhalte
@@ -17,11 +41,20 @@ function showTab(tabName) {
     });
 
     // Zeige ausgewaehlten Tab-Inhalt
-    document.getElementById('content-' + tabName).classList.remove('hidden');
+    const activeContent = document.getElementById('content-' + tabName);
+    if (!activeContent) {
+        return;
+    }
+    activeContent.classList.remove('hidden');
 
     // Setze aktiven Tab-Stil
     document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
-    document.getElementById('tab-' + tabName).classList.add('border-indigo-500', 'text-indigo-600');
+    const activeButton = document.getElementById('tab-' + tabName);
+    if (activeButton) {
+        activeButton.classList.add('border-indigo-500', 'text-indigo-600');
+    }
+
+    setStoredOverviewTab(tabName);
 
     // Zeige Upload-Bereich fuer den aktiven Tab, falls vorhanden
     const activeUpload = document.querySelector(`.tab-upload[data-tab="${tabName}"]`);
@@ -50,6 +83,11 @@ function initUmfragenSearch() {
 
 document.addEventListener('DOMContentLoaded', initUmfragenSearch);
 document.addEventListener('DOMContentLoaded', () => {
+    const stored = getStoredOverviewTab();
+    if (stored && document.getElementById('content-' + stored)) {
+        showTab(stored);
+        return;
+    }
     showTab('aufguesse');
 });
 
@@ -106,25 +144,27 @@ window.handleOverviewUpload = handleOverviewUpload;
 
 // Loeschfunktion fuer Datenbank-Eintraege
 function deleteDatenbankEintrag(type, id, name) {
-    if (confirm('Moechten Sie wirklich "' + name + '" loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.')) {
-        // Erstelle ein Formular fuer den DELETE-Request
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '../deletes/delete-entry.php';
-
-        const typeInput = document.createElement('input');
-        typeInput.type = 'hidden';
-        typeInput.name = 'type';
-        typeInput.value = type;
-
-        const idInput = document.createElement('input');
-        idInput.type = 'hidden';
-        idInput.name = 'id';
-        idInput.value = id;
-
-        form.appendChild(typeInput);
-        form.appendChild(idInput);
-        document.body.appendChild(form);
-        form.submit();
+    const currentTab = getCurrentOverviewTab();
+    if (currentTab) {
+        setStoredOverviewTab(currentTab);
     }
+    // Erstelle ein Formular fuer den DELETE-Request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '../deletes/delete-entry.php';
+
+    const typeInput = document.createElement('input');
+    typeInput.type = 'hidden';
+    typeInput.name = 'type';
+    typeInput.value = type;
+
+    const idInput = document.createElement('input');
+    idInput.type = 'hidden';
+    idInput.name = 'id';
+    idInput.value = id;
+
+    form.appendChild(typeInput);
+    form.appendChild(idInput);
+    document.body.appendChild(form);
+    form.submit();
 }

@@ -162,6 +162,7 @@ $hintergrundFiles = array_values(array_filter($uploadedFiles, function ($file) {
 $uploadBaseDir = rtrim(UPLOAD_PATH, '/\\') . DIRECTORY_SEPARATOR;
 $werbungUploadDir = $uploadBaseDir . 'werbung' . DIRECTORY_SEPARATOR;
 $planUploadDir = $uploadBaseDir . 'plan' . DIRECTORY_SEPARATOR;
+$screenUploadDir = $uploadBaseDir . 'screens' . DIRECTORY_SEPARATOR;
 $werbungUploadFiles = [];
 if (is_dir($werbungUploadDir)) {
     foreach (scandir($werbungUploadDir) as $entry) {
@@ -186,6 +187,20 @@ if (is_dir($planUploadDir)) {
             continue;
         }
         $planUploadFiles[] = 'plan/' . $entry;
+    }
+}
+
+$screenUploadFiles = [];
+if (is_dir($screenUploadDir)) {
+    foreach (scandir($screenUploadDir) as $entry) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $fullPath = $screenUploadDir . $entry;
+        if (!is_file($fullPath)) {
+            continue;
+        }
+        $screenUploadFiles[] = 'screens/' . $entry;
     }
 }
 
@@ -274,6 +289,20 @@ foreach ($planUploadFiles as $path) {
         'datei' => $path,
         'typ' => 'Hintergrundbild',
         'plan_id' => null
+    ];
+}
+
+$screenTabFiles = [];
+foreach ($screenUploadFiles as $path) {
+    $path = trim((string)$path);
+    if ($path === '') {
+        continue;
+    }
+    $screenTabFiles[] = [
+        'bereich' => 'Bildschirm',
+        'name' => 'Datei',
+        'datei' => $path,
+        'typ' => 'Bildschirmbild'
     ];
 }
 
