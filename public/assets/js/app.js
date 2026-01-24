@@ -121,6 +121,7 @@ let globalAdCurrentPath = '';
 let globalAdCurrentType = '';
 let planAdExitTimer = null;
 let globalAdExitTimer = null;
+let globalAdPreloadVideo = null;
 
 // Startet die Initialisierung der Anzeige.
 function startAufgussApp() {
@@ -463,6 +464,21 @@ function ensurePlanAdPreloadVideo() {
     return video;
 }
 
+// Stellt ein Preload-Video fuer globale Werbung bereit.
+function ensureGlobalAdPreloadVideo() {
+    if (globalAdPreloadVideo) return globalAdPreloadVideo;
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.preload = 'auto';
+    movePlanAdVideoOffscreen(video);
+    globalAdPreloadVideo = video;
+    return video;
+}
+
 // Erstellt Offscreen-Container fuer Video.
 function ensurePlanAdOffscreenContainer() {
     if (planAdOffscreenContainer) return planAdOffscreenContainer;
@@ -511,6 +527,23 @@ function movePlanAdVideoVisible(video, media) {
 function preloadPlanAdVideo(mediaPath) {
     if (!mediaPath || !document.body) return;
     const video = ensurePlanAdPreloadVideo();
+    if (video.dataset.src !== mediaPath) {
+        video.dataset.src = mediaPath;
+        video.src = mediaPath;
+        if (typeof video.load === 'function') {
+            try {
+                video.load();
+            } catch (error) {
+                // Ignore load errors on older browsers.
+            }
+        }
+    }
+}
+
+// Laedt globale Werbung vor (Video).
+function preloadGlobalAdVideo(mediaPath) {
+    if (!mediaPath || !document.body) return;
+    const video = ensureGlobalAdPreloadVideo();
     if (video.dataset.src !== mediaPath) {
         video.dataset.src = mediaPath;
         video.src = mediaPath;
@@ -879,6 +912,13 @@ function updateGlobalAdConfig(globalAd, serverTime) {
         pauseSeconds: Number(globalAd.pause_seconds) || 10,
         rotationStartedAt: globalAd.rotation_started_at ? String(globalAd.rotation_started_at) : null
     };
+    const mediaPath = globalAdConfig.path ? normalizeBannerImagePath(globalAdConfig.path) : '';
+    const isVideo = globalAdConfig.type
+        ? globalAdConfig.type === 'video'
+        : isBannerVideoPath(mediaPath);
+    if (globalAdConfig.enabled && isVideo && mediaPath) {
+        preloadGlobalAdVideo(mediaPath);
+    }
     updateGlobalAdOverlay();
 }
 
@@ -1154,7 +1194,28 @@ function showGlobalAd(mediaPath, mediaType) {
 
     if (mediaPath !== globalAdCurrentPath || mediaType !== globalAdCurrentType) {
         if (mediaType === 'video') {
-            media.innerHTML = `<video src="${escapeHtml(mediaPath)}" class="plan-ad-asset" autoplay muted loop playsinline></video>`;
+            let video = ensureGlobalAdPreloadVideo();
+            const needsReplace = !video || video.dataset.src !== mediaPath;
+            if (needsReplace) {
+                movePlanAdVideoOffscreen(video);
+                video.dataset.src = mediaPath;
+                if (video.src !== mediaPath) {
+                    video.src = mediaPath;
+                }
+                video.autoplay = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.setAttribute('playsinline', '');
+                video.setAttribute('webkit-playsinline', '');
+                video.setAttribute('muted', '');
+                video.loop = true;
+            }
+            movePlanAdVideoVisible(video, media);
+            const tryPlay = () => {
+                tryPlayPlanAdVideo(video, true);
+            };
+            video.addEventListener('loadedmetadata', tryPlay, { once: true });
+            tryPlay();
         } else {
             media.innerHTML = `<img src="${escapeHtml(mediaPath)}" alt="Werbung" class="plan-ad-asset">`;
         }
@@ -1165,6 +1226,12 @@ function showGlobalAd(mediaPath, mediaType) {
     if (!globalAdVisible) {
         wrap.classList.add('is-visible');
         globalAdVisible = true;
+    }
+    if (mediaType === 'video') {
+        const video = media.querySelector('video');
+        if (video) {
+            tryPlayPlanAdVideo(video, false);
+        }
     }
 }
 
